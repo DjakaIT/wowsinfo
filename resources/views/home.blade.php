@@ -5,7 +5,7 @@
 @section('content')
   <iframe src="https://api.wn8.info/tools/wows/twitchlive.php" title="description"></iframe>
   <div>
-    <table>
+    <table class="standard-table">
       <thead>
         <tr class="bg-gray-100 text-left">
           <th class="border-b">Player</th>
@@ -21,7 +21,7 @@
         @endforeach
       </tbody>
     </table>
-    <table>
+    <table class="standard-table">
       <thead>
         <tr class="bg-gray-100 text-left">
           <th class="border-b">Player</th>
@@ -37,7 +37,7 @@
         @endforeach
       </tbody>
     </table>
-    <table>
+    <table class="standard-table">
       <thead>
         <tr class="bg-gray-100 text-left">
           <th class="border-b">Player</th>
@@ -53,7 +53,7 @@
         @endforeach
       </tbody>
     </table>
-    <table>
+    <table class="standard-table">
       <thead>
         <tr class="bg-gray-100 text-left">
           <th class="border-b">Player</th>

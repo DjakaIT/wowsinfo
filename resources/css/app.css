@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.standard-table{
+    float: left;
+    width: 23%;
+    margin-right: 1%;
+}
