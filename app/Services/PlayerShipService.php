@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
-
+use Illuminate\Support\Facades\DB;
 
 
 class PlayerShipService
@@ -168,14 +168,35 @@ class PlayerShipService
 
 
 
-    protected $period_and_criteria = [
-        'last24hours' => ['battles' => 5, 'tier' => 1, 'date' => now()->subHours(24)],
-        'last7days' => ['battles' => 35, 'tier' => 2, 'date' => now()->subHours(24)],
-        'last25days' => ['battles' => 120, 'tier' => 3, 'date' => now()->subHours(24)],
-        'overall' => ['battles' => 5, 'tier' => 1, 'date' => null],
-
-    ];
-
+    public function getPeriodCriteria()
+    {
+        return [
+            'last24hours' => [
+                'date' => Carbon::now()->subHours(24),
+                'min_battles' => 5,
+                'min_tier' => 2,
+                'limit' => 10,
+            ],
+            'last7days' => [
+                'date' => Carbon::now()->subDays(7),
+                'min_battles' => 35,
+                'min_tier' => 2,
+                'limit' => 10,
+            ],
+            'lastMonth' => [
+                'date' => Carbon::now()->subDays(25),
+                'min_battles' => 120,
+                'min_tier' => 2,
+                'limit' => 10,
+            ],
+            'overall' => [
+                'date' => null, // No date restriction for overall stats
+                'min_battles' => 5,
+                'min_tier' => 1,
+                'limit' => 10,
+            ],
+        ];
+    }
 
 
 
@@ -229,69 +250,48 @@ class PlayerShipService
         return $stats;
     }
 
+    public function getTopPlayersLast24Hours()
+    {
+        return PlayerShip::select('account_id', DB::raw('MAX(ship_name) as ship_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
+            ->where('ship_tier', '>', 5)
+            ->where('battles_played', '>', 5)
+            ->groupBy('account_id')
+            ->orderByDesc('total_player_wn8')
+            ->limit(10)
+            ->get()
+            ->map(function ($player) {
+                return [
+                    'name' => $player->ship_name,
+                    'wid' => $player->account_id,
+                    'wn8' => $player->total_player_wn8,
+                ];
+            })
+            ->toArray();
+    }
+
+
 
     public function rankPlayersByPeriod($period)
     {
-        //set dates for which to pull data, 
-        //and criteria for that date range
-        $dateRanges = [
-            'last24hours' => [
-                'date' => now()->subHours(24),
-                'min_battles' => 5,
-                'min_tier' => 2,
-                'limit' => 10,
-            ],
-            'last7days' => [
-                'date' => now()->subHours(24),
-                'min_battles' => 5,
-                'min_tier' => 2,
-                'limit' => 10,
-            ],
-            'lastMonth' => [
-                'date' => now()->subHours(24),
-                'min_battles' => 5,
-                'min_tier' => 2,
-                'limit' => 10,
-            ],
-            'overall' => [
-                'date' => now()->subHours(24),
-                'min_battles' => 5,
-                'min_tier' => 2,
-                'limit' => 10,
-            ],
-        ];
+
+        $criteria = $this->getPeriodCriteria();
 
         if (!isset($dateRanges[$period])) {
             throw new \InvalidArgumentException("Invalid period: $period");
         }
 
         //store each period in a variable to use later
-        $criteria = $dateRanges[$period];
-
+        $config = $criteria[$period];
         try {
-            $rankedPlayers = PlayerShip::where('updated_at', '>=', $criteria['date'])
-                ->groupBy('account_id')
-                ->havingRaw('battles_played >= ?', [$criteria['min_battles']])
-                ->havingRaw('AVG(ship_tier) >= ?', [$criteria['min_tier']])
+            $query = PlayerShip::where('battles_played', '>=', $config['min_battles'])
+                ->where('ship_tier', '>=', $config['min_tier'])
+                ->orderByDesc('total_player_wn8');
 
-                ->select([
-                    'account_id',
-                    'battles_played',
-                    'damage_dealt',
-                    'wins_count',
-                    'frags',
-                    'survival_rate',
-                    'win_rate',
-                    'total_player_wn8'
+            if ($config['date']) {
+                $query->where('updated_at', '>=', $config['date']);
+            }
 
-                ])
-
-                ->orderBy('total_player_wn8', 'desc')
-                ->limit($criteria['limit'])
-                ->get();
-
-
-            return $rankedPlayers;
+            return $query->take($config['limit'])->get(['ship_name', 'account_id', 'total_player_wn8']);
         } catch (\Exception $e) {
             Log::error("Error ranking players for period: $period", [
                 'message' => $e->getMessage(),

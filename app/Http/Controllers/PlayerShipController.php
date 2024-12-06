@@ -15,6 +15,17 @@ class PlayerShipController extends Controller
         $this->playerShipService = $playerShipService;
     }
 
+    public function getHomePageSTats()
+    {
+
+        $topPlayersLast24Hours = $this->playerShipService->getTopPlayersLast24Hours();
+
+        return view('home', [
+            'statistics' => [
+                'topPlayersLast24Hours' => $topPlayersLast24Hours,
+            ],
+        ]);
+    }
     public function updatePlayerShips()
     {
         $this->playerShipService->fetchAndStorePlayerShips();
