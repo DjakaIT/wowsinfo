@@ -168,7 +168,7 @@ class PlayerShipService
 
 
 
-    public function getPeriodCriteria()
+    /*  public function getPeriodCriteria()
     {
         return [
             'last24hours' => [
@@ -250,18 +250,24 @@ class PlayerShipService
         return $stats;
     }
 
+ */
+
+
     public function getTopPlayersLast24Hours()
     {
-        return PlayerShip::select('account_id', DB::raw('MAX(ship_name) as ship_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
+        $last24Hours = now()->subDays(1);
+
+        return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
             ->where('ship_tier', '>', 5)
             ->where('battles_played', '>', 5)
+            ->where('updated_at', '<=', $last24Hours)
             ->groupBy('account_id')
             ->orderByDesc('total_player_wn8')
             ->limit(10)
             ->get()
             ->map(function ($player) {
                 return [
-                    'name' => $player->ship_name,
+                    'name' => $player->player_name,
                     'wid' => $player->account_id,
                     'wn8' => $player->total_player_wn8,
                 ];
@@ -269,9 +275,26 @@ class PlayerShipService
             ->toArray();
     }
 
+    public function getTopPlayersLast7Days()
+    {
+        return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
+            ->where('ship_tier', '>', 5)
+            ->where('battles_played', '>', 35)
+            ->groupBy('account_id')
+            ->orderByDesc('total_plawlyer_wn8')
+            ->limit(10)
+            ->get()
+            ->map(function ($player) {
+                return [
+                    'name' => $player->player_name,
+                    'wid' => $player->account_id,
+                    'wn8' => $player->total_player_wn8,
+                ];
+            })
+            ->toArray();
+    }
 
-
-    public function rankPlayersByPeriod($period)
+    /*   public function rankPlayersByPeriod($period)
     {
 
         $criteria = $this->getPeriodCriteria();
@@ -300,7 +323,7 @@ class PlayerShipService
 
             throw $e;
         }
-    }
+    } */
 
     public function fetchAndStorePlayerShips()
     {
@@ -321,6 +344,9 @@ class PlayerShipService
 
                 if ($response->successful()) {
                     $data = $response->json();
+
+                    $playerName = Player::get('nickname');
+
 
                     if (isset($data['data'][$playerId])) {
                         foreach ($data['data'][$playerId] as $shipStats) {
@@ -477,6 +503,7 @@ class PlayerShipService
                                     'ship_id' => $shipStats['ship_id']
                                 ],
                                 [
+                                    'player_name' => $playerName,
                                     'battles_played' => $totalBattles,
                                     'wins_count' => $totalWins,
                                     'damage_dealt' => $totalDamageDealt,

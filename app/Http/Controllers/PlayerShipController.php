@@ -32,10 +32,10 @@ class PlayerShipController extends Controller
         return response()->json(['message' => 'Player ship statistics fetched and stored successfully.']);
     }
 
-    public function getPeriodicPlayerStats($playerId, $period)
+    /*  public function getPeriodicPlayerStats($playerId, $period)
     {
         $this->playerShipService->getPlayerStatsByPeriod($playerId, $period);
-    }
+    } */
 
     public function index()
     {
