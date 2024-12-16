@@ -13,6 +13,9 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
+    'wargaming' => [
+        'api_key' => env('WARGAMING_API_KEY'),
+    ],
 
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),

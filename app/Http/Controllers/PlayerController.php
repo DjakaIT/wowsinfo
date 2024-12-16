@@ -51,12 +51,15 @@ class PlayerController extends Controller
 
                     if ($players) {
                         foreach ($players as $playerData) {
+
+                            $clan_id = Player::where('account_id')->value('clan_id');
+
                             Player::updateOrCreate(
                                 ['account_id' => $playerData['account_id']],
                                 [
                                     'nickname' => $playerData['nickname'],
                                     'server' => strtoupper($server),
-                                    'clan_id' => $playerData['clan_id']
+                                    'clan_id' => $clan_id,
                                 ]
                             );
                             Log::info("Stored player with ID: " . $playerData['account_id'] . " on server: " . strtoupper($server));

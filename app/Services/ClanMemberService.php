@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Clan;
 use App\Models\ClanMember;
+use App\Models\PlayerShip;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -56,6 +57,14 @@ class ClanMemberService
 
                         if (is_array($members) && count($members) > 0) {
                             foreach ($members as $memberId => $player) {
+                                $total_player_wn8 = PlayerShip::where('account_id', $player['account_id'])->value('total_player_wn8');
+                                $clan_wn8 = 0;
+                                $player_count = 0;
+                                if ($total_player_wn8 !== null) {
+                                    $clan_wn8 += $total_player_wn8;
+                                    $player_count++;
+                                }
+                                $total_clan_wn8 = round($clan_wn8 / $player_count);
                                 try {
                                     ClanMember::updateOrCreate(
                                         ['account_id' => $player['account_id']],
@@ -64,7 +73,8 @@ class ClanMemberService
                                             'clan_id' => $clanId,
                                             'clan_name' => $clanName,
                                             'joined_at' => now()->setTimestamp($player['joined_at']),
-                                            'role' => $player['role']
+                                            'role' => $player['role'],
+                                            'clan_wn8' => $total_clan_wn8,
                                         ]
                                     );
 

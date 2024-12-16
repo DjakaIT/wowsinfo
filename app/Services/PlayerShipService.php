@@ -257,11 +257,11 @@ class PlayerShipService
     {
         $last24Hours = now()->subDays(1);
 
-        return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
+        return PlayerShip::select('account_id', DB::raw('player_name as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
             ->where('ship_tier', '>', 5)
             ->where('battles_played', '>', 5)
             ->where('updated_at', '<=', $last24Hours)
-            ->groupBy('account_id')
+            ->groupBy('account_id', 'player_name')
             ->orderByDesc('total_player_wn8')
             ->limit(10)
             ->get()
@@ -396,7 +396,8 @@ class PlayerShipService
                 if ($response->successful()) {
                     $data = $response->json();
 
-                    $playerName = Player::get('nickname');
+                    $playerName = Player::where('account_id', $playerId)->value('nickname');
+
 
 
                     if (isset($data['data'][$playerId])) {
