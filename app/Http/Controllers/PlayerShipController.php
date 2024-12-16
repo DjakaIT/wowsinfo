@@ -20,11 +20,14 @@ class PlayerShipController extends Controller
 
         $topPlayersLast24Hours = $this->playerShipService->getTopPlayersLast24Hours();
         $topPlayersLast7Days = $this->playerShipService->getTopPlayersLast7Days();
-
+        $topPlayersLastMonth = $this->playerShipService->getTopPlayersLastMonth();
+        $topPlayersOverall = $this->playerShipService->getTopPlayersOverall();
         return view('home', [
             'statistics' => [
                 'topPlayersLast24Hours' => $topPlayersLast24Hours,
                 'topPlayersLast7Days' => $topPlayersLast7Days,
+                'topPlayersLastMonth' => $topPlayersLastMonth,
+                'topPlayersOverall' => $topPlayersOverall,
             ],
         ]);
     }
