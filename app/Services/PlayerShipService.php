@@ -163,6 +163,7 @@ class PlayerShipService
             'xp' => $stats[$battleType]['xp'] ?? 0,
             'survived_battles' => $stats[$battleType]['survived_battles'] ?? 0,
             'distance' => $stats[$battleType]['distance'] ?? 0,
+            'last_battle_time' => $stats[$battleType]['last_battle_time'] ?? 0,
         ];
     }
 

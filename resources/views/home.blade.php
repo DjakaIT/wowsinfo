@@ -81,7 +81,7 @@
             <thead>
                 <tr class="bg-gray-100 text-left">
                     <th class="border-b">Clan</th>
-                    <th class="border-b">Wid</th>
+                    <th class="border-b">Clan Wid</th>
                     <th class="border-b">WN8</th>
                 </tr>
             </thead>

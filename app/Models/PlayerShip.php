@@ -13,6 +13,7 @@ class PlayerShip extends Model
         'account_id',
         'ship_id',
         'player_name',
+        'last_battle_time',
         'ship_name',
         'ship_type',
         'ship_tier',
