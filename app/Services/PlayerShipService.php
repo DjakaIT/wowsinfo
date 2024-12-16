@@ -277,9 +277,13 @@ class PlayerShipService
 
     public function getTopPlayersLast7Days()
     {
+
+        $last7days = now()->subDays(7);
+
         return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
             ->where('ship_tier', '>', 5)
             ->where('battles_played', '>', 30)
+            ->where('updated_at', '<=', $last7days)
             ->groupBy('account_id')
             ->orderByDesc('total_player_wn8')
             ->limit(10)
@@ -293,6 +297,53 @@ class PlayerShipService
             })
             ->toArray();
     }
+
+    public function getTopPlayersLastMonth()
+    {
+
+        $lastMonth = now()->subDays(25);
+
+        return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
+            ->where('ship_tier', '>', 5)
+            ->where('battles_played', '>', 120)
+            ->where('updated_at', '>=', $lastMonth)
+            ->groupBy('account_id')
+            ->orderByDesc('total_player_wn8')
+            ->limit(10)
+            ->get()
+            ->map(function ($player) {
+                return [
+                    'name' => $player->player_name,
+                    'wid' => $player->account_id,
+                    'wn8' => $player->total_player_wn8,
+                ];
+            })
+            ->toArray();
+    }
+
+    public function getTopPlayersOverall()
+    {
+
+        $overall = now()->subDays(29);
+
+        return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
+            ->where('ship_tier', '>', 5)
+            ->where('battles_played', '>', 500)
+            ->where('updated_at', '>=', $overall)
+            ->groupBy('account_id')
+            ->orderByDesc('total_player_wn8')
+            ->limit(10)
+            ->get()
+            ->map(function ($player) {
+                return [
+                    'name' => $player->player_name,
+                    'wid' => $player->account_id,
+                    'wn8' => $player->total_player_wn8,
+                ];
+            })
+            ->toArray();
+    }
+
 
     /*   public function rankPlayersByPeriod($period)
     {
