@@ -7,6 +7,7 @@ use App\Models\ClanMember;
 use App\Models\PlayerShip;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class ClanMemberService
 {
@@ -17,6 +18,24 @@ class ClanMemberService
     public function __construct()
     {
         $this->apiKey = config('services.wargaming.api_key');
+    }
+
+
+    public function getTopClans()
+    {
+        return ClanMember::select('clan_id', DB::raw('clan_name as clan_name'), DB::raw('MAX(total_clan_wn8) as total_clan_wn8'))
+            ->groupBy('clan_id', 'clan_name')
+            ->orderByDesc('total_clan_wn8')
+            ->limit(10)
+            ->get()
+            ->map(function ($clan) {
+                return [
+                    'name' => $clan->clan_name,
+                    'wid' => $clan->clan_id,
+                    'wn8' => $clan->total_clan_wn8
+                ];
+            })
+            ->toArray();
     }
 
     public function fetchAndStoreClanMembers()

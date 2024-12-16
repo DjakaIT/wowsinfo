@@ -4,16 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\PlayerShip;
 use App\Services\PlayerShipService;
+use App\Services\ClanMemberService;
+
 use Illuminate\Http\Request;
 
 class PlayerShipController extends Controller
 {
     protected $playerShipService;
-
-    public function __construct(PlayerShipService $playerShipService)
+    protected $clanMemberService;
+    public function __construct(PlayerShipService $playerShipService,  ClanMemberService $clanMemberService)
     {
         $this->playerShipService = $playerShipService;
+        $this->clanMemberService = $clanMemberService;
     }
+
+
 
     public function getHomePageSTats()
     {
@@ -22,12 +27,16 @@ class PlayerShipController extends Controller
         $topPlayersLast7Days = $this->playerShipService->getTopPlayersLast7Days();
         $topPlayersLastMonth = $this->playerShipService->getTopPlayersLastMonth();
         $topPlayersOverall = $this->playerShipService->getTopPlayersOverall();
+        $topClans = $this->clanMemberService->getTopClans();
+
         return view('home', [
             'statistics' => [
                 'topPlayersLast24Hours' => $topPlayersLast24Hours,
                 'topPlayersLast7Days' => $topPlayersLast7Days,
                 'topPlayersLastMonth' => $topPlayersLastMonth,
                 'topPlayersOverall' => $topPlayersOverall,
+                'topClans' => $topClans,
+
             ],
         ]);
     }

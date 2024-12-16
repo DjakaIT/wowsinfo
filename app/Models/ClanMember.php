@@ -16,7 +16,8 @@ class ClanMember extends Model
         'left_at',
         'role',
         'clan_id',
-        'clan_name'
+        'clan_name',
+        'total_clan_wn8',
     ];
 
     protected $dates = [

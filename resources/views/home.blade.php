@@ -77,6 +77,24 @@
                 @endforeach
             </tbody>
         </table>
+        <table class="standard-table">
+            <thead>
+                <tr class="bg-gray-100 text-left">
+                    <th class="border-b">Clan</th>
+                    <th class="border-b">Wid</th>
+                    <th class="border-b">WN8</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($statistics['topClans'] as $clan)
+                    <tr class="border-b">
+                        <td class="py-2 px-4">{{ $clan['name'] }}</td>
+                        <td class="py-2 px-4">{{ $clan['wid'] }}</td>
+                        <td class="py-2 px-4">{{ $clan['wn8'] }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
     <iframe src="https://api.wn8.info/tools/wows/ytvids.php" title="description"></iframe>
 @endsection
