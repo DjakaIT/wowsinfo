@@ -279,9 +279,9 @@ class PlayerShipService
     {
         return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
             ->where('ship_tier', '>', 5)
-            ->where('battles_played', '>', 35)
+            ->where('battles_played', '>', 30)
             ->groupBy('account_id')
-            ->orderByDesc('total_plawlyer_wn8')
+            ->orderByDesc('total_player_wn8')
             ->limit(10)
             ->get()
             ->map(function ($player) {
