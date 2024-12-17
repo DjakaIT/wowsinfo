@@ -82,7 +82,7 @@ class PlayerShipService
 
 
 
-        Log::info("Intermediate WN8 values", [
+        /*   Log::info("Intermediate WN8 values", [
             'ship_id' => $shipId,
             'rDmg' => $rDmg,
             'rFrags' => $rFrags,
@@ -91,7 +91,7 @@ class PlayerShipService
             'nFrags' => $nFrags,
             'nWins' => $nWins,
             'WN8' => $wn8,
-        ]);
+        ]); */
 
         return $wn8;
     }
@@ -163,7 +163,6 @@ class PlayerShipService
             'xp' => $stats[$battleType]['xp'] ?? 0,
             'survived_battles' => $stats[$battleType]['survived_battles'] ?? 0,
             'distance' => $stats[$battleType]['distance'] ?? 0,
-            'last_battle_time' => $stats[$battleType]['last_battle_time'] ?? 0,
         ];
     }
 
@@ -525,7 +524,7 @@ class PlayerShipService
 
 
 
-                            Log::info("Processing ship stats", [
+                            /*  Log::info("Processing ship stats", [
                                 'account_id' => $playerId,
                                 'ship_id' => $ship->ship_id,
                                 'pvp_battles' => $pvpStats['battles'] ?? 0,
@@ -534,7 +533,7 @@ class PlayerShipService
                                 'rank_battles' => $rankStats['battles'] ?? 0,
                                 'total_battles' => $totalBattles,
                                 'distance' => 'distance',
-                            ]);
+                            ]); */
 
                             //wn8
                             $wn8 =  $this->calculateWN8($ship, $totalBattles, $totalFrags, $totalWins, $totalDamageDealt);
@@ -544,12 +543,24 @@ class PlayerShipService
                             //wn8 per type / category of a ship 
                             $wn8_category = $this->determineCategoryWN8($wn8);
 
-                            Log::info("Ship WN8 by category", [
+                            /*   Log::info("Ship WN8 by category", [
                                 'ship_name' => $shipName,
                                 'ship_type' => $shipType,
-                                'WN8' => $wn8_category,
-                            ]);
+                                'WN8' => $wn8_category
+                            ]); */
                             // Use ship->id instead of ship_id from API
+
+
+                            Log::info(
+                                "Last battle time of the ship",
+
+                                [
+                                    'last_battle_time',
+                                    $shipStats['last_battle_time']
+
+                                ]
+                            );
+
                             PlayerShip::updateOrCreate(
                                 [
                                     'account_id' => $playerId,
@@ -558,6 +569,7 @@ class PlayerShipService
                                 [
                                     'player_name' => $playerName,
                                     'battles_played' => $totalBattles,
+                                    'last_battle_time' => $shipStats['last_battle_time'],
                                     'wins_count' => $totalWins,
                                     'damage_dealt' => $totalDamageDealt,
                                     'average_damage' => $averageDamage,
