@@ -19,7 +19,10 @@ class PlayerShipController extends Controller
     }
 
 
-
+    public function getPlayerPageStats()
+    {
+        return 'hello world';
+    }
     public function getHomePageSTats()
     {
 

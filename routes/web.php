@@ -11,8 +11,8 @@ use App\Http\Controllers\PlayerShipController;
 use App\Http\Controllers\PlayerStatisticController;
 
 Route::get('/', [PlayerShipController::class, 'getHomePageStats']); // Main home page
-
-
+Route::get('/player/{name}/{id}', [PlayerShipController::class, 'getPlayerPageStats']); // Player page
+//START OF BACKEND ROUTES
 Route::prefix('clans')->group(function () {
 
     Route::get('/fetch', [ClanController::class, 'fetchAndStoreClans']);
@@ -98,6 +98,10 @@ Route::prefix('player-stats')->group(function () {
     Route::put('/{id}', [PlayerStatisticController::class, 'update']);
     Route::delete('/{id}', [PlayerStatisticController::class, 'destroy']);
 });
+//END OF BACKEND ROUTES
+
+
+
 
 Route::get('/player', function () {
     // DATA INFO
@@ -173,32 +177,32 @@ Route::get('/player', function () {
             ]
         ],
         'playerVehicles' => [
-          [
-            'nation' => 'Germany',
-            'name' => 'Vehicle name',
-            'tier' => 2,
-            'battles' => 38,
-            'frags' => 34,
-            'damage' => 4.280,
-            'wins' => 67.46, // percentage
-            'wn8' => 1754,
-            'image' => 'image url', // ??? url ???
-            'description' => 'Vehicle description',
-            'wid' => 555
-          ],
-          [
-            'nation' => 'Japan',
-            'name' => 'Vehicle name',
-            'tier' => 4,
-            'battles' => 45,
-            'frags' => 32,
-            'damage' => 7.490,
-            'wins' => 36.46, // percentage
-            'wn8' => 980,
-            'image' => 'image url', // ??? url ???
-            'description' => 'Vehicle description',
-            'wid' => 555
-          ]
+            [
+                'nation' => 'Germany',
+                'name' => 'Vehicle name',
+                'tier' => 2,
+                'battles' => 38,
+                'frags' => 34,
+                'damage' => 4.280,
+                'wins' => 67.46, // percentage
+                'wn8' => 1754,
+                'image' => 'image url', // ??? url ???
+                'description' => 'Vehicle description',
+                'wid' => 555
+            ],
+            [
+                'nation' => 'Japan',
+                'name' => 'Vehicle name',
+                'tier' => 4,
+                'battles' => 45,
+                'frags' => 32,
+                'damage' => 7.490,
+                'wins' => 36.46, // percentage
+                'wn8' => 980,
+                'image' => 'image url', // ??? url ???
+                'description' => 'Vehicle description',
+                'wid' => 555
+            ]
         ],
     ]);
 });
