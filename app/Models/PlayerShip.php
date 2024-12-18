@@ -20,6 +20,7 @@ class PlayerShip extends Model
         'battles_played',
         'frags',
         'distance',
+        'total_player_wn8',
         'wins_count',
         'damage_dealt',
         'average_damage',
