@@ -83,7 +83,7 @@ class ClanMemberService
                                     $clan_wn8 += $total_player_wn8;
                                     $player_count++;
                                 }
-                                $total_clan_wn8 = round($clan_wn8 / $player_count);
+                                $total_clan_wn8 = $player_count > 0 ? round($clan_wn8 / $total_player_wn8) : 0;
                                 try {
                                     ClanMember::updateOrCreate(
                                         ['account_id' => $player['account_id']],

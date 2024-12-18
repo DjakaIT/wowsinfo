@@ -35,6 +35,9 @@ class PlayerController extends Controller
 
     public function fetchAndStorePlayers(Request $request)
     {
+
+        /* set_time_limit(0); */
+
         Log::info("Started fetching players");
 
         $servers = ['eu', 'na', 'asia'];
