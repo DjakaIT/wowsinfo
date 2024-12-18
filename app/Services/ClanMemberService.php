@@ -93,7 +93,7 @@ class ClanMemberService
                                             'clan_name' => $clanName,
                                             'joined_at' => now()->setTimestamp($player['joined_at']),
                                             'role' => $player['role'],
-                                            'clan_wn8' => $total_clan_wn8,
+                                            'total_clan_wn8' => $total_clan_wn8,
                                         ]
                                     );
 
