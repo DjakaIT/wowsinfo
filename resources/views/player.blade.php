@@ -1,6 +1,8 @@
 @extends('layout.layout')
 
-@section('title', 'Player Page')
+@section('metaTitle', $metaSite['metaTitle'])
+@section('metaDescription', $metaSite['metaDescription'])
+@section('metaKeywords', $metaSite['metaKeywords'])
 
 @section('content')
   <div class="page-padding">
