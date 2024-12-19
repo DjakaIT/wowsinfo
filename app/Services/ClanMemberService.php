@@ -74,16 +74,19 @@ class ClanMemberService
                             'member_count' => is_array($members) ? count($members) : 0
                         ]);
 
-                        if (is_array($members) && count($members) > 0) {
+                        $player_count = count($members);
+                        if (is_array($members) && $player_count > 0) {
+
+                            $sum_player_wn8 = 0;
                             foreach ($members as $memberId => $player) {
                                 $total_player_wn8 = PlayerShip::where('account_id', $player['account_id'])->value('total_player_wn8');
-                                $clan_wn8 = 0;
-                                $player_count = 0;
-                                if ($total_player_wn8 !== null) {
-                                    $clan_wn8 += $total_player_wn8;
-                                    $player_count++;
+                                $total_player_wn8 = $total_player_wn8 !== null ? $total_player_wn8 : 0;
+
+                                if ($total_player_wn8 > 0) {
+                                    $sum_player_wn8 += $total_player_wn8;
                                 }
-                                $total_clan_wn8 = $player_count > 0 ? round($clan_wn8 / $total_player_wn8) : 0;
+
+
                                 try {
                                     ClanMember::updateOrCreate(
                                         ['account_id' => $player['account_id']],
@@ -93,15 +96,17 @@ class ClanMemberService
                                             'clan_name' => $clanName,
                                             'joined_at' => now()->setTimestamp($player['joined_at']),
                                             'role' => $player['role'],
-                                            'total_clan_wn8' => $total_clan_wn8,
                                         ]
                                     );
+
+
+
 
                                     Log::info("Updated/Created clan member", [
                                         'account_id' => $player['account_id'],
                                         'account_name' => $player['account_name'],
                                         'clan_id' => $clanId,
-                                        'clan_name' => $clanName
+                                        'clan_name' => $clanName,
                                     ]);
                                 } catch (\Exception $e) {
                                     Log::error("Error saving clan member", [
@@ -111,6 +116,11 @@ class ClanMemberService
                                     ]);
                                 }
                             }
+
+
+                            $total_clan_wn8 = $player_count > 0 ? round($sum_player_wn8 / $player_count) : 0;
+
+                            ClanMember::where('clan_id', $clanId)->update(['total_clan_wn8' => $total_clan_wn8]);
                         } else {
                             Log::info("No members found for this clan", ['clan_id' => $clanId]);
                         }
