@@ -1,5 +1,9 @@
 <?php
-
+/*
+DROP DATABASE `wows-laravel`;
+CREATE DATABASE `wows-laravel`;
+USE `wows-laravel`;
+*/
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClanController;
 use App\Http\Controllers\PlayerController;
@@ -11,6 +15,8 @@ use App\Http\Controllers\PlayerShipController;
 use App\Http\Controllers\PlayerStatisticController;
 
 Route::get('/', [PlayerShipController::class, 'getHomePageStats']); // Main home page
+Route::get('/player/{name}/{id}', [PlayerShipController::class, 'getPlayerPageStats']); // Player page
+
 
 
 Route::prefix('clans')->group(function () {
