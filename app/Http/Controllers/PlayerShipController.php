@@ -17,7 +17,7 @@ class PlayerShipController extends Controller
         $this->playerShipService = $playerShipService;
         $this->clanMemberService = $clanMemberService;
     }
-    
+
     //BLADE
     public function getPlayerPageStats()
     {
