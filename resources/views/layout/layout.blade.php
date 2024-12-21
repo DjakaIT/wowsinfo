@@ -3,7 +3,10 @@
 <head>
 <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>@yield('title', 'Default Title')</title>
+  <title>@yield('metaTitle', 'WN8')</title>
+
+  <meta name="description" content="@yield('metaDescription', 'WN8')">
+  <meta name="keywords" content="@yield('metaKeywords', 'WN8')">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.bunny.net">

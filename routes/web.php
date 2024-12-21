@@ -1,4 +1,9 @@
 <?php
+/*
+DROP DATABASE `wows-laravel`;
+CREATE DATABASE `wows-laravel`;
+USE `wows-laravel`;
+*/
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClanController;
@@ -13,6 +18,9 @@ use App\Http\Controllers\PlayerStatisticController;
 Route::get('/', [PlayerShipController::class, 'getHomePageStats']); // Main home page
 Route::get('/player/{name}/{id}', [PlayerShipController::class, 'getPlayerPageStats']); // Player page
 //START OF BACKEND ROUTES
+
+
+
 Route::prefix('clans')->group(function () {
 
     Route::get('/fetch', [ClanController::class, 'fetchAndStoreClans']);

@@ -18,12 +18,32 @@ class PlayerShipController extends Controller
         $this->clanMemberService = $clanMemberService;
     }
 
-
+    //BLADE
     public function getPlayerPageStats()
     {
-        return 'hello world';
+        // $PLNAME je promenljiva treba se zameniti stvarnim imenom igraca
+        $metaTitle = '$PLNAME - WN8 player statistics for World of Warships';
+        $metaDescription = 'Latest statistics for player $PLNAME  in World of Warships, WN8 daily, weekly and monthly updates and statistic.';
+        $metaKeywords = 'WN8, World of Warships, Statistics, Player statistics, $PLNAME';
+
+        return view('player', [
+            'metaSite' => [
+                'metaTitle' => $metaTitle,
+                'metaDescription' => $metaDescription,
+                'metaKeywords' => $metaKeywords,
+            ],
+            'statistics' => [
+                'topPlayersLast24Hours' => $topPlayersLast24Hours,
+                'topPlayersLast7Days' => $topPlayersLast7Days,
+                'topPlayersLastMonth' => $topPlayersLastMonth,
+                'topPlayersOverall' => $topPlayersOverall,
+                'topClans' => $topClans,
+
+            ],
+        ]);
     }
-    public function getHomePageSTats()
+
+    public function getHomePageStats()
     {
 
         $topPlayersLast24Hours = $this->playerShipService->getTopPlayersLast24Hours();
@@ -32,7 +52,16 @@ class PlayerShipController extends Controller
         $topPlayersOverall = $this->playerShipService->getTopPlayersOverall();
         $topClans = $this->clanMemberService->getTopClans();
 
+        $metaTitle = 'WN8 - Player statistics in World of Warships';
+        $metaDescription = 'This page provide you with latest information on World of Warships players and clans, WN8 stats, improvement with daily updates.';
+        $metaKeywords = 'WN8, World of Warships, Statistics, Player statistics';
+
         return view('home', [
+            'metaSite' => [
+                'metaTitle' => $metaTitle,
+                'metaDescription' => $metaDescription,
+                'metaKeywords' => $metaKeywords,
+            ],
             'statistics' => [
                 'topPlayersLast24Hours' => $topPlayersLast24Hours,
                 'topPlayersLast7Days' => $topPlayersLast7Days,
