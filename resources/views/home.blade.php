@@ -18,7 +18,9 @@
             <tbody>
                 @foreach ($statistics['topPlayersLast24Hours'] as $player)
                     <tr class="border-b">
-                        <td class="py-2 px-4"><a href="{{ route('getPlayerPageStats', ['name' => $player['name'], 'id' => $player['id']]) }}">{{ $player['name'] }}</a></td>
+                        {{--                         <td class="py-2 px-4"><a href="{{ route('getPlayerPageStats', ['name' => $player['name'], 'id' => $player['id']]) }}">{{ $player['name'] }}</a></td>
+ --}}
+                        <td class="py-2 px-4">{{ $player['name'] }}</td>
                         <td class="py-2 px-4">{{ $player['wid'] }}</td>
                         <td class="py-2 px-4">{{ $player['wn8'] }}</td>
                     </tr>
