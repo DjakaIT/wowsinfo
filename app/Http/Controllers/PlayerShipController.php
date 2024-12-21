@@ -32,14 +32,14 @@ class PlayerShipController extends Controller
                 'metaDescription' => $metaDescription,
                 'metaKeywords' => $metaKeywords,
             ],
-            'statistics' => [
+            /*    'statistics' => [
                 'topPlayersLast24Hours' => $topPlayersLast24Hours,
                 'topPlayersLast7Days' => $topPlayersLast7Days,
                 'topPlayersLastMonth' => $topPlayersLastMonth,
                 'topPlayersOverall' => $topPlayersOverall,
                 'topClans' => $topClans,
 
-            ],
+            ], */
         ]);
     }
 
