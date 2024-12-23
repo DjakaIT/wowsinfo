@@ -15,9 +15,16 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         // Add your scheduled tasks here.
         $schedule->command('fetch-store:player-ships')
-            ->everyMinute()
+            ->dailyAte('02:00')
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/Fetch_player_ships.log'));
+
+
+
+        $schedule->command('fetch-store:players-data {server} {--search=} {--page=1} {--limit=100}')
+            ->dailyAt('04:00')
+            ->withoutOverlapping()
+            ->appendOutputTo('logs/fetch_players.log');
     }
 
 
