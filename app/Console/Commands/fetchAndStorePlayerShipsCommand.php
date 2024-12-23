@@ -8,38 +8,31 @@ use Illuminate\Support\Facades\Log;
 
 class fetchAndStorePlayerShipsCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'fetch-store:player-ships';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Fetch and store player ships stats daily';
 
-    /**
-     * Execute the console command.
-     */
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
     public function handle()
     {
+        // Create a custom logger for this command
+        $logFilePath = storage_path('logs/Fetch_player_ships.log');
+        $logger = Log::build([
+            'driver' => 'single',
+            'path' => $logFilePath,
+        ]);
+
         try {
+            $logger->info('FetchPlayerShipsCommand started.');
+
+            // Call the PlayerShipController's method
             app(PlayerShipController::class)->updatePlayerShips();
 
-            Log::info('FetchPlayerShipsCommand executed succesfully');
-            $this->info("Players' ships data fetched and stored succesfully");
+            $logger->info('FetchPlayerShipsCommand executed successfully.');
+            $this->info("Players' ships data fetched and stored successfully.");
         } catch (\Exception $e) {
-            Log::Error("FetchPlayerShipsCommand failed: " . $e->getMessage());
-            $this->error("Failed fetching players' ships data, check logs");
+            $logger->error("FetchPlayerShipsCommand failed: " . $e->getMessage());
+            $this->error("Failed fetching players' ships data. Check the logs for details.");
         }
+
+        $logger->info('FetchPlayerShipsCommand finished.');
     }
 }

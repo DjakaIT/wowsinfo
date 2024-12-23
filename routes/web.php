@@ -33,7 +33,7 @@ Route::prefix('clans')->group(function () {
 
 Route::prefix('players')->group(function () {
 
-    Route::get('/fetch', [PlayerController::class, 'fetchAndStorePlayers']);
+    Route::get('/fetch', [PlayerController::class, 'updatePlayers']);
     Route::get('/', [PlayerController::class, 'index']);
     Route::get('/{id}', [PlayerController::class, 'show']);
     Route::post('/', [PlayerController::class, 'store']);
