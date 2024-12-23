@@ -69,6 +69,33 @@ class ShipController extends Controller
         return response()->json($ships);
     }
 
+
+    public function displayWiki()
+    {
+        return view('wiki.index');
+    }
+    //return a nation
+    public function showNation($nation)
+    {
+        return view('wiki.ship-nation', compact('nation'));
+    }
+
+
+    //return type of the ships
+    public function showType($type)
+    {
+        return view('wiki.ship-type', compact('type'));
+    }
+
+    //return full ship and its details
+    public function showShip($nation, $type, $ship)
+    {
+        return view('wiki.ship-details', compact('nation', 'type', 'ship'));
+    }
+
+
+
+
     //save a ship
     public function store(Request $request)
     {
