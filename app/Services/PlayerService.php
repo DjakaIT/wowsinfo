@@ -44,7 +44,7 @@ class PlayerService
     public function fetchAndStorePlayers($server, $search, $page = 1, $limit = 100)
     {
 
-        /* set_time_limit(0); */
+        set_time_limit(0);
 
         Log::info("Started fetching players");
 
