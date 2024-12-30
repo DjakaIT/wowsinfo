@@ -23,7 +23,7 @@ class fetchAndStoreShipsCommand extends Command
         ]);
 
         try {
-            $logger->info("Fetch ships cron started- ");
+            $logger->info("Fetch ships cron started ");
             app(ShipController::class)->fetchAndStoreShips();
         } catch (Exception $e) {
             $logger->error('Fetch ships cron failed: ' . $e->getMessage());

@@ -17,7 +17,7 @@ class ClanController extends Controller
         $this->ClanService = $clanService;
     }
 
-    public function fetchAndStoreClans(Request $request)
+    public function fetchAndStoreClans()
     {
         Log::info("Reached fetchAndStoreClans method");
 
