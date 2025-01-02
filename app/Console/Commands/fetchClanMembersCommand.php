@@ -18,7 +18,7 @@ class fetchClanMembersCommand extends Command
     public function handle()
     {
 
-        $logFilePath = storage_path('logs/ships.log');
+        $logFilePath = storage_path('logs/clan_members.log');
         $logger = Log::build([
             'driver' => 'single',
             'path' => $logFilePath,

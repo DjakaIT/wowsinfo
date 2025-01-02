@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class fetchClansCommand extends Command
 {
-    protected $signature = 'fetch-store:ships';
+    protected $signature = 'fetch-store:clans';
 
     protected $description = 'fetch and store clans';
 
