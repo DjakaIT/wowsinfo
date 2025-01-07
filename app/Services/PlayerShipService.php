@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ClanMember;
 use App\Models\Player;
 use App\Models\PlayerShip;
 use App\Models\Ship;
@@ -278,13 +279,23 @@ class PlayerShipService
     }
 
 
-    public function getPlayerStatsByVehicle($accountId)
+    // TO DO: 
+    //Ovdje treba proslijediti sa fronta ono što igrač klikne / upiše, 
+    //npr. Ako klikne na "Bismarck" brod 
+    //onda aplikacija taj string ovdje unese kao parametar
+    // $ship_name = 'Bismarck';
+    public function getPlayerStatsByVehicle($ship_name)
     {
+
+
         return DB::table('player_ships')
             ->select(
+                'account_id',
+                'player_name',
                 'battles_played',
                 'wins_count',
                 'ship_tier',
+                'ship_type',
                 'survival_rate',
                 'damage_dealt',
                 'frags',
@@ -294,7 +305,8 @@ class PlayerShipService
                 'spotted',
                 'wn8'
             )
-            ->where('account_id', $accountId)
+            ->where('ship_name', $ship_name)
+            ->orderBy('total_player_wn8', 'desc')
             ->get();
     }
 
@@ -307,7 +319,7 @@ class PlayerShipService
         Log::info('Starting fetchAndStorePlayerShips');
 
         try {
-            $playerIds = Player::pluck('account_id')->all();
+            $playerIds = ClanMember::pluck('account_id')->all();
             Log::info("Data loaded", ['players_count' => count($playerIds)]);
 
             foreach ($playerIds as $playerId) {
