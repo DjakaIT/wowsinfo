@@ -43,7 +43,7 @@ class fetchPlayersCommand extends Command
             $page = $this->option('page') ?? 1;
             $limit = $this->option('limit') ?? 100;
 
-            $this->playerService->fetchAndStorePlayers($server, $search, $page, $limit);
+            $this->playerService->fetchAndStorePlayers($server, $search, $page);
 
             Log::info('fetchPlayersCommand executed successfully');
             $this->info("Player data fetched and stored successfully.");

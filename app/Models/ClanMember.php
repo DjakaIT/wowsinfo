@@ -31,4 +31,9 @@ class ClanMember extends Model
     {
         return $query->whereNull('left_at');
     }
+
+    public function clan()
+    {
+        return $this->BelongsTo(Clan::class, 'clan_id', 'clan_id');
+    }
 }

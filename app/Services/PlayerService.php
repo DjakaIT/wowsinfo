@@ -5,6 +5,9 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use App\Models\Player;
 use Illuminate\Support\Facades\Log;
+use App\Models\ClanMember;
+use App\Models\Clan;
+use Illuminate\Support\Facades\DB;
 
 class PlayerService
 {
@@ -40,58 +43,55 @@ class PlayerService
         return $terms;
     }
 
-
-    public function fetchAndStorePlayers($server, $search, $page = 1, $limit = 100)
+    public function fetchAndStorePlayers($serverOption)
     {
+        $serverUrl = $this->baseUrls[$serverOption] ?? $this->baseUrls['eu'];
+        $clans = Clan::where('server', $serverOption)->get();
 
-        set_time_limit(0);
+        foreach ($clans as $clan) {
+            foreach ($clan->members as $member) {
+                $response = Http::get("{$serverUrl}/wows/account/info/", [
+                    'application_id' => $this->apiKey,
+                    'account_id' => $member->account_id,
+                ]);
 
-        Log::info("Started fetching players");
+                $data = $response->json();
 
-        $servers = ['eu', 'na', 'asia'];
-        $searchTerms = $this->generateSearchTerms();
-        $limit = 100;
-
-        foreach ($servers as $server) {
-            foreach ($searchTerms as $search) {
-                $page = 1;
-                $hasMore = true;
-
-                while ($hasMore) {
-                    $players = $this->getAllPlayers($server, $search, $page, $limit);
-
-                    if ($players) {
-                        foreach ($players as $playerData) {
-
-                            $clan_id = Player::where('account_id')->value('clan_id');
-
-                            Player::updateOrCreate(
-                                ['account_id' => $playerData['account_id']],
-                                [
-                                    'nickname' => $playerData['nickname'],
-                                    'server' => strtoupper($server),
-                                    'clan_id' => $clan_id,
-                                ]
-                            );
-                            Log::info("Stored player with ID: " . $playerData['account_id'] . " on server: " . strtoupper($server));
-                        }
-
-                        Log::info("Fetched page {$page} for search term '{$search}' on server: " . strtoupper($server));
-                        $page++;
-                        $hasMore = count($players) === $limit;
-                    } else {
-                        Log::info("No more players found for search term '{$search}' on server: " . strtoupper($server));
-                        $hasMore = false;
-                    }
+                if ($response->failed() || !isset($data['data'][$member->account_id])) {
+                    Log::warning("Failed to fetch data for account_id: {$member->account_id}");
+                    continue;
                 }
 
-                // Short delay to respect API rate limits
-                usleep(500000); // 0.5 seconds
+                $playerInfo = $data['data'][$member->account_id];
+
+                if (is_null($playerInfo)) {
+                    Log::info("Player[{$playerInfo['nickname']}] null, SKIP!!!");
+                    continue;
+                }
+
+                if (Player::where('account_id', $playerInfo['account_id'])->exists()) {
+                    Log::info("Player[{$playerInfo['nickname']}] exist, SKIP!!!");
+                    continue;
+                }
+
+                $player = new Player([
+                    'account_id' => $playerInfo['account_id'],
+                    'nickname' => $playerInfo['nickname'],
+                    'server' => $serverOption,
+                    'last_battle_time' => $playerInfo['last_battle_time'],
+                    'account_created' => $playerInfo['created_at'],
+                    'clan_name' => $clan->tag,
+                    'clan_id' => $clan->clan_id,
+                ]);
+
+                $player->save();
+                Log::info("Stored player with nickname: {$playerInfo['nickname']}");
             }
         }
 
         return response()->json(['message' => 'All players fetched and stored in database successfully'], 201);
     }
+
 
     public function getAllPlayers($server, $search, $page = 1, $limit = 100)
     {
@@ -123,6 +123,40 @@ class PlayerService
             }
         } catch (\Exception $e) {
             Log::error("Exception during Player API call: " . $e->getMessage());
+        }
+
+        return null;
+    }
+
+    public function fetchAccountCreatedDate($server, $accountId)
+    {
+        $url = $this->baseUrls[$server] . "/wows/account/info/";
+        try {
+            $response = Http::get($url, [
+                'application_id' => $this->apiKey,
+                'account_id' => $accountId,
+            ]);
+
+            if ($response->failed()) {
+                Log::error("Account Info API Request failed for server: {$server} with status: " . $response->status());
+                return null;
+            }
+
+            $responseData = $response->json();
+
+            if ($responseData['status'] === 'ok' && isset($responseData['data'][$accountId]['created_at'])) {
+                // Convert Unix timestamp to DATETIME format
+                $createdAt = date('Y-m-d H:i:s', $responseData['data'][$accountId]['created_at']);
+
+                // Update the database
+                Player::where('account_id', $accountId)->update(['account_created' => $createdAt]);
+
+                return $createdAt;
+            } else {
+                Log::error("Unexpected Account Info response for server: {$server}", ['response' => $responseData]);
+            }
+        } catch (\Exception $e) {
+            Log::error("Exception during Account Info API call: " . $e->getMessage());
         }
 
         return null;

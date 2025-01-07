@@ -22,7 +22,7 @@ class Clan extends Model
     //defines a OneToMany relationship with players table in the db
     public function players()
     {
-        return $this->hasMany(Player::class);
+        return $this->hasMany(Player::class, 'clan_id', 'clan_id');
     }
 
     public function battles()

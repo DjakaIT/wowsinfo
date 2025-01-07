@@ -81,18 +81,6 @@ class PlayerShipService
         $wn8 = (700 * $nDmg) + (300 * $nFrags) + (150 * $nWins);
 
 
-
-        /*   Log::info("Intermediate WN8 values", [
-            'ship_id' => $shipId,
-            'rDmg' => $rDmg,
-            'rFrags' => $rFrags,
-            'rWins' => $rWins,
-            'nDmg' => $nDmg,
-            'nFrags' => $nFrags,
-            'nWins' => $nWins,
-            'WN8' => $wn8,
-        ]); */
-
         return $wn8;
     }
 
@@ -167,90 +155,6 @@ class PlayerShipService
     }
 
 
-
-    /*  public function getPeriodCriteria()
-    {
-        return [
-            'last24hours' => [
-                'date' => Carbon::now()->subHours(24),
-                'min_battles' => 5,
-                'min_tier' => 2,
-                'limit' => 10,
-            ],
-            'last7days' => [
-                'date' => Carbon::now()->subDays(7),
-                'min_battles' => 35,
-                'min_tier' => 2,
-                'limit' => 10,
-            ],
-            'lastMonth' => [
-                'date' => Carbon::now()->subDays(25),
-                'min_battles' => 120,
-                'min_tier' => 2,
-                'limit' => 10,
-            ],
-            'overall' => [
-                'date' => null, // No date restriction for overall stats
-                'min_battles' => 5,
-                'min_tier' => 1,
-                'limit' => 10,
-            ],
-        ];
-    }
-
-
-
-    public function getPlayerStatsByPeriod($playerId, $period)
-    {
-
-        $dateRanges = [
-            'last24hours' => now()->subHours(24),
-            'last7days' => now()->subDays(7),
-            'lastMonth' => now()->subDays(25),
-            'overall' => null,
-        ];
-
-
-
-        if (!isset($dateRanges[$period])) {
-            throw new \InvalidArgumentException("Invalid period: $period");
-        }
-
-        $query = PlayerShip::where('account_id', $playerId);
-
-        if ($period !== 'overall') {
-            $query->where('updated_at', '>=', $dateRanges[$period]);
-        }
-
-        $stats = $query->get()->reduce(
-            function ($carry, $playerShip) {
-                $carry['battles'] += $playerShip->battles_played;
-                $carry['damage'] += $playerShip->damage_dealt;
-                $carry['wins'] += $playerShip->wins;
-                $carry['frags'] += $playerShip->frags;
-                $carry['wn8_player'] += $playerShip->total_player_wn8;
-                $carry['ship_name'] = $playerShip->ship_name;
-                $carry['sbip_wn8'] += $playerShip->wn8;
-                $carry['average_tier'] += PlayerShip::avg($playerShip->ship_tier);
-                $carry['win_rate'] += $playerShip->battles_played / $playerShip->wins_count;
-            },
-            [
-                'battles' => 0,
-                'damage' => 0,
-                'wins' => 0,
-                'frags' => 0,
-                'wn8_player' => 0,
-                'ship_name' => 0,
-                'sbip_wn8' => 0,
-                'win_rate' => 0,
-
-            ]
-        );
-
-        return $stats;
-    }
-
- */
 
 
     public function getTopPlayersLast24Hours()
@@ -345,36 +249,56 @@ class PlayerShipService
     }
 
 
-    /*   public function rankPlayersByPeriod($period)
+    //get stats for each player, based on a period: 24, 7, 30, overall
+    public function getPlayerStats24($playerId)
     {
+        return PlayerShip::where('account_id', $playerId)
+            ->where('updated_at', '>=', now()->subDays(1))
+            ->get();
+    }
 
-        $criteria = $this->getPeriodCriteria();
+    public function getPlayerStats7Days($playerId)
+    {
+        return PlayerShip::where('account_id', $playerId)
+            ->where('updated_at', '>=', now()->subDays(6))
+            ->get();
+    }
 
-        if (!isset($dateRanges[$period])) {
-            throw new \InvalidArgumentException("Invalid period: $period");
-        }
+    public function getPlayerStatsLastMonth($playerId)
+    {
+        return PlayerShip::where('account_id', $playerId)
+            ->where('updated_at', '>=', now()->subMonth())
+            ->get();
+    }
 
-        //store each period in a variable to use later
-        $config = $criteria[$period];
-        try {
-            $query = PlayerShip::where('battles_played', '>=', $config['min_battles'])
-                ->where('ship_tier', '>=', $config['min_tier'])
-                ->orderByDesc('total_player_wn8');
+    public function getPlayerStatsOverall($playerId)
+    {
+        return PlayerShip::where('account_id', $playerId)
+            ->get();
+    }
 
-            if ($config['date']) {
-                $query->where('updated_at', '>=', $config['date']);
-            }
 
-            return $query->take($config['limit'])->get(['ship_name', 'account_id', 'total_player_wn8']);
-        } catch (\Exception $e) {
-            Log::error("Error ranking players for period: $period", [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+    public function getPlayerStatsByVehicle($accountId)
+    {
+        return DB::table('player_ships')
+            ->select(
+                'battles_played',
+                'wins_count',
+                'ship_tier',
+                'survival_rate',
+                'damage_dealt',
+                'frags',
+                'xp',
+                'capture',
+                'defend',
+                'spotted',
+                'wn8'
+            )
+            ->where('account_id', $accountId)
+            ->get();
+    }
 
-            throw $e;
-        }
-    } */
+
 
     public function fetchAndStorePlayerShips()
     {
@@ -472,16 +396,7 @@ class PlayerShipService
 
 
 
-                            /*               $modes = ['pvp', 'pve', 'club', 'rank_solo', 'rank_div2', 'rank_div3', 'pve_solo', 'pve_div2', 'pve_div3', 'pvp_div2', 'pvp_div3'];
-                            $totalStats = ['batles' => 0, 'wins' => 0, 'damage_dealt' => 0];
 
-                            foreach ($modes as $mode){
-                                if(isset($shipStats[mode])){
-                                    $stats = $this->extractBattleStats($shipStats, $mode);
-                                    $totalStats[]
-                                }
-                            }
- */
                             // Calculate total battles
                             $totalBattles = ($pvpStats['battles'] ?? 0) + ($pveStats['battles'] ?? 0)
                                 + ($clubStats['battles'] ?? 0) + ($rankStats['battles'] ?? 0)
@@ -517,6 +432,38 @@ class PlayerShipService
                                 + ($pve3Stats['frags'] ?? 0) + ($pvp2Stats['frags'] ?? 0)
                                 + ($pvp3Stats['frags'] ?? 0);
 
+                            $totalXp = ($pvpStats['xp'] ?? 0) + ($pveStats['xp'] ?? 0)
+                                + ($clubStats['xp'] ?? 0) + ($rankStats['xp'] ?? 0)
+                                + ($rank_div2Stats['xp'] ?? 0) + ($rank_div3Stats['xp'] ?? 0)
+                                + ($pve_soloStats['xp'] ?? 0) + ($pve2Stats['xp'] ?? 0)
+                                + ($pve3Stats['xp'] ?? 0) + ($pvp2Stats['xp'] ?? 0)
+                                + ($pvp3Stats['xp'] ?? 0);
+
+
+                            $totalCapture = ($pvpStats['capture_points'] ?? 0) + ($pveStats['capture_points'] ?? 0)
+                                + ($clubStats['capture_points'] ?? 0) + ($rankStats['capture_points'] ?? 0)
+                                + ($rank_div2Stats['capture_points'] ?? 0) + ($rank_div3Stats['capture_points'] ?? 0)
+                                + ($pve_soloStats['capture_points'] ?? 0) + ($pve2Stats['capture_points'] ?? 0)
+                                + ($pve3Stats['capture_points'] ?? 0) + ($pvp2Stats['capture_points'] ?? 0)
+                                + ($pvp3Stats['capture_points'] ?? 0);
+
+                            $totalDefend = ($pvpStats['dropped_capture_points'] ?? 0) + ($pveStats['dropped_capture_points'] ?? 0)
+                                + ($clubStats['dropped_capture_points'] ?? 0) + ($rankStats['dropped_capture_points'] ?? 0)
+                                + ($rank_div2Stats['dropped_capture_points'] ?? 0) + ($rank_div3Stats['dropped_capture_points'] ?? 0)
+                                + ($pve_soloStats['dropped_capture_points'] ?? 0) + ($pve2Stats['dropped_capture_points'] ?? 0)
+                                + ($pve3Stats['dropped_capture_points'] ?? 0) + ($pvp2Stats['dropped_capture_points'] ?? 0)
+                                + ($pvp3Stats['dropped_capture_points'] ?? 0);
+
+                            $totalSpotted = ($pvpStats['ships_spotted'] ?? 0) + ($pveStats['ships_spotted'] ?? 0)
+                                + ($clubStats['ships_spotted'] ?? 0) + ($rankStats['ships_spotted'] ?? 0)
+                                + ($rank_div2Stats['ships_spotted'] ?? 0) + ($rank_div3Stats['ships_spotted'] ?? 0)
+                                + ($pve_soloStats['ships_spotted'] ?? 0) + ($pve2Stats['ships_spotted'] ?? 0)
+                                + ($pve3Stats['ships_spotted'] ?? 0) + ($pvp2Stats['ships_spotted'] ?? 0)
+                                + ($pvp3Stats['ships_spotted'] ?? 0);
+
+
+
+
 
                             // Calculate survival rate
                             $totalSurvivedBattles = ($pvpStats['survived_battles'] ?? 0) + ($pveStats['survived_battles'] ?? 0) + ($clubStats['survived_battles'] ?? 0) + ($rankStats['survived_battles'] ?? 0);
@@ -524,16 +471,7 @@ class PlayerShipService
 
 
 
-                            /*  Log::info("Processing ship stats", [
-                                'account_id' => $playerId,
-                                'ship_id' => $ship->ship_id,
-                                'pvp_battles' => $pvpStats['battles'] ?? 0,
-                                'pve_battles' => $pveStats['battles'] ?? 0,
-                                'club_battles' => $clubStats['battles'] ?? 0,
-                                'rank_battles' => $rankStats['battles'] ?? 0,
-                                'total_battles' => $totalBattles,
-                                'distance' => 'distance',
-                            ]); */
+
 
                             //wn8
                             $wn8 =  $this->calculateWN8($ship, $totalBattles, $totalFrags, $totalWins, $totalDamageDealt);
@@ -543,12 +481,6 @@ class PlayerShipService
                             //wn8 per type / category of a ship 
                             $wn8_category = $this->determineCategoryWN8($wn8);
 
-                            /*   Log::info("Ship WN8 by category", [
-                                'ship_name' => $shipName,
-                                'ship_type' => $shipType,
-                                'WN8' => $wn8_category
-                            ]); */
-                            // Use ship->id instead of ship_id from API
 
 
                             Log::info(
@@ -575,12 +507,16 @@ class PlayerShipService
                                     'average_damage' => $averageDamage,
                                     'frags' => $totalFrags,
                                     'survival_rate' => $survivalRate,
+                                    'xp' => $totalXp,
                                     'ship_name' => $shipName,
                                     'ship_type' => $shipType,
                                     'ship_tier' => $shipTier,
                                     'distance' => $shipStats['distance'],
                                     'wn8' => $wn8,
                                     'total_player_wn8' => $total_player_wn8,
+                                    'capture' => $totalCapture,
+                                    'defend' => $totalDefend,
+                                    'spotted' => $totalSpotted,
                                     // PVE stats
                                     'pve_battles' => $pveStats['battles'] ?? 0,
                                     'pve_wins' => $pveStats['wins'] ?? 0,

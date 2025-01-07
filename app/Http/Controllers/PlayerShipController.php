@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PlayerShip;
 use App\Services\PlayerShipService;
 use App\Services\ClanMemberService;
+use App\Services\PlayerService;
 
 use Illuminate\Http\Request;
 
@@ -12,10 +13,13 @@ class PlayerShipController extends Controller
 {
     protected $playerShipService;
     protected $clanMemberService;
-    public function __construct(PlayerShipService $playerShipService,  ClanMemberService $clanMemberService)
+
+    protected $playerService;
+    public function __construct(PlayerShipService $playerShipService, ClanMemberService $clanMemberService, PlayerService $playerService)
     {
         $this->playerShipService = $playerShipService;
         $this->clanMemberService = $clanMemberService;
+        $this->playerService = $playerService;
     }
 
     //BLADE
@@ -26,6 +30,14 @@ class PlayerShipController extends Controller
         $metaDescription = 'Latest statistics for player $PLNAME  in World of Warships, WN8 daily, weekly and monthly updates and statistic.';
         $metaKeywords = 'WN8, World of Warships, Statistics, Player statistics, $PLNAME';
 
+        /* $playerStats24 = $this->playerShipService->getPlayerStats24($playerId);
+        $playerStats7 = $this->playerShipService->getPlayerStats7Days($playerId);
+        $playerStats30 = $this->playerShipService->getPlayerStatsLastMonth($playerId);
+        $playerStatsOverall = $this->playerShipService->getPlayerStatsOverall($playerId);
+        $playerVehicleStats = $this->playerShipService->getPlayerVehicleStats($playerId);
+        $playerInfo = $this->playerService->($playerId);
+
+ */
         return view('player', [
             'metaSite' => [
                 'metaTitle' => $metaTitle,
