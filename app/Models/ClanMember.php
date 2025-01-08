@@ -18,6 +18,7 @@ class ClanMember extends Model
         'clan_id',
         'clan_name',
         'total_clan_wn8',
+        'account_created'
     ];
 
     protected $dates = [

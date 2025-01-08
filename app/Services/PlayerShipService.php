@@ -332,7 +332,7 @@ class PlayerShipService
                 if ($response->successful()) {
                     $data = $response->json();
 
-                    $playerName = Player::where('account_id', $playerId)->value('nickname');
+                    $playerName = ClanMember::where('account_id', $playerId)->value('account_name');
 
 
 
