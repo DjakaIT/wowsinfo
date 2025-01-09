@@ -48,6 +48,8 @@ class ClanMemberService
             ->toArray();
     }
 
+
+
     public function fetchAndStoreClanMembers()
     {
         Log::info('fetchClanMembers method called');
@@ -239,5 +241,30 @@ class ClanMemberService
         }
 
         return null;
+    }
+
+
+    public function getPlayerMemberInfo($account_id, $name)
+    {
+        $playerInfo = ClanMember::select('account_id', 'account_name as name', 'clan_id', 'clan_name as clanName', 'account_created as createdAt')
+            ->where('account_id', $account_id)
+            ->where('account_name', $name)
+            ->first();
+
+        if (!$playerInfo) {
+            Log::warning("Player not found", ['account_id' => $account_id, 'name' => $name]);
+            return null;
+        }
+
+        $playerData = [
+            'name' => $playerInfo->name,
+            'wid' => $playerInfo->account_id,
+            'createdAt' => $playerInfo->createdAt,
+            'clanName' => $playerInfo->clanName,
+            'clanId' => $playerInfo->clan_id
+        ];
+
+        Log::info("Fetched player info", ['playerInfo' => $playerData]);
+        return $playerData;
     }
 }

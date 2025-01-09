@@ -23,35 +23,29 @@ class PlayerShipController extends Controller
     }
 
     //BLADE
-    public function getPlayerPageStats()
+    public function getPlayerPageStats($name, $account_id)
     {
-        // $PLNAME je promenljiva treba se zameniti stvarnim imenom igraca
-        $metaTitle = '$PLNAME - WN8 player statistics for World of Warships';
-        $metaDescription = 'Latest statistics for player $PLNAME  in World of Warships, WN8 daily, weekly and monthly updates and statistic.';
-        $metaKeywords = 'WN8, World of Warships, Statistics, Player statistics, $PLNAME';
+        $metaTitle = "$name - WN8 player statistics for World of Warships";
+        $metaDescription = "Latest statistics for player $name in World of Warships, WN8 daily, weekly and monthly updates and statistic.";
+        $metaKeywords = "WN8, World of Warships, Statistics, Player statistics, $name";
 
-        /* $playerStats24 = $this->playerShipService->getPlayerStats24($playerId);
-        $playerStats7 = $this->playerShipService->getPlayerStats7Days($playerId);
-        $playerStats30 = $this->playerShipService->getPlayerStatsLastMonth($playerId);
-        $playerStatsOverall = $this->playerShipService->getPlayerStatsOverall($playerId);
-        $playerVehicleStats = $this->playerShipService->getPlayerVehicleStats($playerId);
-        $playerInfo = $this->playerService->($playerId);
+        // Get player info
+        $playerInfo = $this->clanMemberService->getPlayerMemberInfo($account_id, $name);
 
- */
+        if (!$playerInfo) {
+            abort(404, 'Player not found');
+        }
+
+
         return view('player', [
             'metaSite' => [
                 'metaTitle' => $metaTitle,
                 'metaDescription' => $metaDescription,
                 'metaKeywords' => $metaKeywords,
             ],
-            /*    'statistics' => [
-                'topPlayersLast24Hours' => $topPlayersLast24Hours,
-                'topPlayersLast7Days' => $topPlayersLast7Days,
-                'topPlayersLastMonth' => $topPlayersLastMonth,
-                'topPlayersOverall' => $topPlayersOverall,
-                'topClans' => $topClans,
-
-            ], */
+            'playerInfo' => $playerInfo,
+            'playerStatistics' => [],
+            'playerVehicles' => []
         ]);
     }
 
