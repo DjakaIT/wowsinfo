@@ -355,6 +355,7 @@ class PlayerShipService
                             $shipName = $ship->name;
                             $shipType = $ship->type;
                             $shipTier = $ship->tier;
+                            $shipNation = $ship->nation;
 
                             // Extract statistics for different battle types
                             $pvpStats = [];
@@ -523,6 +524,7 @@ class PlayerShipService
                                     'ship_name' => $shipName,
                                     'ship_type' => $shipType,
                                     'ship_tier' => $shipTier,
+                                    'ship_nation' => $shipNation,
                                     'distance' => $shipStats['distance'],
                                     'wn8' => $wn8,
                                     'total_player_wn8' => $total_player_wn8,
@@ -582,6 +584,7 @@ class PlayerShipService
     public function getPlayerVehicleData($account_id, $name)
     {
         $playerVehicles = PlayerShip::select(
+            'ship_nation as nation',
             'ship_name as name',
             'ship_tier as tier',
             'battles_played as battles',
@@ -595,7 +598,7 @@ class PlayerShipService
             ->get()
             ->map(function ($vehicle) {
                 return [
-                    'nation' => '0',
+                    'nation' => $vehicle->nation,
                     'name' => $vehicle->name,
                     'tier' => $vehicle->tier,
                     'battles' => $vehicle->battles,

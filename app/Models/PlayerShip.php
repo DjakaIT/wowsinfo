@@ -16,6 +16,7 @@ class PlayerShip extends Model
         'last_battle_time',
         'ship_name',
         'ship_type',
+        'ship_nation',
         'ship_tier',
         'battles_played',
         'frags',
