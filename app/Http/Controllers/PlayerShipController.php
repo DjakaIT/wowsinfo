@@ -31,7 +31,7 @@ class PlayerShipController extends Controller
 
         // Get player info
         $playerInfo = $this->clanMemberService->getPlayerMemberInfo($account_id, $name);
-
+        $playerVehicleInfo = $this->playerShipService->getPlayerVehicleData($account_id, $name);
         if (!$playerInfo) {
             abort(404, 'Player not found');
         }
@@ -43,9 +43,9 @@ class PlayerShipController extends Controller
                 'metaDescription' => $metaDescription,
                 'metaKeywords' => $metaKeywords,
             ],
-            'playerInfo' => $playerInfo,
-            'playerStatistics' => [],
-            'playerVehicles' => []
+            'playerInfo' => $playerInfo ?? null,
+            'playerStatistics' => [] ?? null,
+            'playerVehicles' => $playerVehicleInfo ?: [],
         ]);
     }
 

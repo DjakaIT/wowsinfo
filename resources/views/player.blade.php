@@ -27,7 +27,7 @@
                         <th class="border-b">Last month</th>
                     </tr>
                 </thead>
-                <tbody>
+                {{--   <tbody>
                     <tr class="border-b">
                         <td class="py-2 px-4">Battles</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['battles'] }}</td>
@@ -112,7 +112,7 @@
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['wn8'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['wn8'] }}</td>
                     </tr>
-                </tbody>
+                </tbody> --}}
             </table>
         </div>
         <!-- ### Player statistics -->

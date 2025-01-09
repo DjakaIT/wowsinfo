@@ -577,4 +577,42 @@ class PlayerShipService
             throw $e;
         }
     }
+
+
+    public function getPlayerVehicleData($account_id, $name)
+    {
+        $playerVehicles = PlayerShip::select(
+            'ship_name as name',
+            'ship_tier as tier',
+            'battles_played as battles',
+            'frags as frags',
+            'damage_dealt as damage',
+            'wins_count as wins',
+            'wn8 as wn8'
+        )
+            ->where('account_id', $account_id)
+            ->where('player_name', $name)
+            ->get()
+            ->map(function ($vehicle) {
+                return [
+                    'nation' => '0',
+                    'name' => $vehicle->name,
+                    'tier' => $vehicle->tier,
+                    'battles' => $vehicle->battles,
+                    'frags' => $vehicle->frags,
+                    'damage' => $vehicle->damage,
+                    'wins' => $vehicle->wins,
+                    'wn8' => $vehicle->wn8,
+                ];
+            })
+            ->toArray();
+        if (!$playerVehicles) {
+            Log::warning("Player vehicle info not found", ['account_id' => $account_id, 'name' => $name]);
+            return [];
+        }
+
+        Log::info("Fetched vehicle for player $account_id", ['player vehicle data: ' => $playerVehicles]);
+
+        return $playerVehicles;
+    }
 }
