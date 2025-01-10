@@ -105,11 +105,7 @@ class PlayerShipService
 
         $player_total_wn8 = $total_battles > 0 ? $total_weighted_wn8 / $total_battles : 0;
 
-        Log::info("Total player wn8", [
-            'account_id' => $playerId,
-            'total_player_wn8' => $player_total_wn8,
-            'total_battles' => $total_battles
-        ]);
+
 
         return $player_total_wn8;
     }
@@ -495,16 +491,12 @@ class PlayerShipService
                             $wn8_category = $this->determineCategoryWN8($wn8);
 
 
-
-                            Log::info(
-                                "Last battle time of the ship",
-
-                                [
-                                    'last_battle_time',
-                                    $shipStats['last_battle_time']
-
-                                ]
-                            );
+                            Log::info("Processing ship for player", [
+                                'player_id' => $playerId,
+                                'ship_id' => $ship->ship_id,
+                                'ship_name' => $ship->name,
+                                'ship_nation' => $ship->nation
+                            ]);
 
                             PlayerShip::updateOrCreate(
                                 [
@@ -558,7 +550,11 @@ class PlayerShipService
                                 ]
                             );
                         }
-
+                        Log::info("Successfully updated/created player ship record", [
+                            'player_id' => $playerId,
+                            'ship_id' => $shipStats['ship_id'],
+                            'nation' => $ship->nation
+                        ]);
                         $this->totalPlayerWN8($playerId);
                     }
                 } else {
