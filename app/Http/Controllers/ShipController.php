@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class ShipController extends Controller
 {
-    //display all ships
+    // Display all ships
 
     protected $ShipService;
 
@@ -54,6 +54,50 @@ class ShipController extends Controller
         }
 
         return response()->json(['message' => 'Ships fetched and stored in database succesfully', 201]);
+    }
+
+    // WIKI ROUTES
+    // Ovo bi trebalo u kontroler za wiki
+    public function getWikiHomePage()
+    {
+        $metaTitle = 'World of Warships - Battleships wiki - wows.WN8.info';
+        $metaDescription = 'World of Warships battleships information wiki page';
+        $metaKeywords = 'WN8, World of Warships, ship, ships, warships, warship, wiki, battleships, battleship, description, information, info, modules, configuration';
+
+        return view('wiki', [
+            'metaSite' => [
+                'metaTitle' => $metaTitle,
+                'metaDescription' => $metaDescription,
+                'metaKeywords' => $metaKeywords,
+            ],
+            'nations' => [
+                'usa', 'pan_asia', 'ussr', 'europe', 'japan', 'uk', 'germany', 'netherlands', 'italy', 'france', 'commonwealth', 'spain', 'pan_america'
+            ],
+            'types' => [
+                'cruiser', 'battleship', 'destroyer', 'air_carrier', 'submarine'
+            ],
+        ]);
+    }
+
+    public function getWikiNationPage()
+    {
+        $metaTitle = 'World of Warships - Battleships wiki - wows.WN8.info';
+        $metaDescription = 'World of Warships battleships information wiki page';
+        $metaKeywords = 'WN8, World of Warships, ship, ships, warships, warship, wiki, battleships, battleship, description, information, info, modules, configuration';
+
+        return view('wiki', [
+            'metaSite' => [
+                'metaTitle' => $metaTitle,
+                'metaDescription' => $metaDescription,
+                'metaKeywords' => $metaKeywords,
+            ],
+            'nations' => [
+                'usa', 'pan_asia', 'ussr', 'europe', 'japan', 'uk', 'germany', 'netherlands', 'italy', 'france', 'commonwealth', 'spain', 'pan_america'
+            ],
+            'types' => [
+                'cruiser', 'battleship', 'destroyer', 'air_carrier', 'submarine'
+            ],
+        ]);
     }
 
     public function index()

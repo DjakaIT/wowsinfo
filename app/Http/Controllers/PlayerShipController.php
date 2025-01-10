@@ -49,6 +49,7 @@ class PlayerShipController extends Controller
         ]);
     }
 
+    // Ovo bi trebalo u kontroler za homepage ili statistiku
     public function getHomePageStats()
     {
 
@@ -78,6 +79,7 @@ class PlayerShipController extends Controller
             ],
         ]);
     }
+
     public function updatePlayerShips()
     {
         $this->playerShipService->fetchAndStorePlayerShips();
