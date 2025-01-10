@@ -18,7 +18,7 @@ class ShipController extends Controller
         $this->ShipService = $shipService;
     }
 
-    public function fetchAndStoreShips(Request $request)
+    public function fetchAndStoreShips()
     {
 
         Log::info("Reached fetchAndStoreShips method");

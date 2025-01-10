@@ -5,6 +5,9 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use App\Models\Player;
 use Illuminate\Support\Facades\Log;
+use App\Models\ClanMember;
+use App\Models\Clan;
+use Illuminate\Support\Facades\DB;
 
 class PlayerService
 {
@@ -40,11 +43,9 @@ class PlayerService
         return $terms;
     }
 
-
     public function fetchAndStorePlayers($server, $search, $page = 1, $limit = 100)
     {
-
-        /* set_time_limit(0); */
+        set_time_limit(0);
 
         Log::info("Started fetching players");
 
@@ -63,17 +64,39 @@ class PlayerService
                     if ($players) {
                         foreach ($players as $playerData) {
 
-                            $clan_id = Player::where('account_id')->value('clan_id');
+
+
+                            $accountId = $playerData['account_id'];
+                            $clanId = DB::table('clan_members')
+                                ->where('account_id', $accountId)
+                                ->value('clan_id');
+                            if ($clanId === null) {
+                                Log::info("No clans found for account_id: {$accountId}");
+                            } else {
+
+                                Log::info("Fetched clan_id: {$clanId} for account_id: {$accountId}");
+                            }
+
+                            $clanName = Clan::where('clan_id', $clanId)->value('name');
+                            Log::info("Fetched clan_name: {$clanName} for clan_id: {$clanId}");
+
+
+
+
+                            $createdAt = $this->fetchAccountCreatedDate($server, $accountId);
 
                             Player::updateOrCreate(
-                                ['account_id' => $playerData['account_id']],
+                                ['account_id' => $accountId],
                                 [
                                     'nickname' => $playerData['nickname'],
                                     'server' => strtoupper($server),
-                                    'clan_id' => $clan_id,
+                                    'clan_id' => $clanId,
+                                    'clan_name' => $clanName,
+
+                                    'account_created' => $createdAt,
                                 ]
                             );
-                            Log::info("Stored player with ID: " . $playerData['account_id'] . " on server: " . strtoupper($server));
+                            Log::info("Stored player with ID: " . $accountId . " on server: " . strtoupper($server));
                         }
 
                         Log::info("Fetched page {$page} for search term '{$search}' on server: " . strtoupper($server));
@@ -123,6 +146,40 @@ class PlayerService
             }
         } catch (\Exception $e) {
             Log::error("Exception during Player API call: " . $e->getMessage());
+        }
+
+        return null;
+    }
+
+    public function fetchAccountCreatedDate($server, $accountId)
+    {
+        $url = $this->baseUrls[$server] . "/wows/account/info/";
+        try {
+            $response = Http::get($url, [
+                'application_id' => $this->apiKey,
+                'account_id' => $accountId,
+            ]);
+
+            if ($response->failed()) {
+                Log::error("Account Info API Request failed for server: {$server} with status: " . $response->status());
+                return null;
+            }
+
+            $responseData = $response->json();
+
+            if ($responseData['status'] === 'ok' && isset($responseData['data'][$accountId]['created_at'])) {
+                // Convert Unix timestamp to DATETIME format
+                $createdAt = date('Y-m-d H:i:s', $responseData['data'][$accountId]['created_at']);
+
+                // Update the database
+                Player::where('account_id', $accountId)->update(['account_created' => $createdAt]);
+
+                return $createdAt;
+            } else {
+                Log::error("Unexpected Account Info response for server: {$server}", ['response' => $responseData]);
+            }
+        } catch (\Exception $e) {
+            Log::error("Exception during Account Info API call: " . $e->getMessage());
         }
 
         return null;

@@ -15,14 +15,16 @@ class Player extends Model
         'nickname',
         'server',
         'clan_id',
-        'total_player_wn8'
+        'total_player_wn8',
+        'account_created',
+        'clan_name'
     ];
 
 
     //defines the relationship with Clan table
     public function clan()
     {
-        return $this->BelongsTo(Clan::class);
+        return $this->BelongsTo(Clan::class, 'clan_id', 'clan_id');
     }
 
     public function achievements()
