@@ -36,6 +36,19 @@ class PlayerShipController extends Controller
             abort(404, 'Player not found');
         }
 
+        $playerStatisticsLastDay = $this->playerShipService->getPlayerStatsLastDay($account_id);
+        $playerStatisticsLastWeek = $this->playerShipService->getPlayerStatsLastWeek($account_id);
+        $playerStatisticsLastMonth = $this->playerShipService->getPlayerStatsLastMonth($account_id);
+        $playerStatisticsOverall = $this->playerShipService->getPlayerStatsOverall($account_id);
+
+
+        $playerStatistics = [
+            'lastDay' => $playerStatisticsLastDay,
+            'lastWeek' => $playerStatisticsLastWeek,
+            'lastMonth' => $playerStatisticsLastMonth,
+            'overall' => $playerStatisticsOverall
+        ];
+
 
         return view('player', [
             'metaSite' => [
@@ -44,7 +57,7 @@ class PlayerShipController extends Controller
                 'metaKeywords' => $metaKeywords,
             ],
             'playerInfo' => $playerInfo ?? null,
-            'playerStatistics' => [] ?? null,
+            'playerStatistics' => $playerStatistics,
             'playerVehicles' => $playerVehicleInfo ?: [],
         ]);
     }

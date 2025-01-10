@@ -246,33 +246,7 @@ class PlayerShipService
     }
 
 
-    //get stats for each player, based on a period: 24, 7, 30, overall
-    public function getPlayerStats24($playerId)
-    {
-        return PlayerShip::where('account_id', $playerId)
-            ->where('updated_at', '>=', now()->subDays(1))
-            ->get();
-    }
 
-    public function getPlayerStats7Days($playerId)
-    {
-        return PlayerShip::where('account_id', $playerId)
-            ->where('updated_at', '>=', now()->subDays(6))
-            ->get();
-    }
-
-    public function getPlayerStatsLastMonth($playerId)
-    {
-        return PlayerShip::where('account_id', $playerId)
-            ->where('updated_at', '>=', now()->subMonth())
-            ->get();
-    }
-
-    public function getPlayerStatsOverall($playerId)
-    {
-        return PlayerShip::where('account_id', $playerId)
-            ->get();
-    }
 
 
     // TO DO: 
@@ -576,6 +550,95 @@ class PlayerShipService
         }
     }
 
+    //get stats for each player, based on a period: 24, 7, 30, overall
+
+
+    public function getPlayerStatsLastDay($account_id)
+    {
+        $playerStatistics = PlayerShip::select(
+            'battles_played as battles',
+            'wins_count as wins',
+            'ship_tier as tier',
+            'survival_rate as survived',
+            'damage_dealt as damage',
+            'frags as frags',
+            'xp as xp',
+            'capture as capture',
+            'defend as defend',
+            'wn8 as wn8'
+        )
+            ->where('account_id', $account_id)
+            ->where('updated_at', '<=', now()->subDay())
+            ->first();
+        Log::info($playerStatistics);
+
+        return $playerStatistics ? $playerStatistics->toArray() : [];
+    }
+    public function getPlayerStatsLastWeek($account_id)
+    {
+        $playerStatistics = PlayerShip::select(
+            'battles_played as battles',
+            'wins_count as wins',
+            'ship_tier as tier',
+            'survival_rate as survived',
+            'damage_dealt as damage',
+            'frags as frags',
+            'xp as xp',
+            'capture as capture',
+            'defend as defend',
+            'wn8 as wn8'
+        )
+            ->where('account_id', $account_id)
+            ->where('updated_at', '>=', now()->subWeek())
+            ->first();
+
+        Log::info($playerStatistics);
+        return $playerStatistics ? $playerStatistics->toArray() : [];
+    }
+
+    public function getPlayerStatsLastMonth($account_id)
+    {
+        $playerStatistics = PlayerShip::select(
+            'battles_played as battles',
+            'wins_count as wins',
+            'ship_tier as tier',
+            'survival_rate as survived',
+            'damage_dealt as damage',
+            'frags as frags',
+            'xp as xp',
+            'capture as capture',
+            'defend as defend',
+            'wn8 as wn8'
+        )
+            ->where('account_id', $account_id)
+            ->where('updated_at', '>=', now()->subMonth())
+            ->first();
+        Log::info($playerStatistics);
+
+        return $playerStatistics ? $playerStatistics->toArray() : [];
+    }
+
+
+    public function getPlayerStatsOverall($account_id)
+    {
+        $playerStatistics = PlayerShip::select(
+            'battles_played as battles',
+            'wins_count as wins',
+            'ship_tier as tier',
+            'survival_rate as survived',
+            'damage_dealt as damage',
+            'frags as frags',
+            'xp as xp',
+            'capture as capture',
+            'defend as defend',
+            'wn8 as wn8'
+        )
+            ->where('account_id', $account_id)
+            ->first();
+        Log::info($playerStatistics);
+
+        return $playerStatistics ? $playerStatistics->toArray() : [];
+    }
 
     public function getPlayerVehicleData($account_id, $name)
     {

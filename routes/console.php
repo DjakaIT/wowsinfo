@@ -34,7 +34,7 @@ Schedule::command('fetch-store:ships')
 
 
 Schedule::command('fetch-store:player-ships')
-    ->dailyAt('02:00')
+    ->dailyAt('04:00')
     ->before(function () {
         Log::info('Player ships fetching cron started');
     })
@@ -45,17 +45,6 @@ Schedule::command('fetch-store:player-ships')
         Log::error('Player ships fetching cron failed: ' . $exception->getMessage());
     });
 
-Schedule::command('fetch-store:players-data')
-    ->weeklyOn(3, '03:00')
-    ->before(function () {
-        Log::info('Player data fetching cron (EU server) started');
-    })
-    ->after(function () {
-        Log::info('Player data fetching cron (EU server) successfully completed');
-    })
-    ->onFailure(function ($exception) {
-        Log::error('Player data fetching cron (EU server) failed: ' . $exception->getMessage());
-    });
 
 Schedule::command('fetch-store:clans')
     ->weeklyOn(4, '02:00')
@@ -70,7 +59,7 @@ Schedule::command('fetch-store:clans')
     });
 
 Schedule::command('fetch-store:clan-members')
-    ->weeklyOn(4, '04:30')
+    ->dailyAt('00:00')
     ->before(function () {
         Log::info('Clan member data fetching cron started');
     })
