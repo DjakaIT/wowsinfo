@@ -1,0 +1,541 @@
+@import 'bootstrap/scss/bootstrap';
+@import './colors.scss';
+
+
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px
+);
+
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 80%
+);
+
+.table{
+  margin-bottom: 0;
+}
+a{
+  text-decoration: none;
+}
+
+p{
+  margin: 0;
+  padding: 0;
+}
+.image-page{
+  img{
+    display: block;
+    width: 100%;
+    margin: 0 auto;
+  }
+}
+// WHITE SPACE
+.mb-10{
+  margin-bottom: 10px;
+}
+.mb-40{
+  margin-bottom: 40px;
+}
+.mb-50{
+  margin-bottom: 50px;
+}
+.gray-link{
+  color: #b3b3b3;
+  font-size: 30px;
+  &:hover{
+    color: #838383;
+  }
+}
+ul{
+  padding: 0;
+}
+.capitalize{
+  text-transform: capitalize;
+}
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.content {
+  flex-grow: 1;
+}
+body{
+  background-color: #f9f9f9;
+}
+.navbar-nav{
+  align-items: center;
+}
+.navbar{
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-left: 100px;
+  background-color: #343a40;
+
+  img{
+    position: absolute;
+    top: 2px;
+    left: 20px;
+    width: 80px;
+    height: auto;
+  }
+
+  .main-nav a{
+    text-decoration: none;
+    color: #fff;
+    
+    &.dropdown-item{
+      color: #000;
+    }
+  }
+}
+.shadow4{
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+}
+
+.customRedefine{
+  font-size: 1.25rem;
+  font-weight: 200;
+
+  b{
+    font-weight: 700;
+  }
+
+  thead{
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    th {
+      color: #303030; // CHANGE to black
+      vertical-align: top;
+      padding: .60rem .75rem;
+    }
+    &.thead-dark th{
+      background-color: transparent;
+      color: #303030;
+    }
+  }
+  &.playerTable thead {
+    background-image: url('/images/table-bg-player.jpg');
+  }
+
+  &.vehicleTable thead {
+    background-image: url('/images/table-bg-vehicle.jpg');
+  }
+
+  p{
+    margin-bottom: 0;
+  }
+
+  tbody{
+    .vehicle-icon{
+      width: 65px;
+      height: auto;
+      display: inline-block;
+      margin-right: 20px;
+      vertical-align: baseline;
+    }
+    .nation-icon{
+      display: block;
+      height: 35px;
+      width: auto;
+      margin: 0 auto;
+    }
+
+    td{
+      padding: 0.35rem 0.75rem;
+    }
+  }
+
+  // CUSTOM SIZINGS
+  &.playerTable{
+    tbody td{ text-align: right }
+    tbody td:first-child { text-align: left }
+    thead th, tbody td{ width: 18% }
+    thead th:first-child, tbody td:first-child{ width: 28% }
+  }
+  &.vehicleTable{
+    tbody td{ text-align: right }
+    tbody td:first-child, td:nth-child(2){ text-align: left }
+    tbody td:last-child{ text-align: right }
+  }
+}
+
+// player page
+.player-title{
+  font-size: 36px;
+  font-weight: 700;
+  color: #000;
+  margin-bottom: -4px;
+}
+
+.player-info{
+  margin-bottom: 0;
+}
+
+.page-padding{
+  padding-top: 30px;
+}
+
+@media (max-width: 600px) {
+  .customRedefine {
+    font-size: 11px;
+  }
+  .player-title{
+    font-size: 24px;
+  }
+  .player-info{
+    font-size: 12px;
+  }
+}
+
+.player-search-dropdown{
+  position: absolute;
+  background: white;
+  width: 100%;
+  top: 38px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  max-height: 300px;
+  overflow: hidden;
+  z-index: 9999;
+
+  .player-search-dropdown-ul{
+    padding: 0;
+    max-height: 300px;
+    overflow-y: scroll;
+    width: calc(100% + 20px);
+
+    li{
+      list-style: none;
+      padding: 5px 20px;
+      cursor: pointer;
+      color: #000;
+
+      &:hover{
+        background-color: #dee2e6;
+      }
+    }
+  }
+}
+.form-control {
+  height: calc(1.5em + 0.75rem + 4px);
+}
+.table-info-para{
+  margin-top: -10px;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.tooltip-container-trigger{
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.heading1{
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  font-weight: 100;
+}
+
+.heading2{
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.tooltip.b-tooltip{
+  text-wrap: balance;
+}
+
+// Footer
+ul{
+  list-style: none;
+}
+footer {
+  color: #adadad;
+  background-color: #343a40;
+  padding: 20px;
+  
+  ul{
+    display: block;
+    width: 100%;
+    text-align: center;
+
+    li{
+      display: inline-block;
+      margin: 0 10px;
+
+      a{
+        color: #fff;
+
+        &:hover{
+          color: #fff;
+        }
+      }
+    }
+  }
+
+  .disclaimer{
+    margin-bottom: 0;
+    font-size: 12px;
+    text-align: center;
+  }
+}
+
+// VEHICLE INFO POPUP
+.vehicle-popup-background{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9998;
+  background: #262626;
+  opacity: 0.45;
+}
+.vehicle-info-popup{
+  position: fixed;
+  z-index: 9999;
+  width: 600px;
+  max-width: 90%;
+  padding: 20px;
+  text-align: center;
+  background: #fff;
+
+  img{
+    margin-bottom: 20px;
+  }
+}
+.popup-holder{
+  position: relative;
+}
+.pointer{
+  cursor: pointer;
+}
+.page-heading{
+  margin: 50px 0;
+  text-align: center;
+  font-size: 36px;
+  font-weight: 700;
+  color: #000;
+}
+.page-subheading{
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 30px;
+  font-weight: 700;
+  color: #000;
+}
+
+.wiki-nation-group{
+  text-align: center;
+}
+.wiki-nation-item{
+  display: inline-block;
+  margin: 5px;
+}
+.wiki-group-holder{
+  width: 100%;
+
+  &:after{
+    content: '';
+    display: block;
+    clear: both;
+  }
+
+  .wiki-type-item{
+    float: left;
+    width: 10%;
+  
+    img{
+      display: block;
+      margin: 0 auto 10px;
+      width: 100%;
+    }
+    span{
+      display: block;
+      text-align: center;
+    }
+  }
+}
+
+.wiki-type-group-home{
+  text-align: center;
+  &:after{
+    content: '';
+    display: block;
+    clear: both;
+  }
+
+  .wiki-type-item{
+    float: left;
+    width: 20%;
+  
+    image{
+      display: block;
+      margin: 0 auto 10px;
+      width: 100%;
+    }
+    span{
+      display: block;
+      text-align: center;
+    }
+  }
+}
+.border-separator{
+  width: 100%;
+  height: 0;
+  margin: 20px 0;
+  border-bottom: 1px solid #bfbfbf;
+}
+.wiki-vehicle-content{
+  .wiki-ship-image{
+    img{
+      width: 100%;
+    }
+  }
+
+  .wiki-info-list{
+    .bullet{
+      font-size: 20px;
+    }
+    .value{
+      font-size: 20px;
+      font-weight: 700;
+    }
+  }
+}
+.wiki-section-title{
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #bfbfbf;
+  text-align: left;
+
+  h2, img{
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  img{
+    width: 50px;
+    margin-right: 15px;
+  }
+}
+.wikie-details-subtitles{
+  font-weight: 700;
+}
+.wiki-module-title-holder{
+  position: relative;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #bfbfbf;
+  
+  .wiki-module-title{
+    margin-bottom: 0;
+  }
+  .wiki-switch{
+    position: absolute;
+    right: 0;
+    z-index: 1;
+    top: 50%;
+    margin-top: -12px;
+    font-weight: 600;
+    color: #78737d;
+  }
+}
+.modules-tree-list{
+  .module-box{
+    margin-bottom: 10px;
+    &:after{
+      content: '';
+      display: block;
+      clear: both;
+    }
+
+    .module-title-box{
+      position: relative;
+      float: left;
+      width: 50px;
+      margin-right: 15px;
+
+      .module-image{
+        display: block;
+        width: 50px;
+        margin-right: 15px;
+        padding: 5px;
+        background: rgb(131,87,157);
+        background: linear-gradient(0deg, rgba(131,87,157,1) 0%, rgba(104,46,154,1) 100%);
+      }
+      
+    }
+    .modules-box{
+      float: left;
+    }
+  }
+}
+
+.module-title{
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+.stats-bar-holder{
+  position: relative;
+  width: 100%;
+  height: 5px;
+  background: #bfbfbf;
+
+  .stat-bar{
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 5px;
+    background: rgb(131,87,157);
+    background: linear-gradient(270deg, rgb(160,124,181) 0%, rgba(104,46,154,1) 100%);
+  }
+}
+
+.wiki-text-info{
+  font-size: 15px;
+}
+
+.wiki-breadcrumb{
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  list-style: none;
+  background-color: #e9ecef;
+  border-radius: 0.25rem;
+}
+
+.head-db{
+  font-size: 12px;
+
+  tr, th{
+    border: 1px solid black;
+    text-align: center;
+
+    tr:nth-child(odd){
+      background: rgb(194, 194, 194);
+    }
+    tr{
+      border: none;
+      border-collapse: collapse;
+    }
+  }
+  
+}

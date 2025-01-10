@@ -32,17 +32,103 @@ class PlayerShipController extends Controller
                 'metaDescription' => $metaDescription,
                 'metaKeywords' => $metaKeywords,
             ],
-            /*    'statistics' => [
-                'topPlayersLast24Hours' => $topPlayersLast24Hours,
-                'topPlayersLast7Days' => $topPlayersLast7Days,
-                'topPlayersLastMonth' => $topPlayersLastMonth,
-                'topPlayersOverall' => $topPlayersOverall,
-                'topClans' => $topClans,
-
-            ], */
+            'playerInfo' => [
+                'name' => 'Player 1',
+                'wid' => 111,
+                'createdAt' => '01.12.2023',
+                'clanName' => 'Clan 1',
+                'clanId' => 333
+            ],
+            'playerStatistics' => [
+                'overall' => [
+                    'battles' => 2000,
+                    'wins' => 59.7, // percentage
+                    'tier' => '7,7',
+                    'survived' => 48.59, // perventage
+                    'damage' => 70.968,
+                    'frags' => '1,13',
+                    'spotted' => '0,18',
+                    'xp' => 1.889,
+                    'capture' => 1000, // ??? type ???
+                    'defend' => 1000, // ??? type ???
+                    'pr' => 2800, // ??? type ???
+                    'wn8' => 3200 // ??? type ???
+                ],
+                'lastDay' => [ // last day only
+                    'battles' => 4,
+                    'wins' => 40.3, // percentage
+                    'tier' => '8',
+                    'survived' => 67.12, // perventage
+                    'damage' => 6.322,
+                    'frags' => '2,11',
+                    'spotted' => '0,18',
+                    'xp' => 652,
+                    'capture' => 300, // ??? type ???
+                    'defend' => 155, // ??? type ???
+                    'pr' => 2005, // ??? type ???
+                    'wn8' => 2890 // ??? type ???
+                ],
+                'lastWeek' => [ // last 7 days
+                    'battles' => 22,
+                    'wins' => 48.9, // percentage
+                    'tier' => '8,2',
+                    'survived' => 37.12, // perventage
+                    'damage' => 12.500,
+                    'frags' => '2,15',
+                    'spotted' => '0,44',
+                    'xp' => 790,
+                    'capture' => 400, // ??? type ???
+                    'defend' => 390, // ??? type ???
+                    'pr' => 2980, // ??? type ???
+                    'wn8' => 2750 // ??? type ???
+                ],
+                'lastMonth' => [ // Last 25 days
+                    'battles' => 154,
+                    'wins' => 60.3, // percentage
+                    'tier' => '8,1',
+                    'survived' => 60.4, // perventage
+                    'damage' => 20.548,
+                    'frags' => '2,12',
+                    'spotted' => '0,56',
+                    'xp' => 980,
+                    'capture' => 824, // ??? type ???
+                    'defend' => 759, // ??? type ???
+                    'pr' => 2299, // ??? type ???
+                    'wn8' => 3145 // ??? type ???
+                ]
+            ],
+            'playerVehicles' => [
+                [
+                    'nation' => 'Germany',
+                    'name' => 'Vehicle name',
+                    'tier' => 2,
+                    'battles' => 38,
+                    'frags' => 34,
+                    'damage' => 4.280,
+                    'wins' => 67.46, // percentage
+                    'wn8' => 1754,
+                    'image' => 'image url', // ??? url ???
+                    'description' => 'Vehicle description',
+                    'wid' => 555
+                ],
+                [
+                    'nation' => 'Japan',
+                    'name' => 'Vehicle name',
+                    'tier' => 4,
+                    'battles' => 45,
+                    'frags' => 32,
+                    'damage' => 7.490,
+                    'wins' => 36.46, // percentage
+                    'wn8' => 980,
+                    'image' => 'image url', // ??? url ???
+                    'description' => 'Vehicle description',
+                    'wid' => 555
+                ]
+            ],
         ]);
     }
 
+    // Ovo bi trebalo u kontroler za homepage ili statistiku
     public function getHomePageStats()
     {
 
@@ -72,6 +158,7 @@ class PlayerShipController extends Controller
             ],
         ]);
     }
+
     public function updatePlayerShips()
     {
         $this->playerShipService->fetchAndStorePlayerShips();

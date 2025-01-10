@@ -16,124 +16,124 @@ use App\Http\Controllers\PlayerShipController;
 use App\Http\Controllers\PlayerStatisticController;
 
 Route::get('/', [PlayerShipController::class, 'getHomePageStats']); // Main home page
-Route::get('/player/{name}/{id}', [PlayerShipController::class, 'getPlayerPageStats']); // Player page
+Route::get('/player/{name}/{id}', [PlayerShipController::class, 'getPlayerPageStats'])->name('player.page'); // Player page
 
 
-Route::get('/player', function () {
-    // DATA INFO
-    // 1. List of 10 best players today -  tier is above 5 and 5+ battles
-    // 2. List of 10 best players last 7 days - tier is above 5 and 30+ battles
-    // 3. List of 10 best players last month (25 days) - tier is above 5 and 120+ battles
-    // 4. List of 10 best players overall (28 days) - tier is above 5 and 500+ battles
-    // 5. List of 10 best Clans
-    return view('player', [
-        'playerInfo' => [
-            'name' => 'Player 1',
-            'wid' => 111,
-            'createdAt' => '01.12.2023',
-            'clanName' => 'Clan 1',
-            'clanId' => 333
-        ],
-        'playerStatistics' => [
-            'overall' => [
-                'battles' => 2000,
-                'wins' => 59.7, // percentage
-                'tier' => '7,7',
-                'survived' => 48.59, // perventage
-                'damage' => 70.968,
-                'frags' => '1,13',
-                'spotted' => '0,18',
-                'xp' => 1.889,
-                'capture' => 1000, // ??? type ???
-                'defend' => 1000, // ??? type ???
-                'pr' => 2800, // ??? type ???
-                'wn8' => 3200 // ??? type ???
-            ],
-            'lastDay' => [ // last day only
-                'battles' => 4,
-                'wins' => 40.3, // percentage
-                'tier' => '8',
-                'survived' => 67.12, // perventage
-                'damage' => 6.322,
-                'frags' => '2,11',
-                'spotted' => '0,18',
-                'xp' => 652,
-                'capture' => 300, // ??? type ???
-                'defend' => 155, // ??? type ???
-                'pr' => 2005, // ??? type ???
-                'wn8' => 2890 // ??? type ???
-            ],
-            'lastWeek' => [ // last 7 days
-                'battles' => 22,
-                'wins' => 48.9, // percentage
-                'tier' => '8,2',
-                'survived' => 37.12, // perventage
-                'damage' => 12.500,
-                'frags' => '2,15',
-                'spotted' => '0,44',
-                'xp' => 790,
-                'capture' => 400, // ??? type ???
-                'defend' => 390, // ??? type ???
-                'pr' => 2980, // ??? type ???
-                'wn8' => 2750 // ??? type ???
-            ],
-            'lastMonth' => [ // Last 25 days
-                'battles' => 154,
-                'wins' => 60.3, // percentage
-                'tier' => '8,1',
-                'survived' => 60.4, // perventage
-                'damage' => 20.548,
-                'frags' => '2,12',
-                'spotted' => '0,56',
-                'xp' => 980,
-                'capture' => 824, // ??? type ???
-                'defend' => 759, // ??? type ???
-                'pr' => 2299, // ??? type ???
-                'wn8' => 3145 // ??? type ???
-            ]
-        ],
-        'playerVehicles' => [
-            [
-                'nation' => 'Germany',
-                'name' => 'Vehicle name',
-                'tier' => 2,
-                'battles' => 38,
-                'frags' => 34,
-                'damage' => 4.280,
-                'wins' => 67.46, // percentage
-                'wn8' => 1754,
-                'image' => 'image url', // ??? url ???
-                'description' => 'Vehicle description',
-                'wid' => 555
-            ],
-            [
-                'nation' => 'Japan',
-                'name' => 'Vehicle name',
-                'tier' => 4,
-                'battles' => 45,
-                'frags' => 32,
-                'damage' => 7.490,
-                'wins' => 36.46, // percentage
-                'wn8' => 980,
-                'image' => 'image url', // ??? url ???
-                'description' => 'Vehicle description',
-                'wid' => 555
-            ]
-        ],
-    ]);
-});
+// Route::get('/player', function () {
+//     // DATA INFO
+//     // 1. List of 10 best players today -  tier is above 5 and 5+ battles
+//     // 2. List of 10 best players last 7 days - tier is above 5 and 30+ battles
+//     // 3. List of 10 best players last month (25 days) - tier is above 5 and 120+ battles
+//     // 4. List of 10 best players overall (28 days) - tier is above 5 and 500+ battles
+//     // 5. List of 10 best Clans
+//     return view('player', [
+//         'playerInfo' => [
+//             'name' => 'Player 1',
+//             'wid' => 111,
+//             'createdAt' => '01.12.2023',
+//             'clanName' => 'Clan 1',
+//             'clanId' => 333
+//         ],
+//         'playerStatistics' => [
+//             'overall' => [
+//                 'battles' => 2000,
+//                 'wins' => 59.7, // percentage
+//                 'tier' => '7,7',
+//                 'survived' => 48.59, // perventage
+//                 'damage' => 70.968,
+//                 'frags' => '1,13',
+//                 'spotted' => '0,18',
+//                 'xp' => 1.889,
+//                 'capture' => 1000, // ??? type ???
+//                 'defend' => 1000, // ??? type ???
+//                 'pr' => 2800, // ??? type ???
+//                 'wn8' => 3200 // ??? type ???
+//             ],
+//             'lastDay' => [ // last day only
+//                 'battles' => 4,
+//                 'wins' => 40.3, // percentage
+//                 'tier' => '8',
+//                 'survived' => 67.12, // perventage
+//                 'damage' => 6.322,
+//                 'frags' => '2,11',
+//                 'spotted' => '0,18',
+//                 'xp' => 652,
+//                 'capture' => 300, // ??? type ???
+//                 'defend' => 155, // ??? type ???
+//                 'pr' => 2005, // ??? type ???
+//                 'wn8' => 2890 // ??? type ???
+//             ],
+//             'lastWeek' => [ // last 7 days
+//                 'battles' => 22,
+//                 'wins' => 48.9, // percentage
+//                 'tier' => '8,2',
+//                 'survived' => 37.12, // perventage
+//                 'damage' => 12.500,
+//                 'frags' => '2,15',
+//                 'spotted' => '0,44',
+//                 'xp' => 790,
+//                 'capture' => 400, // ??? type ???
+//                 'defend' => 390, // ??? type ???
+//                 'pr' => 2980, // ??? type ???
+//                 'wn8' => 2750 // ??? type ???
+//             ],
+//             'lastMonth' => [ // Last 25 days
+//                 'battles' => 154,
+//                 'wins' => 60.3, // percentage
+//                 'tier' => '8,1',
+//                 'survived' => 60.4, // perventage
+//                 'damage' => 20.548,
+//                 'frags' => '2,12',
+//                 'spotted' => '0,56',
+//                 'xp' => 980,
+//                 'capture' => 824, // ??? type ???
+//                 'defend' => 759, // ??? type ???
+//                 'pr' => 2299, // ??? type ???
+//                 'wn8' => 3145 // ??? type ???
+//             ]
+//         ],
+//         'playerVehicles' => [
+//             [
+//                 'nation' => 'Germany',
+//                 'name' => 'Vehicle name',
+//                 'tier' => 2,
+//                 'battles' => 38,
+//                 'frags' => 34,
+//                 'damage' => 4.280,
+//                 'wins' => 67.46, // percentage
+//                 'wn8' => 1754,
+//                 'image' => 'image url', // ??? url ???
+//                 'description' => 'Vehicle description',
+//                 'wid' => 555
+//             ],
+//             [
+//                 'nation' => 'Japan',
+//                 'name' => 'Vehicle name',
+//                 'tier' => 4,
+//                 'battles' => 45,
+//                 'frags' => 32,
+//                 'damage' => 7.490,
+//                 'wins' => 36.46, // percentage
+//                 'wn8' => 980,
+//                 'image' => 'image url', // ??? url ???
+//                 'description' => 'Vehicle description',
+//                 'wid' => 555
+//             ]
+//         ],
+//     ]);
+// });
 
 
 //ship wiki routes 
 Route::prefix('wiki')->group(function () {
 
-    Route::get('/', [ShipController::class, 'ship-home'])->name('wiki.home');
+    Route::get('/', [ShipController::class, 'getWikiHomePage'])->name('wiki.home');
 
-    Route::get('/{nation}', [ShipController::class, 'ship-nation'])->name('wiki.ship-nation');
+    Route::get('/{nation}', [ShipController::class, 'getWikiNationPage'])->name('wiki.nation');
 
-    Route::get('/{type}', [ShipController::class, 'ship-type'])->name('wiki.ship-type');
+    Route::get('/{type}', [ShipController::class, 'getWikiTypePage'])->name('wiki.type');
 
-    Route::get('/{nation}/{type}/{ship}', [ShipController::class, 'ship-details'])->name('wiki.ship-details');
+    Route::get('/{nation}/{type}/{ship}', [ShipController::class, 'getWikiVehiclePage'])->name('wiki.vehicle');
 });
 
 
@@ -146,7 +146,7 @@ Route::prefix('wiki')->group(function () {
 Route::prefix('clans')->group(function () {
 
     Route::get('/fetch', [ClanController::class, 'fetchAndStoreClans']);
-    Route::get('/', [ClanController::class, 'index']);
+    Route::get('/', [ClanController::class, 'index'])->name('clan.page');
     Route::get('/{id}', [ClanController::class, 'show']);
     Route::post('/', [ClanController::class, 'store']);
     Route::put('/{id}', [ClanController::class, 'update']);
