@@ -563,12 +563,13 @@ class PlayerShipService
             'damage_dealt as damage',
             'frags as frags',
             'xp as xp',
+            'spotted as spotted',
             'capture as capture',
             'defend as defend',
             'wn8 as wn8'
         )
             ->where('account_id', $account_id)
-            ->where('updated_at', '<=', now()->subDay())
+            ->where('updated_at', '>=', now()->subDay())
             ->first();
         Log::info($playerStatistics);
 
@@ -584,6 +585,7 @@ class PlayerShipService
             'damage_dealt as damage',
             'frags as frags',
             'xp as xp',
+            'spotted as spotted',
             'capture as capture',
             'defend as defend',
             'wn8 as wn8'
@@ -606,6 +608,7 @@ class PlayerShipService
             'damage_dealt as damage',
             'frags as frags',
             'xp as xp',
+            'spotted as spotted',
             'capture as capture',
             'defend as defend',
             'wn8 as wn8'
@@ -629,6 +632,7 @@ class PlayerShipService
             'damage_dealt as damage',
             'frags as frags',
             'xp as xp',
+            'spotted as spotted',
             'capture as capture',
             'defend as defend',
             'wn8 as wn8'
