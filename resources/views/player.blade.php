@@ -51,11 +51,18 @@
                     </tr>
                     <tr class="border-b">
                         <td class="py-2 px-4">Survived</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['overall']['survived'] ?? 'N/A' }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastDay']['survived'] ?? 'N/A' }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['survived'] ?? 'N/A' }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['survived'] ?? 'N/A' }}</td>
-                    </tr>
+                        <td class="py-2 px-4">
+                            {{ isset($playerStatistics['overall']['survived']) ? round($playerStatistics['overall']['survived'], 2) . '%' : 'N/A' }}
+                        </td>
+                        <td class="py-2 px-4">
+                            {{ isset($playerStatistics['lastDay']['survived']) ? round($playerStatistics['lastDay']['survived'], 2) . '%' : 'N/A' }}
+                        </td>
+                        <td class="py-2 px-4">
+                            {{ isset($playerStatistics['lastWeek']['survived']) ? round($playerStatistics['lastWeek']['survived'], 2) . '%' : 'N/A' }}
+                        </td>
+                        <td class="py-2 px-4">
+                            {{ isset($playerStatistics['lastMonth']['survived']) ? round($playerStatistics['lastMonth']['survived'], 2) . '%' : 'N/A' }}
+                        </td>
                     <tr class="border-b">
                         <td class="py-2 px-4">Damage</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['damage'] ?? 'N/A' }}</td>
