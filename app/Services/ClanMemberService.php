@@ -63,93 +63,52 @@ class ClanMemberService
             foreach ($this->baseUrls as $serverKey => $baseUrl) {
                 Log::info("Processing server", ['server' => strtoupper($serverKey)]);
 
-                foreach ($clanIds as $clanId) {
-                    Log::info("Fetching data for clan", ['clan_id' => $clanId, 'server' => strtoupper($serverKey)]);
+                $clansUrl = $baseUrl . "/wows/clans/info/";
 
-                    $clansUrl = $baseUrl . "/wows/clans/info/";
+                // Batch the clan IDs into groups of 100
+                $batches = array_chunk($clanIds, 100);
+
+                foreach ($batches as $batch) {
+                    Log::info("Fetching data for clan batch", [
+                        'batch_size' => count($batch),
+                        'server' => strtoupper($serverKey)
+                    ]);
 
                     // Define the rate limiter key
-                    $rateLimitKey = "fetch-clan:$clanId:$serverKey";
+                    $rateLimitKey = "fetch-clan-batch:" . implode(',', $batch) . ":$serverKey";
 
                     // Attempt to fetch clan data with rate limiting
                     $executed = RateLimiter::attempt(
                         $rateLimitKey,
                         $perSecond = 20,
-                        function () use ($clanId, $clansUrl, $serverKey) {
+                        function () use ($batch, $clansUrl, $serverKey) {
                             $clanResponse = Http::get($clansUrl, [
                                 'application_id' => $this->apiKey,
-                                'clan_id' => $clanId,
+                                'clan_id' => implode(',', $batch),
                                 'extra' => 'members'
+                            ]);
+
+                            Log::info("Raw API response for batch", [
+                                'response' => $clanResponse->json(),
+                                'server' => strtoupper($serverKey)
                             ]);
 
                             if ($clanResponse->successful()) {
                                 $clanData = $clanResponse->json();
 
-                                if (isset($clanData['data'][$clanId])) {
-                                    $clanInfo = $clanData['data'][$clanId];
-                                    $clanName = $clanInfo['name'];
-                                    $members = $clanInfo['members'] ?? [];
-
-                                    Log::info("Found members in clan", [
-                                        'clan_id' => $clanId,
-                                        'member_count' => is_array($members) ? count($members) : 0
-                                    ]);
-
-                                    $player_count = count($members);
-
-                                    if (is_array($members) && $player_count > 0) {
-                                        $sum_player_wn8 = 0;
-                                        foreach ($members as $memberId => $player) {
-                                            $total_player_wn8 = PlayerShip::where('account_id', $player['account_id'])->value('total_player_wn8');
-                                            $total_player_wn8 = $total_player_wn8 !== null ? $total_player_wn8 : 0;
-
-                                            if ($total_player_wn8 > 0) {
-                                                $sum_player_wn8 += $total_player_wn8;
-                                            }
-                                            try {
-                                                $createdAt = $this->fetchAccountCreationDate($player, $serverKey);
-
-                                                ClanMember::updateOrCreate(
-                                                    ['account_id' => $player['account_id']],
-                                                    [
-                                                        'account_name' => $player['account_name'],
-                                                        'clan_id' => $clanId,
-                                                        'clan_name' => $clanName,
-                                                        'joined_at' => now()->setTimestamp($player['joined_at']),
-                                                        'role' => $player['role'],
-                                                        'account_created' => $createdAt,
-                                                    ]
-                                                );
-
-                                                Log::info("Updated/Created clan member", [
-                                                    'account_id' => $player['account_id'],
-                                                    'account_name' => $player['account_name'],
-                                                    'clan_id' => $clanId,
-                                                    'server' => strtoupper($serverKey)
-                                                ]);
-                                            } catch (\Exception $e) {
-                                                Log::error("Error saving clan member", [
-                                                    'account_id' => $player['account_id'],
-                                                    'clan_id' => $clanId,
-                                                    'error' => $e->getMessage()
-                                                ]);
-                                            }
-                                        }
-
-                                        $total_clan_wn8 = $player_count > 0 ? round($sum_player_wn8 / $player_count) : 0;
-                                        ClanMember::where('clan_id', $clanId)->update(['total_clan_wn8' => $total_clan_wn8]);
+                                foreach ($batch as $clanId) {
+                                    if (isset($clanData['data'][$clanId])) {
+                                        $this->processClanData($clanData['data'][$clanId], $clanId, $serverKey);
                                     } else {
-                                        Log::info("No members found for this clan", ['clan_id' => $clanId]);
+                                        Log::warning("No valid data found for clan in batch", [
+                                            'clan_id' => $clanId,
+                                            'server' => strtoupper($serverKey)
+                                        ]);
                                     }
-                                } else {
-                                    Log::warning("No valid data found for clan", [
-                                        'clan_id' => $clanId,
-                                        'server' => strtoupper($serverKey)
-                                    ]);
                                 }
                             } else {
-                                Log::error("Failed to fetch clan data", [
-                                    'clan_id' => $clanId,
+                                Log::error("Failed to fetch clan data for batch", [
+                                    'batch' => implode(',', $batch),
                                     'server' => strtoupper($serverKey),
                                     'status' => $clanResponse->status()
                                 ]);
@@ -158,8 +117,10 @@ class ClanMemberService
                         $decayRate = 1
                     );
 
+
+
                     if (!$executed) {
-                        Log::warning("Rate limit exceeded for clan ID: {$clanId} on server: " . strtoupper($serverKey));
+                        Log::warning("Rate limit exceeded for batch on server: " . strtoupper($serverKey));
                         sleep(1);
                     }
                 }
@@ -172,6 +133,66 @@ class ClanMemberService
                 'trace' => $e->getTraceAsString()
             ]);
             throw $e;
+        }
+    }
+
+    protected function processClanData($clanInfo, $clanId, $serverKey)
+    {
+        $clanName = $clanInfo['name'];
+        $members = $clanInfo['members'] ?? [];
+
+        Log::info("Found members in clan", [
+            'clan_id' => $clanId,
+            'member_count' => is_array($members) ? count($members) : 0
+        ]);
+
+        $player_count = count($members);
+
+        if (is_array($members) && $player_count > 0) {
+            $sum_player_wn8 = 0;
+            foreach ($members as $memberId => $player) {
+                $total_player_wn8 = PlayerShip::where('account_id', $player['account_id'])->value('total_player_wn8');
+                $total_player_wn8 = $total_player_wn8 !== null ? $total_player_wn8 : 0;
+
+                if ($total_player_wn8 > 0) {
+                    $sum_player_wn8 += $total_player_wn8;
+                }
+                try {
+
+                    $joinedAt = date('Y-m-d H:i:s', $player['joined_at']);
+
+
+                    ClanMember::updateOrCreate(
+                        ['account_id' => $player['account_id']],
+                        [
+                            'account_name' => $player['account_name'],
+                            'clan_id' => $clanId,
+                            'clan_name' => $clanName,
+                            'joined_at' => $joinedAt,
+                            'role' => $player['role'],
+                        ]
+                    );
+
+                    Log::info("Updated/Created clan member", [
+                        'account_id' => $player['account_id'],
+                        'account_name' => $player['account_name'],
+                        'clan_id' => $clanId,
+                        'joined_at' => now()->setTimestamp($player['joined_at']),
+                        'server' => strtoupper($serverKey)
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error("Error saving clan member", [
+                        'account_id' => $player['account_id'],
+                        'clan_id' => $clanId,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            $total_clan_wn8 = $player_count > 0 ? round($sum_player_wn8 / $player_count) : 0;
+            ClanMember::where('clan_id', $clanId)->update(['total_clan_wn8' => $total_clan_wn8]);
+        } else {
+            Log::info("No members found for this clan", ['clan_id' => $clanId]);
         }
     }
     public function fetchAccountCreationDate($player, $serverKey)

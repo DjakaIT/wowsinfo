@@ -120,34 +120,6 @@ class PlayerShipService
         return $player_total_wn8;
     }
 
-
-    private function determineCategoryWN8($wn8)
-    {
-        //simple if statement, if "value" eq "num" then return "x->value"
-        if ($wn8 == null) {
-            return 'Null';
-        }
-
-        if ($wn8 < 750) {
-            return 'Bad';
-        } elseif ($wn8 >= 750 && $wn8 < 1100) {
-            return 'Below Average';
-        } elseif ($wn8 >= 1100 && $wn8 < 1350) {
-            return 'Average';
-        } elseif ($wn8 >= 1350 && $wn8 < 1550) {
-            return 'Good';
-        } elseif ($wn8 >= 1550 && $wn8 < 1750) {
-            return 'Very Good';
-        } elseif ($wn8 >= 1750 && $wn8 < 2100) {
-            return 'Great';
-        } elseif ($wn8 >= 2100 && $wn8 < 2450) {
-            return 'Unicum';
-        } elseif ($wn8 >= 2450 && $wn8 < 9999) {
-            return 'Super Unicum';
-        }
-    }
-
-
     private function extractBattleStats($stats, $battleType)
     {
         return [
@@ -503,8 +475,7 @@ class PlayerShipService
 
                             //total_player_wn8
                             $total_player_wn8 = $this->totalPlayerWN8($playerId);
-                            //wn8 per type / category of a ship 
-                            $wn8_category = $this->determineCategoryWN8($wn8);
+
 
 
                             Log::info("Processing ship for player", [
