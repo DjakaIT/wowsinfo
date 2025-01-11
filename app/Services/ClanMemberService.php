@@ -251,17 +251,27 @@ class ClanMemberService
             ->where('account_name', $name)
             ->first();
 
+
+        // If not found in clan_members, fallback to player_ships table
         if (!$playerInfo) {
-            Log::warning("Player not found", ['account_id' => $account_id, 'name' => $name]);
+            $playerInfo = PlayerShip::select('account_id', 'player_name as name', DB::raw("'NOT IN A CLAN' as clanName"), 'created_at as createdAt')
+                ->where('account_id', $account_id)
+                ->first();
+        }
+
+        // If still not found, return a 404 response or custom error
+        if (!$playerInfo) {
+            Log::warning("Player not found in both clan_members and player_ships", ['account_id' => $account_id, 'name' => $name]);
             return null;
         }
+
 
         $playerData = [
             'name' => $playerInfo->name,
             'wid' => $playerInfo->account_id,
             'createdAt' => $playerInfo->createdAt,
-            'clanName' => $playerInfo->clanName,
-            'clanId' => $playerInfo->clan_id
+            'clanName' => $playerInfo->clanName ?? null,
+            'clanId' => $playerInfo->clan_id ?? null
         ];
 
         Log::info("Fetched player info", ['playerInfo' => $playerData]);

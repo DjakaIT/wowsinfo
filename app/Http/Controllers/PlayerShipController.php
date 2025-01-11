@@ -116,6 +116,11 @@ class PlayerShipController extends Controller
         return response()->json($playerShip);
     }
 
+    public function getNullNames()
+    {
+        $this->playerShipService->getNullNamePlayersNames();
+    }
+
     public function store(Request $request)
     {
         $validatedNewStatData = $request->validate([

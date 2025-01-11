@@ -17,11 +17,21 @@ class PlayerShipService
 {
     protected $apiKey;
     protected $apiUrl = "https://api.worldofwarships.eu/wows/ships/stats/";
+    protected $apiUrlNames = "https://api.worldofwarships.eu/wows/account/info/";
+
+    protected $baseUrls;
+
 
     protected $expectedValues;
     public function __construct()
     {
         $this->apiKey = config('services.wargaming.api_key');
+
+        $this->baseUrls = [
+            'eu' => 'https://api.worldofwarships.eu',
+            'na' => 'https://api.worldofwarships.com',
+            'asia' => 'https://api.worldofwarships.asia',
+        ];
     }
 
     public function loadExpectedValues()
@@ -156,7 +166,7 @@ class PlayerShipService
 
     public function getTopPlayersLast24Hours()
     {
-        $last24Hours = now()->subDays(1);
+        $last24Hours = now()->subHours(24);
 
         return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
             ->where('ship_tier', '>', 5)
@@ -179,12 +189,12 @@ class PlayerShipService
     public function getTopPlayersLast7Days()
     {
 
-        $last7days = now()->subDays(7);
+        $last7days = now()->subDays(6);
 
         return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
             ->where('ship_tier', '>', 5)
             ->where('battles_played', '>', 30)
-            ->where('updated_at', '<=', $last7days)
+            ->where('updated_at', '>=', $last7days)
             ->groupBy('account_id')
             ->orderByDesc('total_player_wn8')
             ->limit(10)
@@ -281,6 +291,38 @@ class PlayerShipService
     }
 
 
+    public function getNullNamePlayersNames(): void
+    {
+        $playerIds = PlayerShip::whereNull('player_name')->pluck('account_id')->unique()->all();
+
+        foreach ($this->baseUrls as $serverKey => $baseUrl) {
+            foreach ($playerIds as $playerId) {
+                $url = $baseUrl . "/wows/account/info/";
+                $response = Http::get($url, [
+                    'application_id' => $this->apiKey,
+                    'account_id' => $playerId,
+                ]);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                    if (isset($data['data'][$playerId]['nickname'])) {
+                        $playerName = $data['data'][$playerId]['nickname'];
+                        PlayerShip::where('account_id', $playerId)->update(['player_name' => $playerName]);
+                        Log::info("Updated player name for account_id: $playerId", ['player_name' => $playerName]);
+                    } else {
+                        Log::warning("Nickname not found in API response for account_id: $playerId", ['server' => strtoupper($serverKey)]);
+                    }
+                } else {
+                    Log::error("Failed to fetch player name from API", [
+                        'account_id' => $playerId,
+                        'server' => strtoupper($serverKey),
+                        'status' => $response->status(),
+                        'response' => $response->body()
+                    ]);
+                }
+            }
+        }
+    }
 
     public function fetchAndStorePlayerShips()
     {
@@ -293,7 +335,7 @@ class PlayerShipService
             Log::info("Data loaded", ['players_count' => count($playerIds)]);
 
             foreach ($playerIds as $playerId) {
-                $response = Http::get($this->apiUrl, [
+                $response = Http::get($this->apiUrlNames, [
                     'application_id' => $this->apiKey,
                     'account_id' => $playerId,
                     'extra' => 'pve,club,pve_div2,pve_div3,pve_solo,pvp_solo,pvp_div2,pvp_div3,rank_solo,rank_div2,rank_div3'
@@ -569,7 +611,7 @@ class PlayerShipService
             'wn8 as wn8'
         )
             ->where('account_id', $account_id)
-            ->where('updated_at', '>=', now()->subDay())
+            ->where('updated_at', '<=', now()->subDay())
             ->first();
         Log::info($playerStatistics);
 
