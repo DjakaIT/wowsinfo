@@ -32,6 +32,8 @@ class PlayerShipService
             'na' => 'https://api.worldofwarships.com',
             'asia' => 'https://api.worldofwarships.asia',
         ];
+
+        ini_set('memory_limit', '512M');
     }
 
     public function loadExpectedValues()
@@ -130,6 +132,9 @@ class PlayerShipService
             'xp' => $stats[$battleType]['xp'] ?? 0,
             'survived_battles' => $stats[$battleType]['survived_battles'] ?? 0,
             'distance' => $stats[$battleType]['distance'] ?? 0,
+            'ships_spotted' => $stats[$battleType]['ships_spotted'] ?? 0,
+            'capture_points' => $stats[$battleType]['capture_points'] ?? 0,
+            'dropped_capture_points' => $stats[$battleType]['dropped_capture_points'] ?? 0,
         ];
     }
 
@@ -298,260 +303,284 @@ class PlayerShipService
 
     public function fetchAndStorePlayerShips()
     {
-        $this->loadExpectedValues();
+
+
+        try {
+            $this->loadExpectedValues();
+        } catch (\Exception $e) {
+            Log::error("Failed to load expected values", [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw new \Exception("Failed to initialize: " . $e->getMessage());
+        }
 
         Log::info('Starting fetchAndStorePlayerShips');
 
         try {
             $playerIds = ClanMember::pluck('account_id')->all();
+            if (empty($playerIds)) {
+                Log::info("No player ids found in database");
+                return false;
+            }
+
             Log::info("Data loaded", ['players_count' => count($playerIds)]);
+            foreach ($this->baseUrls as $serverKey => $baseUrl) {
 
-            foreach ($playerIds as $playerId) {
-                $response = Http::get($this->apiUrlNames, [
-                    'application_id' => $this->apiKey,
-                    'account_id' => $playerId,
-                    'extra' => 'pve,club,pve_div2,pve_div3,pve_solo,pvp_solo,pvp_div2,pvp_div3,rank_solo,rank_div2,rank_div3'
-                ]);
+                $url = $baseUrl . "/wows/ships/stats/";
 
-                if ($response->successful()) {
-                    $data = $response->json();
-
-                    $playerName = ClanMember::where('account_id', $playerId)->value('account_name');
+                foreach ($playerIds as $playerId) {
 
 
+                    $response = Http::get($url, [
+                        'application_id' => $this->apiKey,
+                        'account_id' => $playerId,
+                        'extra' => 'pve,club,pve_div2,pve_div3,pve_solo,pvp_solo,pvp_div2,pvp_div3,rank_solo,rank_div2,rank_div3'
+                    ]);
 
-                    if (isset($data['data'][$playerId])) {
-                        foreach ($data['data'][$playerId] as $shipStats) {
-                            // Find the ship using ship_id from the API
-                            $ship = Ship::where('ship_id', $shipStats['ship_id'])->first();
+                    if ($response->successful()) {
+                        $data = $response->json();
 
-
-                            if (!$ship) {
-                                Log::warning("Ship not found in database", [
-                                    'api_ship_id' => $shipStats['ship_id'],
-                                    'player_id' => $playerId
-                                ]);
-                                continue;
-                            }
-
-
-                            //extract stats from ships table 
-                            $shipName = $ship->name;
-                            $shipType = $ship->type;
-                            $shipTier = $ship->tier;
-                            $shipNation = $ship->nation;
-
-                            // Extract statistics for different battle types
-                            $pvpStats = [];
-                            $pveStats = [];
-                            $clubStats = [];
-                            $rankStats = [];
-
-                            if (isset($shipStats['pvp'])) {
-                                $pvpStats = $this->extractBattleStats($shipStats, 'pvp');
-                            }
-
-                            if (isset($shipStats['pvp_div2'])) {
-                                $pvp2Stats = $this->extractBattleStats($shipStats, 'pvp_div2');
-                            }
-
-                            if (isset($shipStats['pvp_div3'])) {
-                                $pvp3Stats = $this->extractBattleStats($shipStats, 'pvp_div3');
-                            }
-
-                            if (isset($shipStats['pve'])) {
-                                $pveStats = $this->extractBattleStats($shipStats, 'pve');
-                            }
-
-                            if (isset($shipStats['pve_solo'])) {
-                                $pve_soloStats = $this->extractBattleStats($shipStats, 'pve_solo');
-                            }
-
-                            if (isset($shipStats['pve_div2'])) {
-                                $pve2Stats = $this->extractBattleStats($shipStats, 'pve_div2');
-                            }
-
-                            if (isset($shipStats['pve_div3'])) {
-                                $pve3Stats = $this->extractBattleStats($shipStats, 'pve_div3');
-                            }
-
-                            if (isset($shipStats['club'])) {
-                                $clubStats = $this->extractBattleStats($shipStats, 'club');
-                            }
-
-                            if (isset($shipStats['rank_solo'])) {
-                                $rankStats = $this->extractBattleStats($shipStats, 'rank_solo');
-                            }
-
-                            if (isset($shipStats['rank_div2'])) {
-                                $rank_div2Stats = $this->extractBattleStats($shipStats, 'rank_solo');
-                            }
-
-                            if (isset($shipStats['rank_div3'])) {
-                                $rank_div3Stats = $this->extractBattleStats($shipStats, 'rank_solo');
-                            }
+                        $playerName = ClanMember::where('account_id', $playerId)->value('account_name');
 
 
 
-
-                            // Calculate total battles
-                            $totalBattles = ($pvpStats['battles'] ?? 0) + ($pveStats['battles'] ?? 0)
-                                + ($clubStats['battles'] ?? 0) + ($rankStats['battles'] ?? 0)
-                                + ($rank_div2Stats['battles'] ?? 0) + ($rank_div3Stats['battles'] ?? 0)
-                                + ($pve_soloStats['battles'] ?? 0) + ($pve2Stats['battles'] ?? 0)
-                                + ($pve3Stats['battles'] ?? 0) + ($pvp2Stats['battles'] ?? 0)
-                                + ($pvp3Stats['battles'] ?? 0);
-
-                            // Calculate total damage
-                            $totalDamageDealt = ($pvpStats['damage_dealt'] ?? 0) + ($pveStats['damage_dealt'] ?? 0)
-                                + ($clubStats['damage_dealt'] ?? 0) + ($rankStats['damage_dealt'] ?? 0)
-                                + ($rank_div2Stats['damage_dealt'] ?? 0) + ($rank_div3Stats['damage_dealt'] ?? 0)
-                                + ($pve_soloStats['damage_dealt'] ?? 0) + ($pve2Stats['damage_dealt'] ?? 0)
-                                + ($pve3Stats['damage_dealt'] ?? 0) + ($pvp2Stats['damage_dealt'] ?? 0)
-                                + ($pvp3Stats['damage_dealt'] ?? 0);
+                        if (isset($data['data'][$playerId])) {
+                            foreach ($data['data'][$playerId] as $shipStats) {
+                                // Find the ship using ship_id from the API
+                                $ship = Ship::where('ship_id', $shipStats['ship_id'])->first();
 
 
-                            $averageDamage = $totalBattles > 0 ? $totalDamageDealt / $totalBattles : 0;
-
-                            //calculate total wins
-                            $totalWins = ($pvpStats['wins'] ?? 0) + ($pveStats['wins'] ?? 0)
-                                + ($clubStats['wins'] ?? 0) + ($rankStats['wins'] ?? 0)
-                                + ($rank_div2Stats['wins'] ?? 0) + ($rank_div3Stats['wins'] ?? 0)
-                                + ($pve_soloStats['wins'] ?? 0) + ($pve2Stats['wins'] ?? 0)
-                                + ($pve3Stats['wins'] ?? 0) + ($pvp2Stats['wins'] ?? 0)
-                                + ($pvp3Stats['wins'] ?? 0);
-
-                            //calculate total frags
-                            $totalFrags = ($pvpStats['frags'] ?? 0) + ($pveStats['frags'] ?? 0)
-                                + ($clubStats['frags'] ?? 0) + ($rankStats['frags'] ?? 0)
-                                + ($rank_div2Stats['frags'] ?? 0) + ($rank_div3Stats['frags'] ?? 0)
-                                + ($pve_soloStats['frags'] ?? 0) + ($pve2Stats['frags'] ?? 0)
-                                + ($pve3Stats['frags'] ?? 0) + ($pvp2Stats['frags'] ?? 0)
-                                + ($pvp3Stats['frags'] ?? 0);
-
-                            $totalXp = ($pvpStats['xp'] ?? 0) + ($pveStats['xp'] ?? 0)
-                                + ($clubStats['xp'] ?? 0) + ($rankStats['xp'] ?? 0)
-                                + ($rank_div2Stats['xp'] ?? 0) + ($rank_div3Stats['xp'] ?? 0)
-                                + ($pve_soloStats['xp'] ?? 0) + ($pve2Stats['xp'] ?? 0)
-                                + ($pve3Stats['xp'] ?? 0) + ($pvp2Stats['xp'] ?? 0)
-                                + ($pvp3Stats['xp'] ?? 0);
+                                if (!$ship) {
+                                    Log::warning("Ship not found in database", [
+                                        'api_ship_id' => $shipStats['ship_id'],
+                                        'player_id' => $playerId
+                                    ]);
+                                    continue;
+                                }
 
 
-                            $totalCapture = ($pvpStats['capture_points'] ?? 0) + ($pveStats['capture_points'] ?? 0)
-                                + ($clubStats['capture_points'] ?? 0) + ($rankStats['capture_points'] ?? 0)
-                                + ($rank_div2Stats['capture_points'] ?? 0) + ($rank_div3Stats['capture_points'] ?? 0)
-                                + ($pve_soloStats['capture_points'] ?? 0) + ($pve2Stats['capture_points'] ?? 0)
-                                + ($pve3Stats['capture_points'] ?? 0) + ($pvp2Stats['capture_points'] ?? 0)
-                                + ($pvp3Stats['capture_points'] ?? 0);
+                                //extract stats from ships table 
+                                $shipName = $ship->name ?? 'Unknown ship name';
+                                $shipType = $ship->type ?? 'Unknown ship type';
+                                $shipTier = $ship->tier ?? 'Unknown ship tier';
+                                $shipNation = $ship->nation ?? 'Unkown nation';
 
-                            $totalDefend = ($pvpStats['dropped_capture_points'] ?? 0) + ($pveStats['dropped_capture_points'] ?? 0)
-                                + ($clubStats['dropped_capture_points'] ?? 0) + ($rankStats['dropped_capture_points'] ?? 0)
-                                + ($rank_div2Stats['dropped_capture_points'] ?? 0) + ($rank_div3Stats['dropped_capture_points'] ?? 0)
-                                + ($pve_soloStats['dropped_capture_points'] ?? 0) + ($pve2Stats['dropped_capture_points'] ?? 0)
-                                + ($pve3Stats['dropped_capture_points'] ?? 0) + ($pvp2Stats['dropped_capture_points'] ?? 0)
-                                + ($pvp3Stats['dropped_capture_points'] ?? 0);
 
-                            $totalSpotted = ($pvpStats['ships_spotted'] ?? 0) + ($pveStats['ships_spotted'] ?? 0)
-                                + ($clubStats['ships_spotted'] ?? 0) + ($rankStats['ships_spotted'] ?? 0)
-                                + ($rank_div2Stats['ships_spotted'] ?? 0) + ($rank_div3Stats['ships_spotted'] ?? 0)
-                                + ($pve_soloStats['ships_spotted'] ?? 0) + ($pve2Stats['ships_spotted'] ?? 0)
-                                + ($pve3Stats['ships_spotted'] ?? 0) + ($pvp2Stats['ships_spotted'] ?? 0)
-                                + ($pvp3Stats['ships_spotted'] ?? 0);
+                                // Extract statistics for different battle types
+                                $pvpStats = [];
+                                $pvp2Stats = [];
+                                $pvp3Stats = [];
+                                $pveStats = [];
+                                $pve_soloStats = [];
+                                $pve2Stats = [];
+                                $pve3Stats = [];
+                                $clubStats = [];
+                                $rankStats = [];
+                                $rank_div2Stats = [];
+                                $rank_div3Stats = [];
+
+                                if (isset($shipStats['pvp'])) {
+                                    $pvpStats = $this->extractBattleStats($shipStats, 'pvp');
+                                }
+
+                                if (isset($shipStats['pvp_div2'])) {
+                                    $pvp2Stats = $this->extractBattleStats($shipStats, 'pvp_div2');
+                                }
+
+                                if (isset($shipStats['pvp_div3'])) {
+                                    $pvp3Stats = $this->extractBattleStats($shipStats, 'pvp_div3');
+                                }
+
+                                if (isset($shipStats['pve'])) {
+                                    $pveStats = $this->extractBattleStats($shipStats, 'pve');
+                                }
+
+                                if (isset($shipStats['pve_solo'])) {
+                                    $pve_soloStats = $this->extractBattleStats($shipStats, 'pve_solo');
+                                }
+
+                                if (isset($shipStats['pve_div2'])) {
+                                    $pve2Stats = $this->extractBattleStats($shipStats, 'pve_div2');
+                                }
+
+                                if (isset($shipStats['pve_div3'])) {
+                                    $pve3Stats = $this->extractBattleStats($shipStats, 'pve_div3');
+                                }
+
+                                if (isset($shipStats['club'])) {
+                                    $clubStats = $this->extractBattleStats($shipStats, 'club');
+                                }
+
+                                if (isset($shipStats['rank_solo'])) {
+                                    $rankStats = $this->extractBattleStats($shipStats, 'rank_solo');
+                                }
+
+                                if (isset($shipStats['rank_div2'])) {
+                                    $rank_div2Stats = $this->extractBattleStats($shipStats, 'rank_solo');
+                                }
+
+                                if (isset($shipStats['rank_div3'])) {
+                                    $rank_div3Stats = $this->extractBattleStats($shipStats, 'rank_solo');
+                                }
 
 
 
 
+                                // Calculate total battles
+                                $totalBattles = ($pvpStats['battles'] ?? 0) + ($pveStats['battles'] ?? 0)
+                                    + ($clubStats['battles'] ?? 0) + ($rankStats['battles'] ?? 0)
+                                    + ($rank_div2Stats['battles'] ?? 0) + ($rank_div3Stats['battles'] ?? 0)
+                                    + ($pve_soloStats['battles'] ?? 0) + ($pve2Stats['battles'] ?? 0)
+                                    + ($pve3Stats['battles'] ?? 0) + ($pvp2Stats['battles'] ?? 0)
+                                    + ($pvp3Stats['battles'] ?? 0);
 
-                            // Calculate survival rate
-                            $totalSurvivedBattles = ($pvpStats['survived_battles'] ?? 0) + ($pveStats['survived_battles'] ?? 0) + ($clubStats['survived_battles'] ?? 0) + ($rankStats['survived_battles'] ?? 0);
-                            $survivalRate = $totalBattles > 0 ? ($totalSurvivedBattles / $totalBattles) * 100 : 0;
+                                // Calculate total damage
+                                $totalDamageDealt = ($pvpStats['damage_dealt'] ?? 0) + ($pveStats['damage_dealt'] ?? 0)
+                                    + ($clubStats['damage_dealt'] ?? 0) + ($rankStats['damage_dealt'] ?? 0)
+                                    + ($rank_div2Stats['damage_dealt'] ?? 0) + ($rank_div3Stats['damage_dealt'] ?? 0)
+                                    + ($pve_soloStats['damage_dealt'] ?? 0) + ($pve2Stats['damage_dealt'] ?? 0)
+                                    + ($pve3Stats['damage_dealt'] ?? 0) + ($pvp2Stats['damage_dealt'] ?? 0)
+                                    + ($pvp3Stats['damage_dealt'] ?? 0);
 
 
+                                $averageDamage = $totalBattles > 0 ? $totalDamageDealt / $totalBattles : 0;
+
+                                //calculate total wins
+                                $totalWins = ($pvpStats['wins'] ?? 0) + ($pveStats['wins'] ?? 0)
+                                    + ($clubStats['wins'] ?? 0) + ($rankStats['wins'] ?? 0)
+                                    + ($rank_div2Stats['wins'] ?? 0) + ($rank_div3Stats['wins'] ?? 0)
+                                    + ($pve_soloStats['wins'] ?? 0) + ($pve2Stats['wins'] ?? 0)
+                                    + ($pve3Stats['wins'] ?? 0) + ($pvp2Stats['wins'] ?? 0)
+                                    + ($pvp3Stats['wins'] ?? 0);
+
+                                //calculate total frags
+                                $totalFrags = ($pvpStats['frags'] ?? 0) + ($pveStats['frags'] ?? 0)
+                                    + ($clubStats['frags'] ?? 0) + ($rankStats['frags'] ?? 0)
+                                    + ($rank_div2Stats['frags'] ?? 0) + ($rank_div3Stats['frags'] ?? 0)
+                                    + ($pve_soloStats['frags'] ?? 0) + ($pve2Stats['frags'] ?? 0)
+                                    + ($pve3Stats['frags'] ?? 0) + ($pvp2Stats['frags'] ?? 0)
+                                    + ($pvp3Stats['frags'] ?? 0);
+
+                                $totalXp = ($pvpStats['xp'] ?? 0) + ($pveStats['xp'] ?? 0)
+                                    + ($clubStats['xp'] ?? 0) + ($rankStats['xp'] ?? 0)
+                                    + ($rank_div2Stats['xp'] ?? 0) + ($rank_div3Stats['xp'] ?? 0)
+                                    + ($pve_soloStats['xp'] ?? 0) + ($pve2Stats['xp'] ?? 0)
+                                    + ($pve3Stats['xp'] ?? 0) + ($pvp2Stats['xp'] ?? 0)
+                                    + ($pvp3Stats['xp'] ?? 0);
 
 
+                                $totalCapture = ($pvpStats['capture_points'] ?? 0) + ($pveStats['capture_points'] ?? 0)
+                                    + ($clubStats['capture_points'] ?? 0) + ($rankStats['capture_points'] ?? 0)
+                                    + ($rank_div2Stats['capture_points'] ?? 0) + ($rank_div3Stats['capture_points'] ?? 0)
+                                    + ($pve_soloStats['capture_points'] ?? 0) + ($pve2Stats['capture_points'] ?? 0)
+                                    + ($pve3Stats['capture_points'] ?? 0) + ($pvp2Stats['capture_points'] ?? 0)
+                                    + ($pvp3Stats['capture_points'] ?? 0);
 
-                            //wn8
-                            $wn8 =  $this->calculateWN8($ship, $totalBattles, $totalFrags, $totalWins, $totalDamageDealt);
+                                $totalDefend = ($pvpStats['dropped_capture_points'] ?? 0) + ($pveStats['dropped_capture_points'] ?? 0)
+                                    + ($clubStats['dropped_capture_points'] ?? 0) + ($rankStats['dropped_capture_points'] ?? 0)
+                                    + ($rank_div2Stats['dropped_capture_points'] ?? 0) + ($rank_div3Stats['dropped_capture_points'] ?? 0)
+                                    + ($pve_soloStats['dropped_capture_points'] ?? 0) + ($pve2Stats['dropped_capture_points'] ?? 0)
+                                    + ($pve3Stats['dropped_capture_points'] ?? 0) + ($pvp2Stats['dropped_capture_points'] ?? 0)
+                                    + ($pvp3Stats['dropped_capture_points'] ?? 0);
 
-                            //total_player_wn8
-                            $total_player_wn8 = $this->totalPlayerWN8($playerId);
+                                $totalSpotted = ($pvpStats['ships_spotted'] ?? 0) + ($pveStats['ships_spotted'] ?? 0)
+                                    + ($clubStats['ships_spotted'] ?? 0) + ($rankStats['ships_spotted'] ?? 0)
+                                    + ($rank_div2Stats['ships_spotted'] ?? 0) + ($rank_div3Stats['ships_spotted'] ?? 0)
+                                    + ($pve_soloStats['ships_spotted'] ?? 0) + ($pve2Stats['ships_spotted'] ?? 0)
+                                    + ($pve3Stats['ships_spotted'] ?? 0) + ($pvp2Stats['ships_spotted'] ?? 0)
+                                    + ($pvp3Stats['ships_spotted'] ?? 0);
 
+                                // Calculate survival rate
+                                $totalSurvivedBattles = ($pvpStats['survived_battles'] ?? 0) + ($pveStats['survived_battles'] ?? 0) + ($clubStats['survived_battles'] ?? 0) + ($rankStats['survived_battles'] ?? 0);
+                                $survivalRate = $totalBattles > 0 ? ($totalSurvivedBattles / $totalBattles) * 100 : 0;
 
+                                //wn8
+                                $wn8 =  $this->calculateWN8($ship, $totalBattles, $totalFrags, $totalWins, $totalDamageDealt);
 
-                            Log::info("Processing ship for player", [
-                                'player_id' => $playerId,
-                                'ship_id' => $ship->ship_id,
-                                'ship_name' => $ship->name,
-                                'ship_nation' => $ship->nation
-                            ]);
+                                //total_player_wn8
+                                $total_player_wn8 = $this->totalPlayerWN8($playerId);
 
-                            PlayerShip::updateOrCreate(
-                                [
-                                    'account_id' => $playerId,
-                                    'ship_id' => $shipStats['ship_id']
-                                ],
-                                [
-                                    'player_name' => $playerName,
-                                    'battles_played' => $totalBattles,
-                                    'last_battle_time' => $shipStats['last_battle_time'],
-                                    'wins_count' => $totalWins,
-                                    'damage_dealt' => $totalDamageDealt,
-                                    'average_damage' => $averageDamage,
-                                    'frags' => $totalFrags,
-                                    'survival_rate' => $survivalRate,
-                                    'xp' => $totalXp,
-                                    'ship_name' => $shipName,
-                                    'ship_type' => $shipType,
-                                    'ship_tier' => $shipTier,
-                                    'ship_nation' => $shipNation,
-                                    'distance' => $shipStats['distance'],
-                                    'wn8' => $wn8,
-                                    'total_player_wn8' => $total_player_wn8,
+                                Log::info("Processing ship for player", [
+                                    'player_id' => $playerId,
+                                    'ship_id' => $ship->ship_id,
+                                    'ship_name' => $ship->name,
+                                    'ship_nation' => $ship->nation,
+                                    'spotted' => $totalSpotted,
                                     'capture' => $totalCapture,
                                     'defend' => $totalDefend,
-                                    'spotted' => $totalSpotted,
-                                    // PVE stats
-                                    'pve_battles' => $pveStats['battles'] ?? 0,
-                                    'pve_wins' => $pveStats['wins'] ?? 0,
-                                    'pve_frags' => $pveStats['frags'] ?? 0,
-                                    'pve_xp' => $pveStats['xp'] ?? 0,
-                                    'pve_survived_battles' => $pveStats['survived_battles'] ?? 0,
-                                    // PVP stats
-                                    'pvp_battles' => $pvpStats['battles'] ?? 0,
-                                    'pvp_wins' => $pvpStats['wins'] ?? 0,
-                                    'pvp_frags' => $pvpStats['frags'] ?? 0,
-                                    'pvp_xp' => $pvpStats['xp'] ?? 0,
-                                    'pvp_survived_battles' => $pvpStats['survived_battles'] ?? 0,
-                                    // Club stats
-                                    'club_battles' => $clubStats['battles'] ?? 0,
-                                    'club_wins' => $clubStats['wins'] ?? 0,
-                                    'club_frags' => $clubStats['frags'] ?? 0,
-                                    'club_xp' => $clubStats['xp'] ?? 0,
-                                    'club_survived_battles' => $clubStats['survived_battles'] ?? 0,
-                                    //Rank stats
-                                    'rank_battles' => $rankStats['battles'] ?? 0,
-                                    'rank_wins' => $rankStats['wins'] ?? 0,
-                                    'rank_frags' => $rankStats['frags'] ?? 0,
-                                    'rank_xp' => $rankStats['xp'] ?? 0,
-                                    'rank_survived_battles' => $rankStats['survived_battles'] ?? 0,
-                                ]
-                            );
+                                    'xp' => $totalXp,
+                                ]);
+
+                                PlayerShip::updateOrCreate(
+                                    [
+                                        'account_id' => $playerId,
+                                        'ship_id' => $shipStats['ship_id']
+                                    ],
+                                    [
+                                        'player_name' => $playerName,
+                                        'battles_played' => $totalBattles,
+                                        'last_battle_time' => $shipStats['last_battle_time'],
+                                        'wins_count' => $totalWins,
+                                        'damage_dealt' => $totalDamageDealt,
+                                        'average_damage' => $averageDamage,
+                                        'frags' => $totalFrags,
+                                        'survival_rate' => $survivalRate,
+                                        'xp' => $totalXp,
+                                        'ship_name' => $shipName,
+                                        'ship_type' => $shipType,
+                                        'ship_tier' => $shipTier,
+                                        'ship_nation' => $shipNation,
+                                        'distance' => $shipStats['distance'],
+                                        'wn8' => $wn8,
+                                        'total_player_wn8' => $total_player_wn8,
+                                        'capture' => $totalCapture,
+                                        'defend' => $totalDefend,
+                                        'spotted' => $totalSpotted,
+                                        // PVE stats
+                                        'pve_battles' => $pveStats['battles'] ?? 0,
+                                        'pve_wins' => $pveStats['wins'] ?? 0,
+                                        'pve_frags' => $pveStats['frags'] ?? 0,
+                                        'pve_xp' => $pveStats['xp'] ?? 0,
+                                        'pve_survived_battles' => $pveStats['survived_battles'] ?? 0,
+                                        // PVP stats
+                                        'pvp_battles' => $pvpStats['battles'] ?? 0,
+                                        'pvp_wins' => $pvpStats['wins'] ?? 0,
+                                        'pvp_frags' => $pvpStats['frags'] ?? 0,
+                                        'pvp_xp' => $pvpStats['xp'] ?? 0,
+                                        'pvp_survived_battles' => $pvpStats['survived_battles'] ?? 0,
+                                        // Club stats
+                                        'club_battles' => $clubStats['battles'] ?? 0,
+                                        'club_wins' => $clubStats['wins'] ?? 0,
+                                        'club_frags' => $clubStats['frags'] ?? 0,
+                                        'club_xp' => $clubStats['xp'] ?? 0,
+                                        'club_survived_battles' => $clubStats['survived_battles'] ?? 0,
+                                        //Rank stats
+                                        'rank_battles' => $rankStats['battles'] ?? 0,
+                                        'rank_wins' => $rankStats['wins'] ?? 0,
+                                        'rank_frags' => $rankStats['frags'] ?? 0,
+                                        'rank_xp' => $rankStats['xp'] ?? 0,
+                                        'rank_survived_battles' => $rankStats['survived_battles'] ?? 0,
+                                    ]
+                                );
+                            }
+                            Log::info("Successfully updated/created player ship record", [
+                                'player_id' => $playerId,
+                                'ship_id' => $shipStats['ship_id'],
+                                'nation' => $ship ? $ship->nation : 'unknown',
+                            ]);
+                            $this->totalPlayerWN8($playerId);
                         }
-                        Log::info("Successfully updated/created player ship record", [
-                            'player_id' => $playerId,
-                            'ship_id' => $shipStats['ship_id'],
-                            'nation' => $ship->nation
+                    } else {
+                        Log::error("Failed to fetch player ships", [
+                            'account_id' => $playerId,
+                            'status' => $response->status(),
+                            'response' => $response->body()
                         ]);
-                        $this->totalPlayerWN8($playerId);
                     }
-                } else {
-                    Log::error("Failed to fetch player ships", [
-                        'account_id' => $playerId,
-                        'status' => $response->status(),
-                        'response' => $response->body()
-                    ]);
                 }
             }
+
 
             return true;
         } catch (\Exception $e) {

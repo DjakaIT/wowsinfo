@@ -41,9 +41,10 @@ Schedule::command('fetch-store:player-ships')
     ->after(function () {
         Log::info('Player ships fetching cron completed');
     })
-    ->onFailure(function ($exception) {
-        Log::error('Player ships fetching cron failed: ' . $exception->getMessage());
-    });
+    ->onFailure(function () {
+        Log::error('Player ships fetching cron failed. Check the logs for detailed error information.');
+    })
+    ->appendOutputTo(storage_path('logs/player_ships_cron.log'));
 
 
 Schedule::command('fetch-store:clans')
@@ -68,4 +69,16 @@ Schedule::command('fetch-store:clan-members')
     })
     ->onFailure(function ($exception) {
         Log::error('Clan member data fetching cron failed: ' . $exception->getMessage());
+    });
+
+Schedule::command('fetch-store:account-creation')
+    ->weeklyOn(4, '00:00')
+    ->before(function () {
+        Log::info('Account creation date fetching cron started');
+    })
+    ->after(function () {
+        Log::info('Account creation date fetching cron completed');
+    })
+    ->onFailure(function ($exception) {
+        Log::error('Account creation date fetching cron failed: ' . $exception->getMessage());
     });
