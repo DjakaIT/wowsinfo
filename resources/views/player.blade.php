@@ -1,3 +1,6 @@
+@php
+  use App\Helpers\FrontendHelper;
+@endphp
 @extends('layout.layout')
 
 @section('metaTitle', $metaSite['metaTitle'])
@@ -17,7 +20,7 @@
         <!-- Player statistics -->
         <div v-if="playerStatistics === null">Loading</div>
         <div class="shadow4" v-else>
-            <table class="player-table">
+            <table class="table table-striped table-bordered customRedefine playerTable">
                 <thead>
                     <tr class="bg-gray-100 text-left">
                         <th class="border-b">Stats</th>
@@ -107,10 +110,10 @@
                     </tr>
                     <tr class="border-b">
                         <td class="py-2 px-4">WN8</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['overall']['wn8'] }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastDay']['wn8'] }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['wn8'] }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['wn8'] }}</td>
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['overall']['wn8']]) }}">{{ $playerStatistics['overall']['wn8'] }}</td>
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['lastDay']['wn8']) }}">{{ $playerStatistics['lastDay']['wn8'] }}</td>
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['lastWeek']['wn8']) }}">{{ $playerStatistics['lastWeek']['wn8'] }}</td>
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['lastMonth']['wn8']) }}">{{ $playerStatistics['lastMonth']['wn8'] }}</td>
                     </tr>
                 </tbody> --}}
             </table>
@@ -119,7 +122,7 @@
         <!-- Player vehicles -->
         <div v-if="playerVehicles.length === 0">Loading</div>
         <div v-else class="shadow4 table-container">
-            <table class="player-table">
+            <table class="table table-striped table-bordered customRedefine playerTable">
                 <thead>
                     <tr class="bg-gray-100 text-left">
                         <th class="border-b">Nation</th>
@@ -142,7 +145,7 @@
                             <td class="py-2 px-4">{{ $vehicle['frags'] }}</td>
                             <td class="py-2 px-4">{{ $vehicle['damage'] }}</td>
                             <td class="py-2 px-4">{{ $vehicle['wins'] }}</td>
-                            <td class="py-2 px-4">{{ $vehicle['wn8'] }}</td>
+                            <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($vehicle['wn8']) }}">{{ $vehicle['wn8'] }}</td>
                         </tr>
                     @endforeach
                 </tbody>
