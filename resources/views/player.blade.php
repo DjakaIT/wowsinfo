@@ -18,8 +18,8 @@
         <p class="player-info">Created at: {{ $playerInfo['createdAt'] }}</p>
         <!-- ### Player info -->
         <!-- Player statistics -->
-        <div v-if="playerStatistics === null">Loading</div>
-        <div class="shadow4" v-else>
+        <!-- <div v-if="playerStatistics === null">Loading</div> -->
+        <div class="shadow4 mb-40">
             <table class="table table-striped table-bordered customRedefine playerTable">
                 <thead>
                     <tr class="bg-gray-100 text-left">
@@ -30,7 +30,7 @@
                         <th class="border-b">Last month</th>
                     </tr>
                 </thead>
-                {{--   <tbody>
+                <tbody>
                     <tr class="border-b">
                         <td class="py-2 px-4">Battles</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['battles'] }}</td>
@@ -101,27 +101,27 @@
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['defend'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['defend'] }}</td>
                     </tr>
-                    <tr class="border-b">
+                    {{-- <tr class="border-b">
                         <td class="py-2 px-4">PR</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['pr'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['pr'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['pr'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['pr'] }}</td>
-                    </tr>
+                    </tr> --}}
                     <tr class="border-b">
                         <td class="py-2 px-4">WN8</td>
-                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['overall']['wn8']]) }}">{{ $playerStatistics['overall']['wn8'] }}</td>
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['overall']['wn8']) }}">{{ $playerStatistics['overall']['wn8'] }}</td>
                         <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['lastDay']['wn8']) }}">{{ $playerStatistics['lastDay']['wn8'] }}</td>
                         <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['lastWeek']['wn8']) }}">{{ $playerStatistics['lastWeek']['wn8'] }}</td>
                         <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['lastMonth']['wn8']) }}">{{ $playerStatistics['lastMonth']['wn8'] }}</td>
                     </tr>
-                </tbody> --}}
+                </tbody>
             </table>
         </div>
         <!-- ### Player statistics -->
         <!-- Player vehicles -->
-        <div v-if="playerVehicles.length === 0">Loading</div>
-        <div v-else class="shadow4 table-container">
+        <!-- <div v-if="playerVehicles.length === 0">Loading</div> -->
+        <div class="shadow4 table-container">
             <table class="table table-striped table-bordered customRedefine playerTable">
                 <thead>
                     <tr class="bg-gray-100 text-left">
