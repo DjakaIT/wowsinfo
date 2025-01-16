@@ -16,13 +16,19 @@ class Clan extends Model
         'server',
         'clan_id',
         'members_count',
-        'clan_created'
+        'clan_created',
+        'clanwn8'
     ];
 
     //defines a OneToMany relationship with players table in the db
     public function players()
     {
         return $this->hasMany(Player::class, 'clan_id', 'clan_id');
+    }
+
+    public function members()
+    {
+        return $this->hasMany(ClanMember::class, 'clan_id', 'clan_id');
     }
 
     public function battles()

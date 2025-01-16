@@ -31,22 +31,7 @@ class ClanMemberService
     }
 
 
-    public function getTopClans()
-    {
-        return ClanMember::select('clan_id', DB::raw('clan_name as clan_name'), DB::raw('MAX(total_clan_wn8) as total_clan_wn8'))
-            ->groupBy('clan_id', 'clan_name')
-            ->orderByDesc('total_clan_wn8')
-            ->limit(10)
-            ->get()
-            ->map(function ($clan) {
-                return [
-                    'name' => $clan->clan_name,
-                    'wid' => $clan->clan_id,
-                    'wn8' => $clan->total_clan_wn8
-                ];
-            })
-            ->toArray();
-    }
+
 
 
 
@@ -143,24 +128,13 @@ class ClanMemberService
 
         Log::info("Found members in clan", [
             'clan_id' => $clanId,
-            'member_count' => is_array($members) ? count($members) : 0
+            'member_count' => count($members),
         ]);
 
-        $player_count = count($members);
-
-        if (is_array($members) && $player_count > 0) {
-            $sum_player_wn8 = 0;
+        if (is_array($members) && count($members) > 0) {
             foreach ($members as $memberId => $player) {
-                $total_player_wn8 = PlayerShip::where('account_id', $player['account_id'])->value('total_player_wn8');
-                $total_player_wn8 = $total_player_wn8 !== null ? $total_player_wn8 : 0;
-
-                if ($total_player_wn8 > 0) {
-                    $sum_player_wn8 += $total_player_wn8;
-                }
                 try {
-
                     $joinedAt = date('Y-m-d H:i:s', $player['joined_at']);
-
 
                     ClanMember::updateOrCreate(
                         ['account_id' => $player['account_id']],
@@ -175,26 +149,22 @@ class ClanMemberService
 
                     Log::info("Updated/Created clan member", [
                         'account_id' => $player['account_id'],
-                        'account_name' => $player['account_name'],
                         'clan_id' => $clanId,
-                        'joined_at' => now()->setTimestamp($player['joined_at']),
-                        'server' => strtoupper($serverKey)
+                        'server' => strtoupper($serverKey),
                     ]);
                 } catch (\Exception $e) {
                     Log::error("Error saving clan member", [
                         'account_id' => $player['account_id'],
                         'clan_id' => $clanId,
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
                     ]);
                 }
             }
-
-            $total_clan_wn8 = $player_count > 0 ? round($sum_player_wn8 / $player_count) : 0;
-            ClanMember::where('clan_id', $clanId)->update(['total_clan_wn8' => $total_clan_wn8]);
         } else {
             Log::info("No members found for this clan", ['clan_id' => $clanId]);
         }
     }
+
     public function fetchAccountCreationDate($player, $serverKey)
     {
         // Ensure server is valid

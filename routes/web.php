@@ -146,6 +146,7 @@ Route::prefix('wiki')->group(function () {
 Route::prefix('clans')->group(function () {
 
     Route::get('/fetch', [ClanController::class, 'fetchAndStoreClans']);
+    Route::get('/getwn8', [ClanController::class, 'getClanWN8']);
     Route::get('/', [ClanController::class, 'index'])->name('clan.page');
     Route::get('/{id}', [ClanController::class, 'show']);
     Route::post('/', [ClanController::class, 'store']);

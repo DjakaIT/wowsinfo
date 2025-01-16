@@ -21,7 +21,7 @@ Artisan::command('inspire', function () {
 
 
 Schedule::command('fetch-store:ships')
-    ->monthlyOn(15, '01:00')
+    ->weeklyOn(3, '01:00')
     ->before(function () {
         Log::info('Fetch ships cron started');
     })
@@ -57,6 +57,18 @@ Schedule::command('fetch-store:clans')
     })
     ->onFailure(function ($exception) {
         Log::error('Clan data fetching cron failed: ' . $exception->getMessage());
+    });
+
+Schedule::command('fetch-store:getclanwn8')
+    ->weeklyOn(5, '01:00')
+    ->before(function () {
+        Log::info('Clan wn8 fetching cron started');
+    })
+    ->after(function () {
+        Log::info('Clan wn8 fetching cron completed');
+    })
+    ->onFailure(function ($exception) {
+        Log::error('Clan wn8 fetching cron failed: ' . $exception->getMessage());
     });
 
 Schedule::command('fetch-store:clan-members')
