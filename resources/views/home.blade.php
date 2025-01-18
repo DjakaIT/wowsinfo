@@ -8,10 +8,11 @@
 @section('metaKeywords', $metaSite['metaKeywords'])
 
 @section('content')
-<iframe src="https://api.wn8.info/tools/wows/twitchlive.php" title="description"></iframe>
 <div class="container">
-	<div class="row">
-
+	<div class="row mb-40">
+		<div class="col">
+			<iframe src="https://api.wn8.info/tools/wows/twitchlive.php" title="description" class="tw-frame"></iframe>
+		</div>
 	</div>
 	<div class="row mb-40">
 		<div class="col">
@@ -111,6 +112,11 @@
 			<p class="table-info-para"> Statistics for players whose tier is above 5 and who have 120+ battles </p>
 		</div>
 	</div>
+	<div class="row mb-40">
+		<div class="col">
+		<iframe src="https://api.wn8.info/tools/wows/ytvids.php" title="description" class="yt-frame"></iframe>
+		</div>
+	</div>
 	<div class="row mb-10">
 		<div class="col">
 			<h2 class="heading2"> Top Player: Overall </h2>
@@ -178,5 +184,4 @@
 		</div>
 	</div>
 </div>
-<iframe src="https://api.wn8.info/tools/wows/ytvids.php" title="description"></iframe>
 @endsection

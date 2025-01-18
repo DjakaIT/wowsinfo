@@ -19,7 +19,7 @@ Route::get('/', [PlayerShipController::class, 'getHomePageStats']); // Main home
 Route::get('/player/{name}/{id}', [PlayerShipController::class, 'getPlayerPageStats'])->name('player.page'); // Player page
 
 
-// Route::get('/player', function () {
+// Route::get('/player/{name}/{id}', function () {
 //     // DATA INFO
 //     // 1. List of 10 best players today -  tier is above 5 and 5+ battles
 //     // 2. List of 10 best players last 7 days - tier is above 5 and 30+ battles
@@ -27,6 +27,11 @@ Route::get('/player/{name}/{id}', [PlayerShipController::class, 'getPlayerPageSt
 //     // 4. List of 10 best players overall (28 days) - tier is above 5 and 500+ battles
 //     // 5. List of 10 best Clans
 //     return view('player', [
+//         'metaSite' => [
+//             'metaTitle' => "- WN8 player statistics for World of Warships",
+//             'metaDescription' => "Latest statistics for playerin World of Warships, WN8 daily, weekly and monthly updates and statistic.",
+//             'metaKeywords' => "WN8, World of Warships, Statistics, Player statistics",
+//         ],
 //         'playerInfo' => [
 //             'name' => 'Player 1',
 //             'wid' => 111,
@@ -121,7 +126,7 @@ Route::get('/player/{name}/{id}', [PlayerShipController::class, 'getPlayerPageSt
 //             ]
 //         ],
 //     ]);
-// });
+// })->name('player.page');
 
 
 //ship wiki routes 
