@@ -91,7 +91,7 @@ class PlayerShipService
 
 
         // WN8 formula
-        $wn8 = (700 * $nDmg) + (300 * $nFrags) + (150 * $nWins);
+        $wn8 = (1000 * $nDmg) + (100 * $nFrags) + (200 * $nWins);
 
 
         return $wn8;
@@ -120,6 +120,65 @@ class PlayerShipService
 
 
         return $player_total_wn8;
+    }
+
+
+    private function calculatePR($ship, $totalBattles, $totalFrags, $totalWins, $totalDamageDealt)
+    {
+        //PR FORMULA - DIFFERENT RATIOS BUT SAME PARAMETERS AS WN8
+        $shipId = $ship->ship_id;
+
+        if (
+            !isset($this->expectedValues['data'][$shipId]) ||
+            empty($this->expectedValues['data'][$shipId])
+        ) {
+            Log::warning("Expected values not found or empty for ship_id: $shipId");
+            return null;
+        }
+
+        //store expected values for each ship in a varibale
+        $expected = $this->expectedValues['data'][$shipId];
+
+        //get final expected values by multiplying expected values with number of battles
+        $expectedDamage = $expected['average_damage_dealt'] * $totalBattles;
+        $expectedFrags = $expected['average_frags'] * $totalBattles;
+        $expectedWins = ($expected['win_rate'] / 100) * $totalBattles;
+
+        // Ratios
+        $rDmg = $expectedDamage > 0 ? $totalDamageDealt / $expectedDamage : 0;
+        $rFrags = $expectedFrags > 0 ? $totalFrags / $expectedFrags : 0;
+        $rWins = $expectedWins > 0 ? $totalWins / $expectedWins : 0;
+
+        // Normalize
+        $nDmg = max(0, ($rDmg - 0.4) / (1 - 0.4));
+        $nFrags = max(0, ($rFrags - 0.1) / (1 - 0.1));
+        $nWins = max(0, ($rWins - 0.7) / (1 - 0.7));
+
+
+        // PR formula
+        $pr = (700 * $nDmg) + (300 * $nFrags) + (150 * $nWins);
+
+
+        return $pr;
+    }
+
+    public function totalPlayerPR($playerId)
+    {
+        $playerShips = PlayerShip::where('account_id', $playerId)->get();
+
+        $total_weighted_pr = 0;
+        $total_battles = 0;
+
+        foreach ($playerShips as $playerShip) {
+            if ($playerShip->battles_played > 0 && $playerShips->pr !== null) {
+                $total_weighted_pr += $playerShip->pr * $playerShip->battles_played;
+                $total_battles += $playerShip->battles_played;
+            }
+        }
+
+        $player_total_pr = $total_battles > 0 ? $total_weighted_pr / $total_battles : 0;
+
+        return $player_total_pr;
     }
 
     private function extractBattleStats($stats, $battleType)
@@ -501,6 +560,11 @@ class PlayerShipService
                                 //total_player_wn8
                                 $total_player_wn8 = $this->totalPlayerWN8($playerId);
 
+                                //pr
+                                $pr = $this->calculatePR($ship, $totalBattles, $totalFrags, $totalWins, $totalDamageDealt);
+                                //total player pr
+                                $total_player_pr = $this->totalPlayerPR($playerId);
+
                                 Log::info("Processing ship for player", [
                                     'player_id' => $playerId,
                                     'ship_id' => $ship->ship_id,
@@ -534,6 +598,8 @@ class PlayerShipService
                                         'distance' => $shipStats['distance'],
                                         'wn8' => $wn8,
                                         'total_player_wn8' => $total_player_wn8,
+                                        'pr' => $pr,
+                                        'total_player_pr' => $total_player_pr,
                                         'capture' => $totalCapture,
                                         'defend' => $totalDefend,
                                         'spotted' => $totalSpotted,

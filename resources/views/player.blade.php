@@ -103,24 +103,32 @@
                     </tr>
                     <tr class="border-b">
                         <td class="py-2 px-4">Defend</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['overall']['defend'] }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastDay']['defend'] }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['defend'] }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['defend'] }}</td>
+                        <td class="py-2 px-4">{{ $playerStatistics['overall']['defend']  ?? 'N/A'}}</td>
+                        <td class="py-2 px-4">{{ $playerStatistics['lastDay']['defend']  ?? 'N/A'}}</td>
+                        <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['defend']  ?? 'N/A'}}</td>
+                        <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['defend']  ?? 'N/A'}}</td>
                     </tr>
-                    {{-- <tr class="border-b">
+                    <tr class="border-b">
                         <td class="py-2 px-4">PR</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['overall']['pr'] }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastDay']['pr'] }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['pr'] }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['pr'] }}</td>
-                    </tr> --}}
+                        <td class="py-2 px-4">{{ $playerStatistics['overall']['pr'] ?? 'N/A' }}</td>
+                        <td class="py-2 px-4">{{ $playerStatistics['lastDay']['pr']  ?? 'N/A'}}</td>
+                        <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['pr'] ?? 'N/A' }}</td>
+                        <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['pr']  ?? 'N/A'}}</td>
+                    </tr> 
                     <tr class="border-b">
                         <td class="py-2 px-4">WN8</td>
-                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['overall']['wn8']) }}">{{ $playerStatistics['overall']['wn8'] }}</td>
-                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['lastDay']['wn8']) }}">{{ $playerStatistics['lastDay']['wn8'] }}</td>
-                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['lastWeek']['wn8']) }}">{{ $playerStatistics['lastWeek']['wn8'] }}</td>
-                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['lastMonth']['wn8']) }}">{{ $playerStatistics['lastMonth']['wn8'] }}</td>
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['overall']['wn8'] ?? 0) }}">
+                            {{ $playerStatistics['overall']['wn8'] ?? 'N/A' }}
+                        </td>                        
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['lastDay']['wn8'] ?? 0) }}">
+                            {{ $playerStatistics['lastDay']['wn8'] ?? 'N/A' }}
+                        </td>
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['lastWeek']['wn8'] ?? 0) }}">
+                            {{ $playerStatistics['lastWeek']['wn8'] ?? 'N/A' }}
+                        </td>
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['lastMonth']['wn8'] ?? 0) }}">
+                            {{ $playerStatistics['lastMonth']['wn8'] ?? 'N/A' }}
+                        </td>
                     </tr>
                 </tbody>
             </table>
