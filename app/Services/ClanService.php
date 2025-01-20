@@ -128,29 +128,27 @@ class ClanService
     {
         Log::info("Calculating WN8 for all clans");
 
-        // Process clans in chunks to avoid memory and SQL limits
         Clan::chunk(100, function ($clans) {
             foreach ($clans as $clan) {
-                // Fetch the total WN8 for all ships of clan members
-                $totalMemberWN8 = DB::table('clan_members')
+                // Get distinct total_player_wn8 per member
+                $memberWN8s = DB::table('clan_members')
                     ->join('player_ships', 'clan_members.account_id', '=', 'player_ships.account_id')
                     ->where('clan_members.clan_id', $clan->clan_id)
-                    ->sum('player_ships.total_player_wn8');
+                    ->groupBy('player_ships.account_id')
+                    ->select(DB::raw('MAX(player_ships.total_player_wn8) as wn8'))
+                    ->get();
 
-                // Get the total number of members in the clan
-                $memberCount = Clan::where('clan_id', $clan->clan_id)->value('members_count');
+                $sumOfWN8 = $memberWN8s->sum('wn8');
+                $memberCount = $memberWN8s->count();
+                $clanWN8 = $memberCount > 0 ? round($sumOfWN8 / $memberCount) : 0;
 
-                // Calculate the average WN8 for the clan
-                $clanWN8 = $memberCount > 0 ? round($totalMemberWN8 / $memberCount) : 0;
-
-                // Update the clan's WN8 in the database
                 $clan->update(['clanwn8' => $clanWN8]);
 
-                Log::info("Updated WN8 for clan", [
+                Log::info("Debug clan WN8", [
                     'clan_id' => $clan->clan_id,
-                    'clan_wn8' => $clanWN8,
-                    'members_count' => $memberCount,
-                    'total_member_wn8' => $totalMemberWN8,
+                    'sumOfWN8' => $sumOfWN8,
+                    'memberCount' => $memberCount,
+                    'calculated_clan_wn8' => $clanWN8,
                 ]);
             }
         });

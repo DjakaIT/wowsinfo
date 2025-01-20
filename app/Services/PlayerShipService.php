@@ -156,8 +156,10 @@ class PlayerShipService
 
 
         // PR formula
-        $pr = (700 * $nDmg) + (300 * $nFrags) + (150 * $nWins);
+        $pr = ceil((700 * $nDmg) + (300 * $nFrags) + (150 * $nWins));
 
+        Log::info("Caclulated some stats for player's ship:  $nDmg, $nFrags, $nWins");
+        Log::info("Caclulated the total PR for player's ship:  $pr");
 
         return $pr;
     }
@@ -170,13 +172,15 @@ class PlayerShipService
         $total_battles = 0;
 
         foreach ($playerShips as $playerShip) {
-            if ($playerShip->battles_played > 0 && $playerShips->pr !== null) {
+            if ($playerShip->battles_played > 0 && $playerShip->pr !== null) {
                 $total_weighted_pr += $playerShip->pr * $playerShip->battles_played;
                 $total_battles += $playerShip->battles_played;
             }
         }
 
-        $player_total_pr = $total_battles > 0 ? $total_weighted_pr / $total_battles : 0;
+
+        $player_total_pr = ceil($total_battles > 0 ? $total_weighted_pr / $total_battles : 0);
+        Log::info("Caclulated the total PR for player:  $player_total_pr");
 
         return $player_total_pr;
     }
@@ -562,10 +566,12 @@ class PlayerShipService
 
                                 //pr
                                 $pr = $this->calculatePR($ship, $totalBattles, $totalFrags, $totalWins, $totalDamageDealt);
+                                $pr = $pr != null ? $pr : 0;
+
                                 //total player pr
                                 $total_player_pr = $this->totalPlayerPR($playerId);
 
-                                Log::info("Processing ship for player", [
+                                /*  Log::info("Processing ship for player", [
                                     'player_id' => $playerId,
                                     'ship_id' => $ship->ship_id,
                                     'ship_name' => $ship->name,
@@ -574,7 +580,7 @@ class PlayerShipService
                                     'capture' => $totalCapture,
                                     'defend' => $totalDefend,
                                     'xp' => $totalXp,
-                                ]);
+                                ]); */
 
                                 PlayerShip::updateOrCreate(
                                     [
@@ -630,11 +636,11 @@ class PlayerShipService
                                     ]
                                 );
                             }
-                            Log::info("Successfully updated/created player ship record", [
+                            /*  Log::info("Successfully updated/created player ship record", [
                                 'player_id' => $playerId,
                                 'ship_id' => $shipStats['ship_id'],
                                 'nation' => $ship ? $ship->nation : 'unknown',
-                            ]);
+                            ]); */
                             $this->totalPlayerWN8($playerId);
                         }
                     } else {
@@ -674,7 +680,8 @@ class PlayerShipService
             'spotted as spotted',
             'capture as capture',
             'defend as defend',
-            'wn8 as wn8'
+            'wn8 as wn8',
+            'total_player_pr as pr'
         )
             ->where('account_id', $account_id)
             ->where('updated_at', '<=', now()->subDay())
@@ -696,7 +703,8 @@ class PlayerShipService
             'spotted as spotted',
             'capture as capture',
             'defend as defend',
-            'wn8 as wn8'
+            'wn8 as wn8',
+            'total_player_pr as pr'
         )
             ->where('account_id', $account_id)
             ->where('updated_at', '>=', now()->subWeek())
@@ -719,7 +727,8 @@ class PlayerShipService
             'spotted as spotted',
             'capture as capture',
             'defend as defend',
-            'wn8 as wn8'
+            'wn8 as wn8',
+            'total_player_pr as pr'
         )
             ->where('account_id', $account_id)
             ->where('updated_at', '>=', now()->subMonth())
@@ -743,7 +752,8 @@ class PlayerShipService
             'spotted as spotted',
             'capture as capture',
             'defend as defend',
-            'wn8 as wn8'
+            'wn8 as wn8',
+            'total_player_pr as pr'
         )
             ->where('account_id', $account_id)
             ->first();
