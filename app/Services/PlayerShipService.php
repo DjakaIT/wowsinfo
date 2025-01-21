@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 
 class PlayerShipService
@@ -201,75 +202,91 @@ class PlayerShipService
         ];
     }
 
+    public function cacheTopPlayersList()
+    {
+        $stats24h = $this->getTopPlayersLast24Hours();
+        $stats7d = $this->getTopPlayersLast7Days();
+        $stats30d = $this->getTopPlayersLastMonth();
+
+        Cache::put('stats_24h', $stats24h, now()->addDay());
+        Cache::put('stats_7d', $stats7d, now()->addWeek());
+        Cache::put('stats_30d', $stats30d, now()->addMonth());
+    }
 
 
 
     public function getTopPlayersLast24Hours()
     {
-        $last24Hours = now()->subHours(24);
 
-        return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
-            ->where('ship_tier', '>', 5)
-            ->where('battles_played', '>', 5)
-            ->where('updated_at', '<=', $last24Hours)
-            ->groupBy('account_id')
-            ->orderByDesc('total_player_wn8')
-            ->limit(10)
-            ->get()
-            ->map(function ($player) {
-                return [
-                    'name' => $player->player_name,
-                    'wid' => $player->account_id,
-                    'wn8' => $player->total_player_wn8,
-                ];
-            })
-            ->toArray();
+        return Cache::remember('stats_24h', now()->addDay(), function () {
+            $last24Hours = now()->subHours(24);
+
+            return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
+                ->where('ship_tier', '>', 5)
+                ->where('battles_played', '>', 5)
+                ->groupBy('account_id')
+                ->orderByDesc('total_player_wn8')
+                ->limit(10)
+                ->get()
+                ->map(function ($player) {
+                    return [
+                        'name' => $player->player_name,
+                        'wid' => $player->account_id,
+                        'wn8' => $player->total_player_wn8,
+                    ];
+                })
+                ->toArray();
+        });
     }
+
+
 
     public function getTopPlayersLast7Days()
     {
 
-        $last7days = now()->subDays(6);
+        return Cache::remember('stats_7d', now()->addWeek(), function () {
+            $last7days = now()->subDays(6);
 
-        return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
-            ->where('ship_tier', '>', 5)
-            ->where('battles_played', '>', 30)
-            ->where('updated_at', '>=', $last7days)
-            ->groupBy('account_id')
-            ->orderByDesc('total_player_wn8')
-            ->limit(10)
-            ->get()
-            ->map(function ($player) {
-                return [
-                    'name' => $player->player_name,
-                    'wid' => $player->account_id,
-                    'wn8' => $player->total_player_wn8,
-                ];
-            })
-            ->toArray();
+            return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
+                ->where('ship_tier', '>', 5)
+                ->where('battles_played', '>', 30)
+                ->groupBy('account_id')
+                ->orderByDesc('total_player_wn8')
+                ->limit(10)
+                ->get()
+                ->map(function ($player) {
+                    return [
+                        'name' => $player->player_name,
+                        'wid' => $player->account_id,
+                        'wn8' => $player->total_player_wn8,
+                    ];
+                })
+                ->toArray();
+        });
     }
 
     public function getTopPlayersLastMonth()
     {
 
-        $lastMonth = now()->subDays(25);
+        return Cache::remember('stats_30d', now()->addMonth(), function () {
+            $lastMonth = now()->subDays(25);
 
-        return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
-            ->where('ship_tier', '>', 5)
-            ->where('battles_played', '>', 120)
-            ->where('updated_at', '>=', $lastMonth)
-            ->groupBy('account_id')
-            ->orderByDesc('total_player_wn8')
-            ->limit(10)
-            ->get()
-            ->map(function ($player) {
-                return [
-                    'name' => $player->player_name,
-                    'wid' => $player->account_id,
-                    'wn8' => $player->total_player_wn8,
-                ];
-            })
-            ->toArray();
+            return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
+                ->where('ship_tier', '>', 5)
+                ->where('battles_played', '>', 120)
+                ->groupBy('account_id')
+                ->orderByDesc('total_player_wn8')
+                ->limit(10)
+                ->get()
+                ->map(function ($player) {
+                    return [
+                        'name' => $player->player_name,
+                        'wid' => $player->account_id,
+                        'wn8' => $player->total_player_wn8,
+                    ];
+                })
+                ->toArray();
+        });
     }
 
     public function getTopPlayersOverall()
@@ -666,29 +683,42 @@ class PlayerShipService
 
     //get stats for each player, based on a period: 24, 7, 30, overall
 
+    public function cachePlayerStats()
+    {
+        $playerIds = PlayerShip::pluck('account_id')->unique()->all();
+        foreach ($playerIds as $account_id) {
+            $stats24h = $this->getPlayerStatsLastDay($account_id);
+            $stats7d = $this->getPlayerStatsLastWeek($account_id);
+            $stats30d = $this->getPlayerStatsLastMonth($account_id);
 
+            Cache::put('stats_24h', $stats24h, now()->addDay());
+            Cache::put('stats_7d', $stats7d, now()->addWeek());
+            Cache::put('stats_30d', $stats30d, now()->addMonth());
+        }
+    }
     public function getPlayerStatsLastDay($account_id)
     {
-        $playerStatistics = PlayerShip::select(
-            'battles_played as battles',
-            'wins_count as wins',
-            'ship_tier as tier',
-            'survival_rate as survived',
-            'damage_dealt as damage',
-            'frags as frags',
-            'xp as xp',
-            'spotted as spotted',
-            'capture as capture',
-            'defend as defend',
-            'wn8 as wn8',
-            'total_player_pr as pr'
-        )
-            ->where('account_id', $account_id)
-            ->where('updated_at', '<=', now()->subDay())
-            ->first();
-        Log::info($playerStatistics);
+        return Cache::remember("stats_24h_{$account_id}", now()->addDay(), function () use ($account_id) {
+            $playerStatistics = PlayerShip::select(
+                'battles_played as battles',
+                'wins_count as wins',
+                'ship_tier as tier',
+                'survival_rate as survived',
+                'damage_dealt as damage',
+                'frags as frags',
+                'xp as xp',
+                'spotted as spotted',
+                'capture as capture',
+                'defend as defend',
+                'wn8 as wn8',
+                'total_player_pr as pr'
+            )
+                ->where('account_id', $account_id)
+                ->first();
+            Log::info($playerStatistics);
 
-        return $playerStatistics ? $playerStatistics->toArray() : [];
+            return $playerStatistics ? $playerStatistics->toArray() : [];
+        });
     }
     public function getPlayerStatsLastWeek($account_id)
     {

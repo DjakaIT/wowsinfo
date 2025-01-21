@@ -103,10 +103,18 @@ class PlayerShipController extends Controller
         return response()->json(['message' => 'Player ship statistics fetched and stored successfully.']);
     }
 
-    /*  public function getPeriodicPlayerStats($playerId, $period)
+    public function cachePlayerStatistics()
     {
-        $this->playerShipService->getPlayerStatsByPeriod($playerId, $period);
-    } */
+        $this->playerShipService->cachePlayerStats();
+        return response()->json(['message' => 'Player stats caching method invoked successfully.']);
+    }
+
+    public function cacheTopPlayers()
+    {
+        $this->playerShipService->cacheTopPlayersList();
+        return response()->json(['message' => 'Top players caching method invoked successfully.']);
+    }
+
 
     public function index()
     {
