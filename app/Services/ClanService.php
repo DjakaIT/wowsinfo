@@ -124,28 +124,42 @@ class ClanService
             ->toArray();
     }
 
+
+
     public function calculateClanWN8()
     {
         Log::info("Calculating WN8 for all clans");
 
         Clan::chunk(100, function ($clans) {
             foreach ($clans as $clan) {
-                // Get distinct total_player_wn8 per member
-                $memberWN8s = DB::table('clan_members')
-                    ->join('player_ships', 'clan_members.account_id', '=', 'player_ships.account_id')
-                    ->where('clan_members.clan_id', $clan->clan_id)
-                    ->groupBy('player_ships.account_id')
-                    ->select(DB::raw('MAX(player_ships.total_player_wn8) as wn8'))
-                    ->get();
+                $clanId = $clan->clan_id;
 
-                $sumOfWN8 = $memberWN8s->sum('wn8');
+                Log::info("Calculating WN8 for clan", ['clan_id' => $clanId]);
+
+                // Fetch the account_ids of the clan members
+                $clanMembers = DB::table('clan_members')
+                    ->where('clan_id', $clanId)
+                    ->pluck('account_id');
+                Log::info("Clan members", ['clan_members' => $clanMembers]);
+
+                // Fetch the unique total_player_wn8 values for these account_ids
+                $memberWN8s = DB::table('player_ships')
+                    ->whereIn('account_id', $clanMembers)
+                    ->groupBy('account_id')
+                    ->select(DB::raw('MAX(total_player_wn8) as wn8'))
+                    ->pluck('wn8');
+                Log::info("Member WN8s", ['memberWN8s' => $memberWN8s]);
+
+                // Calculate the sum of unique WN8 values and the number of unique members
+                $sumOfWN8 = $memberWN8s->sum();
                 $memberCount = $memberWN8s->count();
-                $clanWN8 = $memberCount > 0 ? round($sumOfWN8 / $memberCount) : 0;
+                $clanWN8 = $memberCount > 0 ? round($sumOfWN8 / $memberCount, 2) : 0;
 
+                // Update the clanwn8 in the clans table
                 $clan->update(['clanwn8' => $clanWN8]);
 
-                Log::info("Debug clan WN8", [
-                    'clan_id' => $clan->clan_id,
+                Log::info("Calculated WN8 for clan", [
+                    'clan_id' => $clanId,
                     'sumOfWN8' => $sumOfWN8,
                     'memberCount' => $memberCount,
                     'calculated_clan_wn8' => $clanWN8,

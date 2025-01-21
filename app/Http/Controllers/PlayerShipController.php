@@ -97,6 +97,7 @@ class PlayerShipController extends Controller
         ]);
     }
 
+
     public function updatePlayerShips()
     {
         $this->playerShipService->fetchAndStorePlayerShips();
