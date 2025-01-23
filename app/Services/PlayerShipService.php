@@ -701,96 +701,158 @@ class PlayerShipService
     {
         return Cache::remember("stats_24h_{$account_id}", now()->addDay(), function () use ($account_id) {
             $playerStatistics = PlayerShip::select(
-                'battles_played as battles',
-                'wins_count as wins',
-                'ship_tier as tier',
-                'survival_rate as survived',
-                'damage_dealt as damage',
-                'frags as frags',
-                'xp as xp',
-                'spotted as spotted',
-                'capture as capture',
-                'defend as defend',
-                'wn8 as wn8',
-                'total_player_pr as pr'
+                DB::raw('SUM(battles_played) as battles'),
+                DB::raw('SUM(wins_count) as wins'),
+                DB::raw('AVG(ship_tier) as tier'),
+                DB::raw('AVG(survival_rate) as survived'),
+                DB::raw('SUM(damage_dealt) as damage'),
+                DB::raw('SUM(frags) as frags'),
+                DB::raw('SUM(xp) as xp'),
+                DB::raw('SUM(spotted) as spotted'),
+                DB::raw('SUM(capture) as capture'),
+                DB::raw('SUM(defend) as defend'),
+                DB::raw('MAX(total_player_wn8) as wn8'),
+                DB::raw('MAX(total_player_pr) as pr')
             )
                 ->where('account_id', $account_id)
                 ->first();
-            Log::info($playerStatistics);
 
-            return $playerStatistics ? $playerStatistics->toArray() : [];
+            Log::info("Player day stats:", $playerStatistics);
+
+            return $playerStatistics ? $playerStatistics->toArray() : [
+                'battles' => '-',
+                'wins' => '-',
+                'tier' => '-',
+                'survived' => '-',
+                'damage' => '-',
+                'frags' => '-',
+                'xp' => '-',
+                'spotted' => '-',
+                'capture' => '-',
+                'defend' => '-',
+                'wn8' => '-',
+                'pr' => '-'
+            ];
         });
     }
     public function getPlayerStatsLastWeek($account_id)
     {
-        $playerStatistics = PlayerShip::select(
-            'battles_played as battles',
-            'wins_count as wins',
-            'ship_tier as tier',
-            'survival_rate as survived',
-            'damage_dealt as damage',
-            'frags as frags',
-            'xp as xp',
-            'spotted as spotted',
-            'capture as capture',
-            'defend as defend',
-            'wn8 as wn8',
-            'total_player_pr as pr'
-        )
-            ->where('account_id', $account_id)
-            ->where('updated_at', '>=', now()->subWeek())
-            ->first();
+        return Cache::remember("stats_7d_{$account_id}", now()->addWeek(), function () use ($account_id) {
 
-        Log::info($playerStatistics);
-        return $playerStatistics ? $playerStatistics->toArray() : [];
+            $playerStatistics = PlayerShip::select(
+                DB::raw('SUM(battles_played) as battles'),
+                DB::raw('SUM(wins_count) as wins'),
+                DB::raw('AVG(ship_tier) as tier'),
+                DB::raw('AVG(survival_rate) as survived'),
+                DB::raw('SUM(damage_dealt) as damage'),
+                DB::raw('SUM(frags) as frags'),
+                DB::raw('SUM(xp) as xp'),
+                DB::raw('SUM(spotted) as spotted'),
+                DB::raw('SUM(capture) as capture'),
+                DB::raw('SUM(defend) as defend'),
+                DB::raw('MAX(total_player_wn8) as wn8'),
+                DB::raw('MAX(total_player_pr) as pr')
+            )
+                ->where('account_id', $account_id)
+                ->where('updated_at', '>=', now()->subWeek())
+                ->first();
+
+            Log::info("Player week stats:", $playerStatistics);
+
+            return $playerStatistics ? $playerStatistics->toArray() : [
+                'battles' => '-',
+                'wins' => '-',
+                'tier' => '-',
+                'survived' => '-',
+                'damage' => '-',
+                'frags' => '-',
+                'xp' => '-',
+                'spotted' => '-',
+                'capture' => '-',
+                'defend' => '-',
+                'wn8' => '-',
+                'pr' => '-'
+            ];
+        });
     }
 
     public function getPlayerStatsLastMonth($account_id)
     {
-        $playerStatistics = PlayerShip::select(
-            'battles_played as battles',
-            'wins_count as wins',
-            'ship_tier as tier',
-            'survival_rate as survived',
-            'damage_dealt as damage',
-            'frags as frags',
-            'xp as xp',
-            'spotted as spotted',
-            'capture as capture',
-            'defend as defend',
-            'wn8 as wn8',
-            'total_player_pr as pr'
-        )
-            ->where('account_id', $account_id)
-            ->where('updated_at', '>=', now()->subMonth())
-            ->first();
-        Log::info($playerStatistics);
+        return Cache::remember("stats_30d_{$account_id}", now()->addMonth(), function () use ($account_id) {
 
-        return $playerStatistics ? $playerStatistics->toArray() : [];
+            $playerStatistics = PlayerShip::select(
+                DB::raw('SUM(battles_played) as battles'),
+                DB::raw('SUM(wins_count) as wins'),
+                DB::raw('AVG(ship_tier) as tier'),
+                DB::raw('AVG(survival_rate) as survived'),
+                DB::raw('SUM(damage_dealt) as damage'),
+                DB::raw('SUM(frags) as frags'),
+                DB::raw('SUM(xp) as xp'),
+                DB::raw('SUM(spotted) as spotted'),
+                DB::raw('SUM(capture) as capture'),
+                DB::raw('SUM(defend) as defend'),
+                DB::raw('MAX(total_player_wn8) as wn8'),
+                DB::raw('MAX(total_player_pr) as pr')
+            )
+                ->where('account_id', $account_id)
+                ->where('updated_at', '>=', now()->subMonth())
+                ->first();
+            Log::info("Player month stats:", $playerStatistics);
+
+
+            return $playerStatistics ? $playerStatistics->toArray() : [
+                'battles' => '-',
+                'wins' => '-',
+                'tier' => '-',
+                'survived' => '-',
+                'damage' => '-',
+                'frags' => '-',
+                'xp' => '-',
+                'spotted' => '-',
+                'capture' => '-',
+                'defend' => '-',
+                'wn8' => '-',
+                'pr' => '-'
+            ];
+        });
     }
 
 
     public function getPlayerStatsOverall($account_id)
     {
         $playerStatistics = PlayerShip::select(
-            'battles_played as battles',
-            'wins_count as wins',
-            'ship_tier as tier',
-            'survival_rate as survived',
-            'damage_dealt as damage',
-            'frags as frags',
-            'xp as xp',
-            'spotted as spotted',
-            'capture as capture',
-            'defend as defend',
-            'wn8 as wn8',
-            'total_player_pr as pr'
+            DB::raw('SUM(battles_played) as battles'),
+            DB::raw('SUM(wins_count) as wins'),
+            DB::raw('AVG(ship_tier) as tier'),
+            DB::raw('AVG(survival_rate) as survived'),
+            DB::raw('SUM(damage_dealt) as damage'),
+            DB::raw('SUM(frags) as frags'),
+            DB::raw('SUM(xp) as xp'),
+            DB::raw('SUM(spotted) as spotted'),
+            DB::raw('SUM(capture) as capture'),
+            DB::raw('SUM(defend) as defend'),
+            DB::raw('MAX(total_player_wn8) as wn8'),
+            DB::raw('MAX(total_player_pr) as pr')
         )
             ->where('account_id', $account_id)
             ->first();
         Log::info($playerStatistics);
 
-        return $playerStatistics ? $playerStatistics->toArray() : [];
+
+        return $playerStatistics ? $playerStatistics->toArray() : [
+            'battles' => '-',
+            'wins' => '-',
+            'tier' => '-',
+            'survived' => '-',
+            'damage' => '-',
+            'frags' => '-',
+            'xp' => '-',
+            'spotted' => '-',
+            'capture' => '-',
+            'defend' => '-',
+            'wn8' => '-',
+            'pr' => '-'
+        ];
     }
 
     public function getPlayerVehicleData($account_id, $name)
