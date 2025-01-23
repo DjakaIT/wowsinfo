@@ -717,7 +717,6 @@ class PlayerShipService
                 ->where('account_id', $account_id)
                 ->first();
 
-            Log::info("Player day stats:", $playerStatistics);
 
             return $playerStatistics ? $playerStatistics->toArray() : [
                 'battles' => '-',
@@ -757,7 +756,6 @@ class PlayerShipService
                 ->where('updated_at', '>=', now()->subWeek())
                 ->first();
 
-            Log::info("Player week stats:", $playerStatistics);
 
             return $playerStatistics ? $playerStatistics->toArray() : [
                 'battles' => '-',
@@ -797,7 +795,6 @@ class PlayerShipService
                 ->where('account_id', $account_id)
                 ->where('updated_at', '>=', now()->subMonth())
                 ->first();
-            Log::info("Player month stats:", $playerStatistics);
 
 
             return $playerStatistics ? $playerStatistics->toArray() : [
