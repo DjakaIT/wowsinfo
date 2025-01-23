@@ -590,7 +590,7 @@ class PlayerShipService
                                 //total player pr
                                 $total_player_pr = $this->totalPlayerPR($playerId);
 
-                                /*  Log::info("Processing ship for player", [
+                                Log::info("Processing ship for player", [
                                     'player_id' => $playerId,
                                     'ship_id' => $ship->ship_id,
                                     'ship_name' => $ship->name,
@@ -599,7 +599,7 @@ class PlayerShipService
                                     'capture' => $totalCapture,
                                     'defend' => $totalDefend,
                                     'xp' => $totalXp,
-                                ]); */
+                                ]);
 
                                 PlayerShip::updateOrCreate(
                                     [
@@ -655,11 +655,10 @@ class PlayerShipService
                                     ]
                                 );
                             }
-                            /*  Log::info("Successfully updated/created player ship record", [
+                            Log::info("Successfully updated/created player ship record", [
                                 'player_id' => $playerId,
                                 'ship_id' => $shipStats['ship_id'],
-                                'nation' => $ship ? $ship->nation : 'unknown',
-                            ]); */
+                            ]);
                             $this->totalPlayerWN8($playerId);
                         }
                     } else {
