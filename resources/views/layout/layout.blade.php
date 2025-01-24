@@ -23,12 +23,14 @@
     
 </head>
 <body>
-  @include('partials.header')
+  <div class="wrapper">
+    @include('partials.header')
 
-  <main class="container">
-    @yield('content')
-  </main>
+    <main class="mb-40 content container">
+      @yield('content')
+    </main>
 
-  @include('partials.footer')
+    @include('partials.footer')
+  </div>
 </body>
 </html>

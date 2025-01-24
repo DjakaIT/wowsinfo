@@ -46,7 +46,7 @@
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['wins'] }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Tier</td>
+                        <td class="py-2 px-4">Tier Ø</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['tier'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['tier'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['tier'] }}</td>
@@ -60,42 +60,42 @@
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['survived'] }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Damage</td>
+                        <td class="py-2 px-4">Damage Ø</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['damage'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['damage'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['damage'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['damage'] }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Frags</td>
+                        <td class="py-2 px-4">Frags Ø</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['frags'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['frags'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['frags'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['frags'] }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Spotted</td>
+                        <td class="py-2 px-4">Spotted Ø</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['spotted'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['spotted'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['spotted'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['spotted'] }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Experience</td>
+                        <td class="py-2 px-4">Experience Ø</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['xp'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['xp'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['xp'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['xp'] }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Capture</td>
+                        <td class="py-2 px-4">Capture Ø</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['capture'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['capture'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['capture'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['capture'] }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Defend</td>
+                        <td class="py-2 px-4">Defend Ø</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['defend'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['defend'] }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['defend'] }}</td>
@@ -129,8 +129,8 @@
                         <th class="border-b">Name</th>
                         <th class="border-b">Tier</th>
                         <th class="border-b">Battles</th>
-                        <th class="border-b">Frags</th>
-                        <th class="border-b">Damage</th>
+                        <th class="border-b">Frags Ø</th>
+                        <th class="border-b">Damage Ø</th>
                         <th class="border-b">Wins</th>
                         <th class="border-b">WN8</th>
                     </tr>
