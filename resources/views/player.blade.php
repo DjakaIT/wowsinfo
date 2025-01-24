@@ -11,9 +11,14 @@
     <div class="page-padding">
         <!-- Player info -->
         <p class="player-title">{{ $playerInfo['name'] }}
-        <p v-if="playerInfo.clanName != ''" class="pointer gray-link">
-            {{ $playerInfo['clanName'] }}
-        </p>
+        @if ($playerInfo['clanName'] !== '')
+            <p>
+                <a class="pointer gray-link" href="{{ route('clan.page', [
+                    'name' => urlencode($playerInfo['clanName']),
+                    'id' => $playerInfo['clanId']
+                ]) }}">{{ $playerInfo['clanName'] }}</a>
+            </p>
+        @endif
         </p>
         <p class="player-info">Created at: {{ $playerInfo['createdAt'] }}</p>
         <!-- ### Player info -->
