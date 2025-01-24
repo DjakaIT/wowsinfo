@@ -7,6 +7,7 @@ use App\Models\Clan;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ClanService
 {
@@ -55,6 +56,7 @@ class ClanService
 
         $servers = ['eu', 'na', 'asia'];
         $limit = 100;
+
         foreach ($servers as $server) {
             $page = 1;
             $hasMore = true;
@@ -68,17 +70,26 @@ class ClanService
                     foreach ($clans['data'] as $clanData) {
                         $clanCreated = isset($clanData['created_at']) ? Carbon::createFromTimestamp($clanData['created_at'])->toDateTimeString() : null;
                         $membersCount = isset($clanData['members_count']) ? (int) $clanData['members_count'] : null;
-                        Clan::updateOrCreate(
+
+                        $storedClan = Clan::updateOrCreate(
                             ['clan_id' => $clanData['clan_id']],
                             [
                                 'name' => $clanData['name'],
                                 'tag' => $clanData['tag'],
                                 'server' => strtoupper($server),
                                 'clan_created' => $clanCreated,
-                                'members_count' => $membersCount
+                                'members_count' => $membersCount,
                             ]
                         );
-                        Log::info("Stored clan with ID: " . $clanData['clan_id'] . " on server: " . strtoupper($server));
+
+                        Log::info("Stored clan", [
+                            'clan_id' => $clanData['clan_id'],
+                            'name' => $storedClan->name,
+                            'tag' => $storedClan->tag,
+                            'server' => strtoupper($server),
+                            'clan_created' => $storedClan->clan_created,
+                            'members_count' => $storedClan->members_count,
+                        ]);
                     }
 
                     Log::info("Fetched page {$page} from server: " . strtoupper($server));
@@ -93,5 +104,69 @@ class ClanService
         }
 
         return ['message' => 'Clans fetched and stored successfully'];
+    }
+
+
+    public function getTopClans()
+    {
+        return Clan::select('clan_id', DB::raw('name as clan_name'), DB::raw('MAX(clanwn8) as total_clan_wn8'))
+            ->groupBy('clan_id', 'clan_name')
+            ->orderByDesc('total_clan_wn8')
+            ->limit(10)
+            ->get()
+            ->map(function ($clan) {
+                return [
+                    'name' => $clan->clan_name,
+                    'wid' => $clan->clan_id,
+                    'wn8' => $clan->total_clan_wn8
+                ];
+            })
+            ->toArray();
+    }
+
+
+
+    public function calculateClanWN8()
+    {
+        Log::info("Calculating WN8 for all clans");
+
+        Clan::chunk(100, function ($clans) {
+            foreach ($clans as $clan) {
+                $clanId = $clan->clan_id;
+
+                Log::info("Calculating WN8 for clan", ['clan_id' => $clanId]);
+
+                // Fetch the account_ids of the clan members
+                $clanMembers = DB::table('clan_members')
+                    ->where('clan_id', $clanId)
+                    ->pluck('account_id');
+                Log::info("Clan members", ['clan_members' => $clanMembers]);
+
+                // Fetch the unique total_player_wn8 values for these account_ids
+                $memberWN8s = DB::table('player_ships')
+                    ->whereIn('account_id', $clanMembers)
+                    ->groupBy('account_id')
+                    ->select(DB::raw('MAX(total_player_wn8) as wn8'))
+                    ->pluck('wn8');
+                Log::info("Member WN8s", ['memberWN8s' => $memberWN8s]);
+
+                // Calculate the sum of unique WN8 values and the number of unique members
+                $sumOfWN8 = $memberWN8s->sum();
+                $memberCount = $memberWN8s->count();
+                $clanWN8 = $memberCount > 0 ? round($sumOfWN8 / $memberCount, 2) : 0;
+
+                // Update the clanwn8 in the clans table
+                $clan->update(['clanwn8' => $clanWN8]);
+
+                Log::info("Calculated WN8 for clan", [
+                    'clan_id' => $clanId,
+                    'sumOfWN8' => $sumOfWN8,
+                    'memberCount' => $memberCount,
+                    'calculated_clan_wn8' => $clanWN8,
+                ]);
+            }
+        });
+
+        Log::info("Completed WN8 calculations for all clans");
     }
 }

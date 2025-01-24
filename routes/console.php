@@ -21,7 +21,7 @@ Artisan::command('inspire', function () {
 
 
 Schedule::command('fetch-store:ships')
-    ->monthlyOn(15, '01:00')
+    ->weeklyOn(3, '01:00')
     ->before(function () {
         Log::info('Fetch ships cron started');
     })
@@ -34,28 +34,18 @@ Schedule::command('fetch-store:ships')
 
 
 Schedule::command('fetch-store:player-ships')
-    ->dailyAt('02:00')
+    ->dailyAt('04:00')
     ->before(function () {
         Log::info('Player ships fetching cron started');
     })
     ->after(function () {
         Log::info('Player ships fetching cron completed');
     })
-    ->onFailure(function ($exception) {
-        Log::error('Player ships fetching cron failed: ' . $exception->getMessage());
-    });
+    ->onFailure(function () {
+        Log::error('Player ships fetching cron failed. Check the logs for detailed error information.');
+    })
+    ->appendOutputTo(storage_path('logs/player_ships_cron.log'));
 
-Schedule::command('fetch-store:players-data')
-    ->weeklyOn(3, '03:00')
-    ->before(function () {
-        Log::info('Player data fetching cron (EU server) started');
-    })
-    ->after(function () {
-        Log::info('Player data fetching cron (EU server) successfully completed');
-    })
-    ->onFailure(function ($exception) {
-        Log::error('Player data fetching cron (EU server) failed: ' . $exception->getMessage());
-    });
 
 Schedule::command('fetch-store:clans')
     ->weeklyOn(4, '02:00')
@@ -69,8 +59,20 @@ Schedule::command('fetch-store:clans')
         Log::error('Clan data fetching cron failed: ' . $exception->getMessage());
     });
 
+Schedule::command('fetch-store:getclanwn8')
+    ->weeklyOn(5, '01:00')
+    ->before(function () {
+        Log::info('Clan wn8 fetching cron started');
+    })
+    ->after(function () {
+        Log::info('Clan wn8 fetching cron completed');
+    })
+    ->onFailure(function ($exception) {
+        Log::error('Clan wn8 fetching cron failed: ' . $exception->getMessage());
+    });
+
 Schedule::command('fetch-store:clan-members')
-    ->weeklyOn(4, '04:30')
+    ->dailyAt('00:00')
     ->before(function () {
         Log::info('Clan member data fetching cron started');
     })
@@ -79,4 +81,16 @@ Schedule::command('fetch-store:clan-members')
     })
     ->onFailure(function ($exception) {
         Log::error('Clan member data fetching cron failed: ' . $exception->getMessage());
+    });
+
+Schedule::command('fetch-store:account-creation')
+    ->weeklyOn(4, '00:00')
+    ->before(function () {
+        Log::info('Account creation date fetching cron started');
+    })
+    ->after(function () {
+        Log::info('Account creation date fetching cron completed');
+    })
+    ->onFailure(function ($exception) {
+        Log::error('Account creation date fetching cron failed: ' . $exception->getMessage());
     });

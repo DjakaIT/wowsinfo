@@ -20,40 +20,70 @@ class ShipController extends Controller
 
     public function fetchAndStoreShips()
     {
+        Log::info("Starting ship fetch process");
 
-        Log::info("Reached fetchAndStoreShips method");
+        try {
+            $limit = 100;
+            $page = 1;
+            $totalShips = 0;
+            $hasMore = true;
 
-        $limit = 100;
-        $page = 1;
-        $hasMore = true;
+            while ($hasMore) {
+                $response = $this->ShipService->getShips($page, $limit);
 
-        while ($hasMore) {
-            $ships = $this->ShipService->getShips($page, $limit);
-
-            if ($ships && isset($ships['data'])) {
-                foreach ($ships['data'] as $shipData) {
-                    Ship::updateOrCreate(
-                        ['ship_id' => $shipData['ship_id']],
-                        [
-                            'name' => $shipData['name'],
-                            'nation' => $shipData['nation'],
-                            'type' => $shipData['type'],
-                            'tier' => $shipData['tier'],
-                            'is_premium' => $shipData['is_premium'] ?? false,
-                        ]
-                    );
-
-                    Log::info("Stored ship with ID: " . $shipData['ship_id']);
+                if (!$response || !isset($response['data'])) {
+                    Log::error("Failed to fetch ships for page {$page}");
+                    break;
                 }
 
-                $page++;
-                $hasMore = count($ships['data']) === $limit;
-            } else {
-                $hasMore = false;
-            }
-        }
+                $ships = $response['data'];
 
-        return response()->json(['message' => 'Ships fetched and stored in database succesfully', 201]);
+                foreach ($ships as $shipData) {
+                    try {
+                        Ship::updateOrCreate(
+                            ['ship_id' => $shipData['ship_id']],
+                            [
+                                'name' => $shipData['name'] ?? 'Unknown',
+                                'nation' => $shipData['nation'] ?? 'Unknown',
+                                'type' => $shipData['type'] ?? 'Unknown',
+                                'tier' => $shipData['tier'] ?? 0,
+                                'is_premium' => $shipData['is_premium'] ?? false,
+                            ]
+                        );
+
+                        $totalShips++;
+                    } catch (\Exception $e) {
+                        Log::error("Error storing ship", [
+                            'ship_id' => $shipData['ship_id'] ?? 'unknown',
+                            'error' => $e->getMessage()
+                        ]);
+                        continue;
+                    }
+                }
+
+                // Check if we should continue pagination
+                $hasMore = count($ships) === $limit;
+                $page++;
+
+                Log::info("Processed page {$page}, total ships so far: {$totalShips}");
+            }
+
+            Log::info("Ship fetch process completed", ['total_ships' => $totalShips]);
+            return response()->json([
+                'message' => 'Ships fetched and stored successfully',
+                'total_ships' => $totalShips
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error("Fatal error in fetchAndStoreShips", [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => 'Error fetching ships',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     // WIKI ROUTES
@@ -115,10 +145,26 @@ class ShipController extends Controller
                 'sonar' => 'https://wows-gloss-icons.wgcdn.co/icons/module/icon_module_Sonar_4eb5e83d9d28acbe17715ffdcf5401a450bdcdca53c636f7dc1f5c72d38ed311.png',
             ],
             'nations' => [
-                'usa', 'pan_asia', 'ussr', 'europe', 'japan', 'uk', 'germany', 'netherlands', 'italy', 'france', 'commonwealth', 'spain', 'pan_america'
+                'usa',
+                'pan_asia',
+                'ussr',
+                'europe',
+                'japan',
+                'uk',
+                'germany',
+                'netherlands',
+                'italy',
+                'france',
+                'commonwealth',
+                'spain',
+                'pan_america'
             ],
             'types' => [
-                'cruiser', 'battleship', 'destroyer', 'air_carrier', 'submarine'
+                'cruiser',
+                'battleship',
+                'destroyer',
+                'air_carrier',
+                'submarine'
             ],
         ]);
     }

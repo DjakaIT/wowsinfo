@@ -17,7 +17,6 @@ class ClanMember extends Model
         'role',
         'clan_id',
         'clan_name',
-        'total_clan_wn8',
         'account_created'
     ];
 
@@ -32,6 +31,7 @@ class ClanMember extends Model
     {
         return $query->whereNull('left_at');
     }
+
 
     public function clan()
     {

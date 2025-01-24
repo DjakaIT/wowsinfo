@@ -14,6 +14,10 @@ class ClanController extends Controller
         $this->ClanService = $clanService;
     }
 
+    public function getClanWN8()
+    {
+        $this->ClanService->calculateClanWN8();
+    }
     public function fetchAndStoreClans()
     {
         $result = $this->ClanService->fetchAndStoreClans();
