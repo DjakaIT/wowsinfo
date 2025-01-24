@@ -15,131 +15,65 @@ use App\Http\Controllers\PlayerAchievementController;
 use App\Http\Controllers\PlayerShipController;
 use App\Http\Controllers\PlayerStatisticController;
 
-Route::get('/', [PlayerShipController::class, 'getHomePageStats']); // Main home page
-Route::get('/player/{name}/{id}', [PlayerShipController::class, 'getPlayerPageStats'])->name('player.page'); // Player page
-
-
-// Route::get('/player/{name}/{id}', function () {
-//     // DATA INFO
-//     // 1. List of 10 best players today -  tier is above 5 and 5+ battles
-//     // 2. List of 10 best players last 7 days - tier is above 5 and 30+ battles
-//     // 3. List of 10 best players last month (25 days) - tier is above 5 and 120+ battles
-//     // 4. List of 10 best players overall (28 days) - tier is above 5 and 500+ battles
-//     // 5. List of 10 best Clans
-//     return view('player', [
-//         'metaSite' => [
-//             'metaTitle' => "- WN8 player statistics for World of Warships",
-//             'metaDescription' => "Latest statistics for playerin World of Warships, WN8 daily, weekly and monthly updates and statistic.",
-//             'metaKeywords' => "WN8, World of Warships, Statistics, Player statistics",
-//         ],
-//         'playerInfo' => [
-//             'name' => 'Player 1',
-//             'wid' => 111,
-//             'createdAt' => '01.12.2023',
-//             'clanName' => 'Clan 1',
-//             'clanId' => 333
-//         ],
-//         'playerStatistics' => [
-//             'overall' => [
-//                 'battles' => 2000,
-//                 'wins' => 59.7, // percentage
-//                 'tier' => '7,7',
-//                 'survived' => 48.59, // perventage
-//                 'damage' => 70.968,
-//                 'frags' => '1,13',
-//                 'spotted' => '0,18',
-//                 'xp' => 1.889,
-//                 'capture' => 1000, // ??? type ???
-//                 'defend' => 1000, // ??? type ???
-//                 'pr' => 2800, // ??? type ???
-//                 'wn8' => 3200 // ??? type ???
-//             ],
-//             'lastDay' => [ // last day only
-//                 'battles' => 4,
-//                 'wins' => 40.3, // percentage
-//                 'tier' => '8',
-//                 'survived' => 67.12, // perventage
-//                 'damage' => 6.322,
-//                 'frags' => '2,11',
-//                 'spotted' => '0,18',
-//                 'xp' => 652,
-//                 'capture' => 300, // ??? type ???
-//                 'defend' => 155, // ??? type ???
-//                 'pr' => 2005, // ??? type ???
-//                 'wn8' => 2890 // ??? type ???
-//             ],
-//             'lastWeek' => [ // last 7 days
-//                 'battles' => 22,
-//                 'wins' => 48.9, // percentage
-//                 'tier' => '8,2',
-//                 'survived' => 37.12, // perventage
-//                 'damage' => 12.500,
-//                 'frags' => '2,15',
-//                 'spotted' => '0,44',
-//                 'xp' => 790,
-//                 'capture' => 400, // ??? type ???
-//                 'defend' => 390, // ??? type ???
-//                 'pr' => 2980, // ??? type ???
-//                 'wn8' => 2750 // ??? type ???
-//             ],
-//             'lastMonth' => [ // Last 25 days
-//                 'battles' => 154,
-//                 'wins' => 60.3, // percentage
-//                 'tier' => '8,1',
-//                 'survived' => 60.4, // perventage
-//                 'damage' => 20.548,
-//                 'frags' => '2,12',
-//                 'spotted' => '0,56',
-//                 'xp' => 980,
-//                 'capture' => 824, // ??? type ???
-//                 'defend' => 759, // ??? type ???
-//                 'pr' => 2299, // ??? type ???
-//                 'wn8' => 3145 // ??? type ???
-//             ]
-//         ],
-//         'playerVehicles' => [
-//             [
-//                 'nation' => 'Germany',
-//                 'name' => 'Vehicle name',
-//                 'tier' => 2,
-//                 'battles' => 38,
-//                 'frags' => 34,
-//                 'damage' => 4.280,
-//                 'wins' => 67.46, // percentage
-//                 'wn8' => 1754,
-//                 'image' => 'image url', // ??? url ???
-//                 'description' => 'Vehicle description',
-//                 'wid' => 555
-//             ],
-//             [
-//                 'nation' => 'Japan',
-//                 'name' => 'Vehicle name',
-//                 'tier' => 4,
-//                 'battles' => 45,
-//                 'frags' => 32,
-//                 'damage' => 7.490,
-//                 'wins' => 36.46, // percentage
-//                 'wn8' => 980,
-//                 'image' => 'image url', // ??? url ???
-//                 'description' => 'Vehicle description',
-//                 'wid' => 555
-//             ]
-//         ],
-//     ]);
-// })->name('player.page');
-
-
-//ship wiki routes 
+// WEB ROUTES
+// Homepage
+Route::get('/', [PlayerShipController::class, 'getHomePageStats']);
+// Player page
+Route::get('/player/{name}/{id}', [PlayerShipController::class, 'getPlayerPageStats'])->name('player.page');
+// Clan page
+Route::get('/clan/{name}/{id}', [ClanController::class, 'getClanPage'])->name('clan.page');
+// Wiki - group 
 Route::prefix('wiki')->group(function () {
+    // Most specific route first, matching 3 parameters
+    Route::get('/{nation}/{type}/{ship}', [ShipController::class, 'getWikiVehiclePage'])
+        ->name('wiki.vehicle');
 
+    // Next, more general route matching just nation
+    Route::get('/{nation}', [ShipController::class, 'getWikiNationPage'])
+        ->name('wiki.nation')
+        ->where('nation', 'usa|germany|japan');
+
+    // Then route for type matching just vehicle type
+    Route::get('/{type}', [ShipController::class, 'getWikiTypePage'])
+        ->name('wiki.type')
+        ->where('type', 'cruiser|destroyer|battleship');
+
+    // Home route (this is the default page for /wiki)
     Route::get('/', [ShipController::class, 'getWikiHomePage'])->name('wiki.home');
-
-    Route::get('/{nation}', [ShipController::class, 'getWikiNationPage'])->name('wiki.nation');
-
-    Route::get('/{type}', [ShipController::class, 'getWikiTypePage'])->name('wiki.type');
-
-    Route::get('/{nation}/{type}/{ship}', [ShipController::class, 'getWikiVehiclePage'])->name('wiki.vehicle');
 });
+// FAQ
+Route::view('/faq', 'faq', [
+    'metaSite' => [
+        'metaTitle' => 'Frequently asked questions - wows.wn8.info',
+        'metaDescription' => 'Frequently asked questions on wows.wn8.info',
+        'metaKeywords' => 'WN8, World of Warships, Statistics, Player statistics, FAQ',
+    ],
+]);
+// Imprint
+Route::view('/imprint', 'imprint', [
+    'metaSite' => [
+        'metaTitle' => 'Imprint - wows.wn8.info',
+        'metaDescription' => 'Imprint and terms on wows.wn8.info',
+        'metaKeywords' => 'WN8, World of Warships, Statistics, Player statistics, Imprint',
+    ],
+]);
+// Privacy
+Route::view('/privacy', 'privacy', [
+    'metaSite' => [
+        'metaTitle' => 'Privacy policy - wows.wn8.info',
+        'metaDescription' => 'Privacy policy for wows.wn8.info',
+        'metaKeywords' => 'WN8, World of Warships, Statistics, Player statistics, Privacy policy',
+    ],
+]);
+// Contact
+Route::view('/contact', 'contact', [
+    'metaSite' => [
+        'metaTitle' => 'Contact - wows.wn8.info',
+        'metaDescription' => 'Contact information for wows.wn8.info',
+        'metaKeywords' => 'WN8, World of Warships, Statistics, Player statistics, Contact',
+    ],
+]);
+
 
 
 

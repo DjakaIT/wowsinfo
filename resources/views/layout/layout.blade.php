@@ -910,13 +910,15 @@
 </head>
 
 <body>
+  <div class="wrapper">
     @include('partials.header')
 
-    <main class="container">
-        @yield('content')
+    <main class="mb-40 content container">
+      @yield('content')
     </main>
 
     @include('partials.footer')
+  </div>
 </body>
 
 </html>

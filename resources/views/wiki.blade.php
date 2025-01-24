@@ -12,20 +12,20 @@
 		</div>
 		<h2 class="page-subheading">Nations</h2>
 		<div class="wiki-nation-group mb-50">
-			@foreach ($wiki['nations'] as $nation)
+			@foreach ($nations as $nation)
 				<div class="wiki-nation-item">
-					<a href="{{ route('getWikiPage', ['nation' => $nation]) }}">
-						<img :src="$nation" />
+					<a href="{{ route('wiki.nation', ['nation' => $nation]) }}">
+						<img src="{{ $nationImages[$nation] }}" />
 					</a>
 				</div>
 			@endforeach
 		</div>
 		<h2 class="page-subheading">Warship types</h2>
 		<div class="wiki-type-group-home">
-			@foreach ($wiki['types'] as $type)
+			@foreach ($types as $type)
 				<div class="wiki-type-item">
-					<a href="{{ route('getWikiPage', ['type' => $type]) }}">
-						<img :src="$type" />
+					<a href="{{ route('wiki.type', ['type' => $type]) }}">
+						<img src="{{ asset('images/' . $type . '.png') }}" />
 						<span>{{ $type }}</span>
 					</a>
 				</div>

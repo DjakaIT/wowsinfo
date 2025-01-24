@@ -1,5 +1,5 @@
-<header>
-	<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow4">
+
+	<nav class="navbar navbar-expand-lg navbar-dark shadow4">
 		<a class="navbar-brand" href="/">
 			<img src="{{ asset('images/logo-white.png') }}" alt="logo">
 		</a>
@@ -10,12 +10,12 @@
 		<div class="collapse navbar-collapse" id="nav-collapse">
 			<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 				<li class="nav-item">
-					<a class="nav-link" href="/home">nav_home</a>
+					<a class="nav-link" href="/">Home</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="/wiki">nav_wiki</a>
+					<a class="nav-link" href="/wiki">Wiki</a>
 				</li>
-				<li class="nav-item dropdown">
+				{{-- <li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 						nav_lang
 					</a>
@@ -23,7 +23,7 @@
 						<li><a class="dropdown-item" href="#" >KEY1 VALUE1</a></li>
 						<li><a class="dropdown-item" href="#" >KEY2 VALUE2</a></li>
 					</ul>
-				</li>
+				</li>--}}
 			</ul>
 
 			<!-- Right-aligned nav items -->
@@ -50,10 +50,10 @@
 				</li>
 
 				<li class="nav-item" v-if="get_user.name == ''">
-					<a class="nav-link" href="/login">nav_login</a>
+					<a class="nav-link" href="/login">Login</a>
 				</li>
 
-				<li class="nav-item dropdown" v-else>
+				{{--<li class="nav-item dropdown" v-else>
 					<a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 						<em>get_user.name</em>
 					</a>
@@ -61,8 +61,7 @@
 						<li><a class="dropdown-item" href="/dashboard">nav_dashboard</a></li>
 						<li><a class="dropdown-item" href="#">nav_logout</a></li>
 					</ul>
-				</li>
+				</li>--}}
 			</ul>
 		</div>
 	</nav>
-</header>

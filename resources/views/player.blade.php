@@ -144,8 +144,8 @@
                         <th class="border-b">Name</th>
                         <th class="border-b">Tier</th>
                         <th class="border-b">Battles</th>
-                        <th class="border-b">Frags</th>
-                        <th class="border-b">Damage</th>
+                        <th class="border-b">Frags Ø</th>
+                        <th class="border-b">Damage Ø</th>
                         <th class="border-b">Wins</th>
                         <th class="border-b">WN8</th>
                     </tr>
