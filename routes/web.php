@@ -85,7 +85,7 @@ Route::view('/contact', 'contact', [
 Route::prefix('clans')->group(function () {
 
     Route::get('/fetch', [ClanController::class, 'fetchAndStoreClans']);
-    Route::get('/', [ClanController::class, 'index'])->name('clan.page');
+    // Route::get('/', [ClanController::class, 'index'])->name('clan.page');
     Route::get('/{id}', [ClanController::class, 'show']);
     Route::post('/', [ClanController::class, 'store']);
     Route::put('/{id}', [ClanController::class, 'update']);
