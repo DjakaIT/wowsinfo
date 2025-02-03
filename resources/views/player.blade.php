@@ -142,7 +142,7 @@
         <!-- Player vehicles -->
         <!-- <div v-if="playerVehicles.length === 0">Loading</div> -->
         <div class="shadow4 table-container">
-            <table class="table table-striped table-bordered customRedefine playerTable">
+            <table id="sortableTable" class="table table-striped table-bordered customRedefine playerTable">
                 <thead>
                     <tr class="bg-gray-100 text-left">
                         <th class="border-b">Nation</th>
@@ -170,6 +170,33 @@
                     @endforeach
                 </tbody>
             </table>
+            <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                    const table = document.getElementById("sortableTable");
+                    const headers = table.querySelectorAll("th");
+                    const tbody = table.querySelector("tbody");
+
+                    headers.forEach((header, columnIndex) => {
+                        header.addEventListener("click", () => {
+                            const rows = Array.from(tbody.querySelectorAll("tr"));
+                            const isAscending = header.dataset.order === "asc";
+                            header.dataset.order = isAscending ? "desc" : "asc";
+
+                            rows.sort((rowA, rowB) => {
+                                const cellA = rowA.cells[columnIndex].textContent.trim();
+                                const cellB = rowB.cells[columnIndex].textContent.trim();
+
+                                const isNumeric = !isNaN(cellA) && !isNaN(cellB);
+                                return isAscending
+                                    ? (isNumeric ? cellA - cellB : cellA.localeCompare(cellB))
+                                    : (isNumeric ? cellB - cellA : cellB.localeCompare(cellA));
+                            });
+
+                            tbody.append(...rows);
+                        });
+                    });
+                });
+            </script>
         </div>
         <!-- ### Player vehicles -->
     </div>
