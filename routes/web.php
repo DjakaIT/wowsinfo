@@ -5,6 +5,7 @@ CREATE DATABASE `wows-laravel`;
 USE `wows-laravel`;
 */
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClanController;
 use App\Http\Controllers\PlayerController;
@@ -17,7 +18,42 @@ use App\Http\Controllers\PlayerStatisticController;
 
 // WEB ROUTES
 // Homepage
-Route::get('/', [PlayerShipController::class, 'getHomePageStats']);
+Route::get('/', [PlayerShipController::class, 'getHomePageStats'])->name('home');
+// Dashboard
+Route::view('/dashboard', 'dashboard', [
+    'metaSite' => [
+        'metaTitle' => 'Dashboard - wows.wn8.info',
+        'metaDescription' => 'Dashboard on wows.wn8.info',
+        'metaKeywords' => 'WN8, World of Warships, Statistics, Player statistics, Dashboard',
+    ],
+]);
+// Login
+Route::view('/login', 'login', [
+    'metaSite' => [
+        'metaTitle' => 'Login - wows.wn8.info',
+        'metaDescription' => 'Login on wows.wn8.info',
+        'metaKeywords' => 'WN8, World of Warships, Statistics, Player statistics, Login',
+    ],
+]);
+Route::get('/verification', function (Request $request) {
+    if ($request->query('status') === 'ok') {
+        
+        return view('verification', [
+            'metaSite' => [
+                'metaTitle' => 'Verification - wows.wn8.info',
+                'metaDescription' => 'Verification on wows.wn8.info',
+                'metaKeywords' => 'WN8, World of Warships, Statistics, Player statistics, Verification',
+            ],
+            'nickname' => $request->query('nickname'),
+            'account_id' => $request->query('account_id'),
+            'access_token' => $request->query('access_token'),
+            'expires_at' => $request->query('expires_at')
+        ]);
+    }
+
+    // If login failed, redirect to login page
+    return redirect()->route('login')->with('error', 'Login failed. Please try again.');
+});
 // Player page
 Route::get('/player/{name}/{id}', [PlayerShipController::class, 'getPlayerPageStats'])->name('player.page');
 // Clan page
