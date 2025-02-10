@@ -705,12 +705,12 @@ class PlayerShipService
                 DB::raw('SUM(wins_count) as wins'),
                 DB::raw('AVG(ship_tier) as tier'),
                 DB::raw('AVG(survival_rate) as survived'),
-                DB::raw('SUM(damage_dealt) as damage'),
-                DB::raw('SUM(frags) as frags'),
-                DB::raw('SUM(xp) as xp'),
-                DB::raw('SUM(spotted) as spotted'),
-                DB::raw('SUM(capture) as capture'),
-                DB::raw('SUM(defend) as defend'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(damage_dealt) / SUM(battles_played)) ELSE 0 END as damage'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(frags) / SUM(battles_played)) ELSE 0 END as frags'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(xp) / SUM(battles_played)) ELSE 0 END as xp'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(spotted) / SUM(battles_played)) ELSE 0 END as spotted'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(capture) / SUM(battles_played)) ELSE 0 END as capture'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(defend) / SUM(battles_played)) ELSE 0 END as defend'),
                 DB::raw('MAX(total_player_wn8) as wn8'),
                 DB::raw('MAX(total_player_pr) as pr')
             )
@@ -743,12 +743,12 @@ class PlayerShipService
                 DB::raw('SUM(wins_count) as wins'),
                 DB::raw('AVG(ship_tier) as tier'),
                 DB::raw('AVG(survival_rate) as survived'),
-                DB::raw('SUM(damage_dealt) as damage'),
-                DB::raw('SUM(frags) as frags'),
-                DB::raw('SUM(xp) as xp'),
-                DB::raw('SUM(spotted) as spotted'),
-                DB::raw('SUM(capture) as capture'),
-                DB::raw('SUM(defend) as defend'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(damage_dealt) / SUM(battles_played)) ELSE 0 END as damage'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(frags) / SUM(battles_played)) ELSE 0 END as frags'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(xp) / SUM(battles_played)) ELSE 0 END as xp'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(spotted) / SUM(battles_played)) ELSE 0 END as spotted'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(capture) / SUM(battles_played)) ELSE 0 END as capture'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(defend) / SUM(battles_played)) ELSE 0 END as defend'),
                 DB::raw('MAX(total_player_wn8) as wn8'),
                 DB::raw('MAX(total_player_pr) as pr')
             )
@@ -777,18 +777,17 @@ class PlayerShipService
     public function getPlayerStatsLastMonth($account_id)
     {
         return Cache::remember("stats_30d_{$account_id}", now()->addMonth(), function () use ($account_id) {
-
             $playerStatistics = PlayerShip::select(
                 DB::raw('SUM(battles_played) as battles'),
                 DB::raw('SUM(wins_count) as wins'),
                 DB::raw('AVG(ship_tier) as tier'),
                 DB::raw('AVG(survival_rate) as survived'),
-                DB::raw('SUM(damage_dealt) as damage'),
-                DB::raw('SUM(frags) as frags'),
-                DB::raw('SUM(xp) as xp'),
-                DB::raw('SUM(spotted) as spotted'),
-                DB::raw('SUM(capture) as capture'),
-                DB::raw('SUM(defend) as defend'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(damage_dealt) / SUM(battles_played)) ELSE 0 END as damage'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(frags) / SUM(battles_played)) ELSE 0 END as frags'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(xp) / SUM(battles_played)) ELSE 0 END as xp'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(spotted) / SUM(battles_played)) ELSE 0 END as spotted'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(capture) / SUM(battles_played)) ELSE 0 END as capture'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(defend) / SUM(battles_played)) ELSE 0 END as defend'),
                 DB::raw('MAX(total_player_wn8) as wn8'),
                 DB::raw('MAX(total_player_pr) as pr')
             )
@@ -822,12 +821,12 @@ class PlayerShipService
             DB::raw('SUM(wins_count) as wins'),
             DB::raw('AVG(ship_tier) as tier'),
             DB::raw('AVG(survival_rate) as survived'),
-            DB::raw('SUM(damage_dealt) as damage'),
-            DB::raw('SUM(frags) as frags'),
-            DB::raw('SUM(xp) as xp'),
-            DB::raw('SUM(spotted) as spotted'),
-            DB::raw('SUM(capture) as capture'),
-            DB::raw('SUM(defend) as defend'),
+            DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(damage_dealt) / SUM(battles_played)) ELSE 0 END as damage'),
+            DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(frags) / SUM(battles_played)) ELSE 0 END as frags'),
+            DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(xp) / SUM(battles_played)) ELSE 0 END as xp'),
+            DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(spotted) / SUM(battles_played)) ELSE 0 END as spotted'),
+            DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(capture) / SUM(battles_played)) ELSE 0 END as capture'),
+            DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(defend) / SUM(battles_played)) ELSE 0 END as defend'),
             DB::raw('MAX(total_player_wn8) as wn8'),
             DB::raw('MAX(total_player_pr) as pr')
         )
