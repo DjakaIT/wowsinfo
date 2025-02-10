@@ -692,9 +692,9 @@ class PlayerShipService
             $stats7d = $this->getPlayerStatsLastWeek($account_id);
             $stats30d = $this->getPlayerStatsLastMonth($account_id);
 
-            Cache::put('stats_24h', $stats24h, now()->addDay());
-            Cache::put('stats_7d', $stats7d, now()->addWeek());
-            Cache::put('stats_30d', $stats30d, now()->addMonth());
+            Cache::put("stats_24h_{$account_id}", $stats24h, now()->addDay());
+            Cache::put("stats_7d_{$account_id}", $stats7d, now()->addWeek());
+            Cache::put("stats_30d_{$account_id}", $stats30d, now()->addMonth());
         }
     }
     public function getPlayerStatsLastDay($account_id)
@@ -715,6 +715,8 @@ class PlayerShipService
                 DB::raw('MAX(total_player_pr) as pr')
             )
                 ->where('account_id', $account_id)
+                ->where('last_battle_time', '>=', now()->subDay())
+
                 ->first();
 
 
@@ -753,7 +755,7 @@ class PlayerShipService
                 DB::raw('MAX(total_player_pr) as pr')
             )
                 ->where('account_id', $account_id)
-                ->where('updated_at', '>=', now()->subWeek())
+                ->where('last_battle_time', '>=', now()->subWeek())
                 ->first();
 
 
@@ -792,7 +794,7 @@ class PlayerShipService
                 DB::raw('MAX(total_player_pr) as pr')
             )
                 ->where('account_id', $account_id)
-                ->where('updated_at', '>=', now()->subMonth())
+                ->where('last_battle_time', '>=', now()->subMonth())
                 ->first();
 
 
