@@ -31,24 +31,26 @@
 
             clearTimeout(timeout);
             timeout = setTimeout(() => {
-                axios.get(`https://api.worldofwarships.${server}/wows/account/list/?application_id=${wargamingId}&search=${query}`)
+                fetch(`https://api.worldofwarships.${server}/wows/account/list/?application_id=${wargamingId}&search=${query}`)
+								.then(response => response.json())
                 .then(response => {
 									resultsContainer.innerHTML = "";
-                    if (response.data.data) {
-                        response.data.data.forEach(player => {
-                            const listItem = document.createElement("li");
-                            listItem.classList.add("dropdown-item");
-                            listItem.textContent = `${player.nickname} (ID: ${player.account_id})`;
-                            listItem.addEventListener("click", function () {
-                                searchInput.value = player.nickname;
-                                resultsContainer.style.display = "none";
-                            });
-                            resultsContainer.appendChild(listItem);
-                        });
-                        resultsContainer.style.display = "block";
+									console.log(response)
+                    if (response.data) {
+											response.data.forEach(player => {
+												const listItem = document.createElement("li");
+												listItem.classList.add("dropdown-item");
+												listItem.textContent = `${player.nickname} (ID: ${player.account_id})`;
+												listItem.addEventListener("click", function () {
+														searchInput.value = player.nickname;
+														resultsContainer.style.display = "none";
+												});
+												resultsContainer.appendChild(listItem);
+											});
+											resultsContainer.style.display = "block";
                     } else {
-                        resultsContainer.innerHTML = "<li class='dropdown-item'>No results found</li>";
-                        resultsContainer.style.display = "block";
+											resultsContainer.innerHTML = "<li class='dropdown-item'>No results found</li>";
+											resultsContainer.style.display = "block";
                     }
                 })
                 .catch(error => console.error("Error fetching data:", error));
@@ -111,9 +113,9 @@
 		<!-- Right-aligned nav items -->
 			
 		<ul class="navbar-nav">
-			<li class="nav-item">
+			<li class="nav-item relative">
 				<div class="input-group">
-					<button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Server</button>
+					<button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">EU</button>
 					<ul class="dropdown-menu">
 						<li><a class="dropdown-item" href="#">EU</a></li>
 						<li><a class="dropdown-item" href="#">NA</a></li>
@@ -121,14 +123,14 @@
 						<li><hr class="dropdown-divider"></li>
 						<li><a class="dropdown-item disabled" href="#">RU</a></li>
 					</ul>
-					<button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Dropdown</button>
+					<button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Player</button>
 					<ul class="dropdown-menu">
 						<li><a class="dropdown-item" href="#">Player</a></li>
 						<li><a class="dropdown-item" href="#">Clan</a></li>
 					</ul>
 					<input id="playerSearch" type="text" class="form-control" aria-label="Text input with dropdown button">
 					<button class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
-					<ul id="results" class="dropdown-menu show w-100" style="display: none;"></ul>
+					<ul id="results" class="dropdown-menu show w-100 player-search-dropdown" style="display: none;"></ul>
 				</div>
 			</li>
 
