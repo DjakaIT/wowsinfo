@@ -12,12 +12,10 @@
         <!-- Player info -->
         <p class="player-title">{{ $playerInfo['name'] }}
         @if ($playerInfo['clanName'] !== '')
-            <p>
-                <a class="pointer gray-link" href="{{ route('clan.page', [
-                    'name' => urlencode($playerInfo['clanName']),
-                    'id' => $playerInfo['clanId']
-                ]) }}">{{ $playerInfo['clanName'] }}</a>
-            </p>
+            <a class="pointer gray-link" href="{{ route('clan.page', [
+                'name' => urlencode($playerInfo['clanName']),
+                'id' => $playerInfo['clanId']
+            ]) }}">[{{ $playerInfo['clanName'] }}]</a>
         @endif
         </p>
         <p class="player-info">Created at: {{ $playerInfo['createdAt'] }}</p>
@@ -45,13 +43,13 @@
                     </tr>
                     <tr class="border-b">
                         <td class="py-2 px-4">Wins</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['overall']['wins'] ?? 'N/A' }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastDay']['wins'] ?? 'N/A' }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['wins'] ?? 'N/A' }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['wins'] ?? 'N/A' }}</td>
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($playerStatistics['overall']['wins'] ?? 0) }}">{{ $playerStatistics['overall']['wins'] ?? 'N/A' }}%</td>
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($playerStatistics['lastDay']['wins'] ?? 0) }}">{{ $playerStatistics['lastDay']['wins'] ?? 'N/A' }}%</td>
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($playerStatistics['lastWeek']['wins'] ?? 0) }}">{{ $playerStatistics['lastWeek']['wins'] ?? 'N/A' }}%</td>
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($playerStatistics['lastMonth']['wins'] ?? 0) }}">{{ $playerStatistics['lastMonth']['wins'] ?? 'N/A' }}%</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Tier</td>
+                        <td class="py-2 px-4">Tier Ø</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['tier'] ?? 'N/A' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['tier'] ?? 'N/A' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['tier'] ?? 'N/A' }}</td>
@@ -72,42 +70,42 @@
                             {{ isset($playerStatistics['lastMonth']['survived']) ? round($playerStatistics['lastMonth']['survived'], 2) . '%' : 'N/A' }}
                         </td>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Damage</td>
+                        <td class="py-2 px-4">Damage Ø</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['damage'] ?? 'N/A' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['damage'] ?? 'N/A' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['damage'] ?? 'N/A' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['damage'] ?? 'N/A' }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Frags</td>
+                        <td class="py-2 px-4">Frags Ø</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['frags'] ?? 'N/A' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['frags'] ?? 'N/A' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['frags'] ?? 'N/A' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['frags'] ?? 'N/A' }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Spotted</td>
+                        <td class="py-2 px-4">Spotted Ø</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['spotted'] ?? 'N/A' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['spotted'] ?? 'N/A' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['spotted'] ?? 'N/A' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['spotted'] ?? 'N/A' }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Experience</td>
+                        <td class="py-2 px-4">Experience Ø</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['xp'] ?? 'N/A' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['xp'] ?? 'N/A' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['xp'] ?? 'N/A' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['xp'] ?? 'N/A' }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Capture</td>
+                        <td class="py-2 px-4">Captured Ø</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['capture'] ?? 'N/A' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['capture'] ?? 'N/A' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['capture'] ?? 'N/A' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['capture'] ?? 'N/A' }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Defend</td>
+                        <td class="py-2 px-4">Defended Ø</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['defend']  ?? 'N/A'}}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['defend']  ?? 'N/A'}}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['defend']  ?? 'N/A'}}</td>
@@ -115,10 +113,10 @@
                     </tr>
                     <tr class="border-b">
                         <td class="py-2 px-4">PR</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['overall']['pr'] ?? 'N/A' }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastDay']['pr']  ?? 'N/A'}}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['pr'] ?? 'N/A' }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['pr']  ?? 'N/A'}}</td>
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['overall']['pr'] ?? 0) }}">{{ $playerStatistics['overall']['pr'] ?? 'N/A' }}</td>
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['lastDay']['pr'] ?? 0) }}">{{ $playerStatistics['lastDay']['pr']  ?? 'N/A'}}</td>
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['lastWeek']['pr'] ?? 0) }}">{{ $playerStatistics['lastWeek']['pr'] ?? 'N/A' }}</td>
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($playerStatistics['lastMonth']['pr'] ?? 0) }}">{{ $playerStatistics['lastMonth']['pr']  ?? 'N/A'}}</td>
                     </tr> 
                     <tr class="border-b">
                         <td class="py-2 px-4">WN8</td>
@@ -145,12 +143,14 @@
             <table id="sortableTable" class="table table-striped table-bordered customRedefine playerTable">
                 <thead>
                     <tr class="bg-gray-100 text-left">
-                        <th class="border-b">Nation</th>
                         <th class="border-b">Name</th>
+                        <th class="border-b" style="width: 100px">Nation</th>
+                        <th class="border-b">Type</th>
                         <th class="border-b">Tier</th>
                         <th class="border-b">Battles</th>
                         <th class="border-b">Frags Ø</th>
                         <th class="border-b">Damage Ø</th>
+                        <th class="border-b">XP</th>
                         <th class="border-b">Wins</th>
                         <th class="border-b">WN8</th>
                     </tr>
@@ -158,18 +158,38 @@
                 <tbody>
                     @foreach ($playerVehicles as $vehicle)
                         <tr class="border-b">
-                            <td class="py-2 px-4">{{ $vehicle['nation'] }}</td>
                             <td class="py-2 px-4">{{ $vehicle['name'] }}</td>
+                            <td class="py-2 px-4" style="width: 100px">
+                                <img class="nation-icon" src="{{ FrontendHelper::getFlags($vehicle['nation']) }}" />
+                                <span style="display: none;">{{ $vehicle['nation'] }}<span>
+                            </td>
+                            <td class="py-2 px-4">-</td>
                             <td class="py-2 px-4">{{ $vehicle['tier'] }}</td>
                             <td class="py-2 px-4">{{ $vehicle['battles'] }}</td>
                             <td class="py-2 px-4">{{ $vehicle['frags'] }}</td>
                             <td class="py-2 px-4">{{ $vehicle['damage'] }}</td>
-                            <td class="py-2 px-4">{{ $vehicle['wins'] }}</td>
+                            <td class="py-2 px-4">-</td>
+                            <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($vehicle['wins'] ?? 0) }}">{{ $vehicle['wins'] }}</td>
                             <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($vehicle['wn8']) }}">{{ $vehicle['wn8'] }}</td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
+            <div onclick="closeVehiclePopup" class="vehicle-popup-background"></div>
+            <div class="vehicle-info-popup shadow4" v-if="vehicleInfoPopup.show" ref="vehiclePopup">
+                <h3>Name</h3>
+                <img src="vehicleInfoPopup.obj.image" />
+                <p>
+                    Description
+                    <a href="{{ route('wiki.vehicle', [
+                            'nation' => $nation,
+                            'type' => $key,
+                            'ship' => $vehicle['name']
+                        ]) }}">
+                        <span>More info</span>
+                    </a>
+                </p>
+            </div>
             <script>
                 document.addEventListener("DOMContentLoaded", () => {
                     const table = document.getElementById("sortableTable");

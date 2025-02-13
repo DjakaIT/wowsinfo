@@ -20,7 +20,7 @@
         <div class="col-12" class="image-page">
           <h1>Welcome <span id="userNameDashboard"></span></h1>
           <p>At this page you can force update of your own statistic.</p>
-          <div @click="updateStats(get_user.wid)">Update stats</div>
+          <div>Update stats</div>
         </div>
       </div>
     </div>

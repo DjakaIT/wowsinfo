@@ -26,7 +26,7 @@ Route::view('/dashboard', 'dashboard', [
         'metaDescription' => 'Dashboard on wows.wn8.info',
         'metaKeywords' => 'WN8, World of Warships, Statistics, Player statistics, Dashboard',
     ],
-]);
+])->name('dashboard');
 // Login
 Route::view('/login', 'login', [
     'metaSite' => [

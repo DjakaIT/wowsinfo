@@ -14,10 +14,7 @@
           <h2>Provider</h2>
           The provider of this Internet site within the legal meaning of the term is the registered company INUNO<br>
           Address:<br>
-          INUNO<br
-          >Hercegovacka 116<br>
-          HR-21000 Split<br>
-          Croatia
+          INUNO
 				</div>
 			</div>
 		</div>
