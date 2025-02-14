@@ -119,7 +119,7 @@
 					<ul class="dropdown-menu">
 						<li><a class="dropdown-item" href="#">EU</a></li>
 						<li><a class="dropdown-item" href="#">NA</a></li>
-						<li><a class="dropdown-item" href="#">AS</a></li>
+						<li><a class="dropdown-item" href="#">ASIA</a></li>
 						<li><hr class="dropdown-divider"></li>
 						<li><a class="dropdown-item disabled" href="#">RU</a></li>
 					</ul>

@@ -6,6 +6,7 @@ use App\Models\Ship;
 use Illuminate\Http\Request;
 use App\Services\ShipService;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class ShipController extends Controller
 {
@@ -168,33 +169,31 @@ class ShipController extends Controller
             ],
         ]);
     }
-
+    
     public function getWikiNationPage($nation)
     {
         $metaTitle = 'World of Warships - Battleships wiki - wows.WN8.info';
         $metaDescription = 'World of Warships battleships information wiki page';
         $metaKeywords = 'WN8, World of Warships, ship, ships, warships, warship, wiki, battleships, battleship, description, information, info, modules, configuration';
-
+        $shipsByNation = Ship::where('nation', $nation)
+            ->orderBy('type')
+            ->with('detail') // Eager load ShipDetail relationship
+            ->get()
+            ->groupBy('type');
+        $orderedShips = $shipsByNation->map(fn($group) => $group->map(fn($ship) => [
+            'name' => $ship->name,
+            'image' => optional($ship->detail)->images ? json_decode($ship->detail->images, true)['small'] : null,
+        ])->values())->toArray();
+        
         return view('wikiNation', [
             'metaSite' => [
                 'metaTitle' => $metaTitle,
                 'metaDescription' => $metaDescription,
                 'metaKeywords' => $metaKeywords,
             ],
-            'nation' => 'usa', // Ovde ide iz parametra nacija
-            'description' => 'Usa description',
-            'types' => [
-                'cruiser' => [
-                    [
-                        'name' => 'Worcester',
-                        'image' => 'https://wows-gloss-icons.wgcdn.co/icons/vehicle/medium/PASC210_f6f8a7492e7a6c7a78d7e0d181b2e8b0bf9845b8d394f7795f320e0405e5e5d1.png',
-                    ],
-                    [
-                        'name' => 'Chester',
-                        'image' => 'https://wows-gloss-icons.wgcdn.co/icons/vehicle/small/PASC002_c9e819fc252eb57edac28ecc2c968de69803d66415b88a10eca629d8a869fd1e.png',
-                    ]
-                ],
-            ],
+            'nation' => $nation, // Ovde ide iz parametra nacija
+            'description' => "{$nation} description",
+            'types' => $orderedShips,
         ]);
     }
 
@@ -203,6 +202,19 @@ class ShipController extends Controller
         $metaTitle = 'World of Warships - Battleships wiki - wows.WN8.info';
         $metaDescription = 'World of Warships battleships information wiki page';
         $metaKeywords = 'WN8, World of Warships, ship, ships, warships, warship, wiki, battleships, battleship, description, information, info, modules, configuration';
+        $formattedType = Str::studly(str_replace('_', '', $type));
+        $shipsByType = Ship::where('type', $formattedType)
+            ->orderBy('nation') // Group ships by nation
+            ->with('detail') // Eager load ShipDetail relationship
+            ->get()
+            ->groupBy('nation'); // Group ships by nation
+
+        // Now map over the ships and prepare the data to return
+        
+        $orderedShips = $shipsByType->map(fn($group) => $group->map(fn($ship) => [
+            'name' => $ship->name,
+            'image' => optional($ship->detail)->images ? json_decode($ship->detail->images, true)['small'] : null,
+        ])->values())->toArray();
 
         return view('wikiType', [
             'metaSite' => [
@@ -210,8 +222,8 @@ class ShipController extends Controller
                 'metaDescription' => $metaDescription,
                 'metaKeywords' => $metaKeywords,
             ],
-            'type' => 'cruiser', // Ovde ide iz parametra nacija
-            'description' => 'Cruiser description',
+            'type' => $type, // Ovde ide iz parametra nacija
+            'description' => "{$type} description",
             'nationImages' => [
                 'usa' => 'https://wiki.wgcdn.co/images/f/f2/Wows_flag_USA.png',
                 'pan_asia' => 'https://wiki.wgcdn.co/images/3/33/Wows_flag_Pan_Asia.png',
@@ -227,28 +239,7 @@ class ShipController extends Controller
                 'spain' => 'https://wiki.wgcdn.co/images/thumb/e/ea/Flag_of_Spain_%28state%29.jpg/80px-Flag_of_Spain_%28state%29.jpg',
                 'pan_america' => 'https://wiki.wgcdn.co/images/9/9e/Wows_flag_Pan_America.png',
             ],
-            'nations' => [
-                'usa' => [
-                    [
-                        'name' => 'Worcester',
-                        'image' => 'https://wows-gloss-icons.wgcdn.co/icons/vehicle/medium/PASC210_f6f8a7492e7a6c7a78d7e0d181b2e8b0bf9845b8d394f7795f320e0405e5e5d1.png',
-                    ],
-                    [
-                        'name' => 'Chester',
-                        'image' => 'https://wows-gloss-icons.wgcdn.co/icons/vehicle/small/PASC002_c9e819fc252eb57edac28ecc2c968de69803d66415b88a10eca629d8a869fd1e.png',
-                    ]
-                ],
-                'germany' => [
-                    [
-                        'name' => 'Worcester',
-                        'image' => 'https://wows-gloss-icons.wgcdn.co/icons/vehicle/medium/PASC210_f6f8a7492e7a6c7a78d7e0d181b2e8b0bf9845b8d394f7795f320e0405e5e5d1.png',
-                    ],
-                    [
-                        'name' => 'Chester',
-                        'image' => 'https://wows-gloss-icons.wgcdn.co/icons/vehicle/small/PASC002_c9e819fc252eb57edac28ecc2c968de69803d66415b88a10eca629d8a869fd1e.png',
-                    ]
-                ],
-            ],
+            'nations' => $orderedShips,
         ]);
     }
 

@@ -67,12 +67,12 @@ Route::prefix('wiki')->group(function () {
     // Next, more general route matching just nation
     Route::get('/{nation}', [ShipController::class, 'getWikiNationPage'])
         ->name('wiki.nation')
-        ->where('nation', 'usa|germany|japan');
+        ->where('nation', 'usa|germany|japan|pan_asia|ussr|europe|uk|netherlands|italy|france|commonwealth|spain|pan_america');
 
     // Then route for type matching just vehicle type
     Route::get('/{type}', [ShipController::class, 'getWikiTypePage'])
         ->name('wiki.type')
-        ->where('type', 'cruiser|destroyer|battleship');
+        ->where('type', 'cruiser|destroyer|battleship|air_carrier|submarine');
 
     // Home route (this is the default page for /wiki)
     Route::get('/', [ShipController::class, 'getWikiHomePage'])->name('wiki.home');
