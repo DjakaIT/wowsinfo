@@ -16,7 +16,7 @@
             localStorage.setItem('access_token', '{{ $access_token }}');
             localStorage.setItem('expires_at', '{{ $expires_at }}');
             
-            window.location.href = '{{ route('home') }}';
+            window.location.href = '{{ route('dashboard') }}';
         }
 
         // Redirect to home page after storing the data

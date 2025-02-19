@@ -10,7 +10,7 @@
 @section('content')
 <div class="page-padding">
   <p class="player-title">
-    [{{ $shortName }}] <span class="gray-link">{{ $fullName }}</span>
+    {{ $shortName }} <span class="gray-link">[{{ $fullName }}]</span>
   </p>
   <p>
     {{ $clanDescription }}

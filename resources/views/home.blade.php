@@ -9,12 +9,12 @@
 
 @section('content')
 <div class="container">
-	<div class="row mb-40">
+	<div class="row mb-20 mt-30">
 		<div class="col">
 			<iframe src="https://api.wn8.info/tools/wows/twitchlive.php" title="description" class="tw-frame"></iframe>
 		</div>
 	</div>
-	<div class="row mb-40">
+	<div class="row mb-20">
 		<div class="col">
 			<h2 class="heading2"> Top Player: Past 24 hours </h2>
 			<div class="table-container">
@@ -112,7 +112,7 @@
 			<p class="table-info-para"> Statistics for players whose tier is above 5 and who have 120+ battles </p>
 		</div>
 	</div>
-	<div class="row mb-40">
+	<div class="row mb-20">
 		<div class="col">
 		<iframe src="https://api.wn8.info/tools/wows/ytvids.php" title="description" class="yt-frame"></iframe>
 		</div>

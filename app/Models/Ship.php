@@ -39,4 +39,10 @@ class Ship extends Model
     {
         return $query->where('nation', $nation);
     }
+
+    // Zlaja dodavao
+    public function detail()
+    {
+        return $this->hasOne(ShipDetail::class, 'ship_id', 'ship_id');
+    }
 }
