@@ -858,6 +858,7 @@ class PlayerShipService
     {
         $playerVehicles = PlayerShip::select(
             'ship_nation as nation',
+            'ship_type as type',
             'ship_name as name',
             'ship_tier as tier',
             'battles_played as battles',
@@ -872,6 +873,7 @@ class PlayerShipService
             ->map(function ($vehicle) {
                 return [
                     'nation' => $vehicle->nation,
+                    'tyoe' => $vehicle->type,
                     'name' => $vehicle->name,
                     'tier' => $vehicle->tier,
                     'battles' => $vehicle->battles,
