@@ -821,7 +821,7 @@ class PlayerShipService
     {
         $playerStatistics = PlayerShip::select(
             DB::raw('SUM(battles_played) as battles'),
-            DB::raw('SUM(wins_count) as wins'),
+            DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(wins_count) / SUM(battles_played)) ELSE 0 END as wins'),
             DB::raw('AVG(ship_tier) as tier'),
             DB::raw('AVG(survival_rate) as survived'),
             DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(damage_dealt) / SUM(battles_played)) ELSE 0 END as damage'),
@@ -865,6 +865,7 @@ class PlayerShipService
             'frags as frags',
             'damage_dealt as damage',
             'wins_count as wins',
+            'xp as xp',
             'wn8 as wn8'
         )
             ->where('account_id', $account_id)
@@ -879,6 +880,7 @@ class PlayerShipService
                     'battles' => $vehicle->battles,
                     'frags' => $vehicle->frags,
                     'damage' => $vehicle->damage,
+                    'xp' => $vehicle->xp,
                     'wins' => $vehicle->wins,
                     'wn8' => $vehicle->wn8,
                 ];

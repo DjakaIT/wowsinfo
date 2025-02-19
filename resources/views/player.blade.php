@@ -164,10 +164,12 @@
                                 <span style="display: none;">{{ $vehicle['nation'] }}<span>
                             </td>
                             <td class="py-2 px-4">-</td>
+                            <td class="py-2 px-4">{{ $vehicle['type'] }}</td>
                             <td class="py-2 px-4">{{ $vehicle['tier'] }}</td>
                             <td class="py-2 px-4">{{ $vehicle['battles'] }}</td>
                             <td class="py-2 px-4">{{ $vehicle['frags'] }}</td>
                             <td class="py-2 px-4">{{ $vehicle['damage'] }}</td>
+                            <td class="py-2 px-4">{{ $vehicle['xp'] }}</td>
                             <td class="py-2 px-4">-</td>
                             <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($vehicle['wins'] ?? 0) }}">{{ $vehicle['wins'] }}</td>
                             <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($vehicle['wn8']) }}">{{ $vehicle['wn8'] }}</td>

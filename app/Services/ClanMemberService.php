@@ -279,9 +279,16 @@ class ClanMemberService
 
     public function getPlayerMemberInfo($account_id, $name)
     {
-        $playerInfo = ClanMember::select('account_id', 'account_name as name', 'clan_id', 'clan_name as clanName', 'account_created as createdAt')
-            ->where('account_id', $account_id)
-            ->where('account_name', $name)
+        $playerInfo = ClanMember::join('clans', 'clan_members.clan_id', '=', 'clans.clan_id')
+            ->select(
+                'clan_members.account_id',
+                'clan_members.account_name as name',
+                'clan_members.clan_id',
+                'clans.tag as clanName',
+                'clan_members.account_created as createdAt'
+            )
+            ->where('clan_members.account_id', $account_id)
+            ->where('clan_members.account_name', $name)
             ->first();
 
 
