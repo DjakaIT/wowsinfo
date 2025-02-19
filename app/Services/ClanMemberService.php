@@ -164,7 +164,49 @@ class ClanMemberService
             Log::info("No members found for this clan", ['clan_id' => $clanId]);
         }
     }
+    public function getClanMemberdata($clanId)
+    {
+        $playerShipService = app(\App\Services\PlayerShipService::class);
 
+        $members = DB::table('clan_members')
+            ->join('player_ships', 'clan_members.account_id', '=', 'player_ships.account_id')
+            ->join('clans', 'clan_members.clan_id', '=', 'clans.clan_id')
+            ->where('clan_members.clan_id', $clanId)
+            ->select(
+                'clan_members.account_id',
+                DB::raw('MAX(player_ships.player_name) as player_name'),
+                DB::raw('MAX(player_ships.total_player_wn8) as wn8'),
+                DB::raw('CASE WHEN SUM(player_ships.battles_played) > 0 THEN ROUND((SUM(player_ships.wins_count) / SUM(player_ships.battles_played))*100,0) ELSE 0 END as win_rate'),
+                DB::raw('SUM(player_ships.battles_played) as battles'),
+                DB::raw('MAX(player_ships.last_battle_time) as lastBattle'),
+                'clan_members.role as position',
+                'clan_members.joined_at as joined',
+                'clans.tag as fullname'
+            )
+            ->groupBy('clan_members.account_id', 'clan_members.role', 'clan_members.joined_at', 'clans.tag')
+            ->get();
+
+        $result = [];
+
+        foreach ($members as $member) {
+            $lastMonthStats = $playerShipService->getPlayerStatsLastMonth($member->account_id);
+            $formattedLastBattleTime = $member->lastBattle ? date('Y-m-d H:i:s', $member->lastBattle) : null;
+            $result[] = [
+                'name'         => $member->player_name,
+                'wn8'          => $member->wn8,
+                'winRate'      => $member->win_rate,
+                'battles'      => $member->battles,
+                'lastBattle'   => $formattedLastBattleTime,
+                'position'     => $member->position,
+                'joined'       => $member->joined,
+                'wn8Month'     => $lastMonthStats['wn8'] ?? '-',
+                'battlesMonth' => $lastMonthStats['battles'] ?? '-',
+                'fullName'     => $member->fullname
+            ];
+        }
+
+        return $result;
+    }
     public function fetchAccountCreationDate($player, $serverKey)
     {
         // Ensure server is valid
@@ -234,7 +276,6 @@ class ClanMemberService
         return null;
     }
 
-    public function getClanMemberdata($clanId) {}
 
     public function getPlayerMemberInfo($account_id, $name)
     {

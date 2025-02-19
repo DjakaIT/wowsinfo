@@ -221,5 +221,3 @@
         <!-- ### Player vehicles -->
     </div>
 @endsection
-player.blade.php
-Prikaz stavke web.php.
