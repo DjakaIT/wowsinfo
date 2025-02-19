@@ -1,3 +1,4 @@
+
 <?php
 /*
 DROP DATABASE `wows-laravel`;
@@ -37,7 +38,7 @@ Route::view('/login', 'login', [
 ]);
 Route::get('/verification', function (Request $request) {
     if ($request->query('status') === 'ok') {
-        
+
         return view('verification', [
             'metaSite' => [
                 'metaTitle' => 'Verification - wows.wn8.info',

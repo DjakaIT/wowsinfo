@@ -175,7 +175,7 @@
                     @endforeach
                 </tbody>
             </table>
-            <div onclick="closeVehiclePopup" class="vehicle-popup-background"></div>
+            {{--<div onclick="closeVehiclePopup" class="vehicle-popup-background"></div>
             <div class="vehicle-info-popup shadow4" v-if="vehicleInfoPopup.show" ref="vehiclePopup">
                 <h3>Name</h3>
                 <img src="vehicleInfoPopup.obj.image" />
@@ -189,7 +189,7 @@
                         <span>More info</span>
                     </a>
                 </p>
-            </div>
+            </div>--}}
             <script>
                 document.addEventListener("DOMContentLoaded", () => {
                     const table = document.getElementById("sortableTable");
@@ -221,3 +221,5 @@
         <!-- ### Player vehicles -->
     </div>
 @endsection
+player.blade.php
+Prikaz stavke web.php.

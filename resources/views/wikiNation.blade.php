@@ -1,3 +1,4 @@
+
 @extends('layout.layout')
 
 @section('metaTitle', $metaSite['metaTitle'])
@@ -35,7 +36,8 @@
 														<a href="{{ route('wiki.vehicle', [
 																'nation' => $nation,
 																'type' => $key,
-																'ship' => $vehicle['name']
+																'ship' => $vehicle['name'],
+																'shipId' => $vehicle['id']
 														]) }}">
 																<img src="{{ $vehicle['image'] }}" alt="{{ $vehicle['name'] }}">
 																<span>{{ $vehicle['name'] }}</span>
@@ -49,3 +51,5 @@
     </div>
   </div>
 @endsection
+wikiNation.blade.php
+Prikaz stavke web.php.

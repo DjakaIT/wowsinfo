@@ -1,3 +1,19 @@
+Razgovor je otvoren. 1 nepročitana poruka.
+
+Preskoči na sadržaj
+Koristite Gmail sa čitačima zaslona
+1 od 2.913
+Fajlovi
+Pristigla pošta
+
+Zlatko Vujičić
+Privici
+11:12 (prije 3 minute)
+prima ja
+
+
+ 8 privitaka
+  •  Skenirao Gmail
 @extends('layout.layout')
 
 @section('metaTitle', $metaSite['metaTitle'])
@@ -41,7 +57,8 @@
                                 <a href="{{ route('wiki.vehicle', [
                                     'nation' => $key,
                                     'type' => $type,
-                                    'ship' => $vehicle['name']
+                                    'ship' => $vehicle['name'],
+                                    'shipId' => $vehicle['id']
                                 ]) }}">
                                     <img src="{{ $vehicle['image'] }}" alt="{{ $vehicle['name'] }}">
                                     <span>{{ $vehicle['name'] }}</span>

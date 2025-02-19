@@ -1,3 +1,4 @@
+
 <script>
     // Check if user is logged in by checking localStorage
     window.onload = function() {
