@@ -1,3 +1,4 @@
+
 @extends('layout.layout')
 
 @section('metaTitle', $metaSite['metaTitle'])
@@ -25,8 +26,8 @@
                         <h1 class="page-heading">{{ $name }}</h1>
                         <ul class="wiki-breadcrumb">
                           <li><a href="/wiki/" class="router-link-active"> Wiki </a><span> / &nbsp;</span></li>
-                          <li><a href="/wiki/usa" class="router-link-active">Usa</a><span> / &nbsp;</span></li>
-                          <li><a href="/wiki/cruiser" class="router-link-active">Cruiser</a><span> / &nbsp;</span></li>
+                          <li><a href="{{ route('wiki.nation', ['nation' => $nation]) }}" class="router-link-active">{{ $nation }}</a><span> / &nbsp;</span></li>
+                          <li><a href="{{ route('wiki.type', ['type' => $type]) }}" class="router-link-active">{{ $type }}</a><span> / &nbsp;</span></li>
                           <li><span>{{ $name }}</span></li>
                         </ul>
                     </div>
@@ -128,8 +129,10 @@
                                         <h3 class="wiki-module-title">Hull</h3>
                                     </div>
                                     @foreach($details['hull'] as $key => $stat)
-                                      <p class="wikie-details-subtitles">{{ $key }}</p>
-                                      <p>{{ $stat }}</p>
+                                      @if($stat !== null)
+                                        <p class="wikie-details-subtitles">{{ $key }}</p>
+                                        <p>{{ $stat }}</p>
+                                      @endif
                                     @endforeach
                                 </div>
                             @endif
@@ -140,8 +143,10 @@
                                         <h3 class="wiki-module-title">Mobility</h3>
                                     </div>
                                     @foreach($details['mobility'] as $key => $stat)
-                                      <p class="wikie-details-subtitles">{{ $key }}</p>
-                                      <p>{{ $stat }}</p>
+                                      @if($stat !== null)
+                                        <p class="wikie-details-subtitles">{{ $key }}</p>
+                                        <p>{{ $stat }}</p>
+                                      @endif
                                     @endforeach
                                 </div>
                             @endif
@@ -152,8 +157,10 @@
                                         <h3 class="wiki-module-title">Concealment</h3>
                                     </div>
                                     @foreach($details['concealment'] as $key => $stat)
-                                      <p class="wikie-details-subtitles">{{ $key }}</p>
-                                      <p>{{ $stat }}</p>
+                                      @if($stat !== null)
+                                        <p class="wikie-details-subtitles">{{ $key }}</p>
+                                        <p>{{ $stat }}</p>
+                                      @endif
                                     @endforeach
                                 </div>
                             @endif
@@ -210,7 +217,7 @@
                               </div>
                             @endif
                             <!-- Secondary armament -->
-                            @if(!empty($details['atbas']) && $details['atbas']['distance'] > 0)
+                            @if(isset($details['atbas']['slots']) && $details['atbas']['distance'] > 0)
                               <div class="col">
                                   <div class="wiki-module-title-holder">
                                     <h3 class="wiki-module-title">Armament</h3>
@@ -237,7 +244,7 @@
                               </div>
                             @endif
                             <!-- Torpedos -->
-                            @if(!empty($details['torpedos']))
+                            @if(!is_null($details['torpedos']))
                               <div class="col">
                                   <div class="wiki-module-title-holder">
                                     <h3 class="wiki-module-title">Torpedos</h3>
@@ -276,7 +283,7 @@
                               </div>
                             @endif
                             <!-- Anti Aircraft -->
-                            @if(!empty($details['anti_aircraft']))
+                            @if(!is_null($details['anti_aircraft']))
                               <div class="col">
                                   <div class="wiki-module-title-holder">
                                     <h3 class="wiki-module-title">Anti Aircraft</h3>
@@ -297,7 +304,7 @@
                               </div>
                             @endif
                             <!-- Sonar -->
-                            @if(!empty($details['submarine_sonar']))
+                            @if(!is_null($details['submarine_sonar']))
                               <div class="col">
                                   <div class="wiki-module-title-holder">
                                     <h3 class="wiki-module-title">Sonar</h3>
@@ -340,3 +347,5 @@
     </div>
 </div>
 @endsection
+wikiVehicle.blade.php
+Prikaz stavke web.php.
