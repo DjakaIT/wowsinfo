@@ -234,6 +234,7 @@ class ClanMemberService
         return null;
     }
 
+    public function getClanMemberdata($clanId) {}
 
     public function getPlayerMemberInfo($account_id, $name)
     {

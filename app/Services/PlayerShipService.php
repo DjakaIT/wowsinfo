@@ -241,7 +241,6 @@ class PlayerShipService
     }
 
 
-
     public function getTopPlayersLast7Days()
     {
 
@@ -703,6 +702,7 @@ class PlayerShipService
     public function getPlayerStatsLastDay($account_id)
     {
         return Cache::remember("stats_24h_{$account_id}", now()->addDay(), function () use ($account_id) {
+            $threshold = now()->subDay()->timestamp; // Convert to Unix timestamp
             $playerStatistics = PlayerShip::select(
                 DB::raw('SUM(battles_played) as battles'),
                 DB::raw('SUM(wins_count) as wins'),
@@ -718,31 +718,30 @@ class PlayerShipService
                 DB::raw('MAX(total_player_pr) as pr')
             )
                 ->where('account_id', $account_id)
-                ->where('last_battle_time', '>=', now()->subDay())
-
+                ->where('last_battle_time', '>=', $threshold)
                 ->first();
 
-
             return $playerStatistics ? $playerStatistics->toArray() : [
-                'battles' => '-',
-                'wins' => '-',
-                'tier' => '-',
+                'battles'  => '-',
+                'wins'     => '-',
+                'tier'     => '-',
                 'survived' => '-',
-                'damage' => '-',
-                'frags' => '-',
-                'xp' => '-',
-                'spotted' => '-',
-                'capture' => '-',
-                'defend' => '-',
-                'wn8' => '-',
-                'pr' => '-'
+                'damage'   => '-',
+                'frags'    => '-',
+                'xp'       => '-',
+                'spotted'  => '-',
+                'capture'  => '-',
+                'defend'   => '-',
+                'wn8'      => '-',
+                'pr'       => '-'
             ];
         });
     }
+
     public function getPlayerStatsLastWeek($account_id)
     {
         return Cache::remember("stats_7d_{$account_id}", now()->addWeek(), function () use ($account_id) {
-
+            $threshold = now()->subWeek()->timestamp;
             $playerStatistics = PlayerShip::select(
                 DB::raw('SUM(battles_played) as battles'),
                 DB::raw('SUM(wins_count) as wins'),
@@ -758,23 +757,22 @@ class PlayerShipService
                 DB::raw('MAX(total_player_pr) as pr')
             )
                 ->where('account_id', $account_id)
-                ->where('last_battle_time', '>=', now()->subWeek())
+                ->where('last_battle_time', '>=', $threshold)
                 ->first();
 
-
             return $playerStatistics ? $playerStatistics->toArray() : [
-                'battles' => '-',
-                'wins' => '-',
-                'tier' => '-',
+                'battles'  => '-',
+                'wins'     => '-',
+                'tier'     => '-',
                 'survived' => '-',
-                'damage' => '-',
-                'frags' => '-',
-                'xp' => '-',
-                'spotted' => '-',
-                'capture' => '-',
-                'defend' => '-',
-                'wn8' => '-',
-                'pr' => '-'
+                'damage'   => '-',
+                'frags'    => '-',
+                'xp'       => '-',
+                'spotted'  => '-',
+                'capture'  => '-',
+                'defend'   => '-',
+                'wn8'      => '-',
+                'pr'       => '-'
             ];
         });
     }
@@ -782,6 +780,7 @@ class PlayerShipService
     public function getPlayerStatsLastMonth($account_id)
     {
         return Cache::remember("stats_30d_{$account_id}", now()->addMonth(), function () use ($account_id) {
+            $threshold = now()->subMonth()->timestamp;
             $playerStatistics = PlayerShip::select(
                 DB::raw('SUM(battles_played) as battles'),
                 DB::raw('SUM(wins_count) as wins'),
@@ -797,23 +796,22 @@ class PlayerShipService
                 DB::raw('MAX(total_player_pr) as pr')
             )
                 ->where('account_id', $account_id)
-                ->where('last_battle_time', '>=', now()->subMonth())
+                ->where('last_battle_time', '>=', $threshold)
                 ->first();
 
-
             return $playerStatistics ? $playerStatistics->toArray() : [
-                'battles' => '-',
-                'wins' => '-',
-                'tier' => '-',
+                'battles'  => '-',
+                'wins'     => '-',
+                'tier'     => '-',
                 'survived' => '-',
-                'damage' => '-',
-                'frags' => '-',
-                'xp' => '-',
-                'spotted' => '-',
-                'capture' => '-',
-                'defend' => '-',
-                'wn8' => '-',
-                'pr' => '-'
+                'damage'   => '-',
+                'frags'    => '-',
+                'xp'       => '-',
+                'spotted'  => '-',
+                'capture'  => '-',
+                'defend'   => '-',
+                'wn8'      => '-',
+                'pr'       => '-'
             ];
         });
     }

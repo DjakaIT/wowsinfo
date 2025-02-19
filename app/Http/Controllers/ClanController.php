@@ -24,6 +24,8 @@ class ClanController extends Controller
         return response()->json($result, 201);
     }
 
+    public function getClanMemberStats() {}
+
     public function getClanPage($name, $id)
     {
         $metaTitle = "$name - WN8 clan statistics in World of Warships";
