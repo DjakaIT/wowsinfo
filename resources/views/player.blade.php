@@ -161,37 +161,20 @@
                             <td class="py-2 px-4">{{ $vehicle['name'] }}</td>
                             <td class="py-2 px-4" style="width: 100px">
                                 <img class="nation-icon" src="{{ FrontendHelper::getFlags($vehicle['nation']) }}" />
-                                <span style="display: none;">{{ $vehicle['nation'] }}<span>
+                                <span style="display: none;">{{ $vehicle['nation'] }}</span>
                             </td>
-                            <td class="py-2 px-4">-</td>
                             <td class="py-2 px-4">{{ $vehicle['type'] }}</td>
                             <td class="py-2 px-4">{{ $vehicle['tier'] }}</td>
                             <td class="py-2 px-4">{{ $vehicle['battles'] }}</td>
                             <td class="py-2 px-4">{{ $vehicle['frags'] }}</td>
                             <td class="py-2 px-4">{{ $vehicle['damage'] }}</td>
                             <td class="py-2 px-4">{{ $vehicle['xp'] }}</td>
-                            <td class="py-2 px-4">-</td>
-                            <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($vehicle['wins'] ?? 0) }}">{{ $vehicle['wins'] }}</td>
+                            <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($vehicle['wins'] ?? 0) }}">{{ $vehicle['wins'] }}%</td>
                             <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($vehicle['wn8']) }}">{{ $vehicle['wn8'] }}</td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
-            {{--<div onclick="closeVehiclePopup" class="vehicle-popup-background"></div>
-            <div class="vehicle-info-popup shadow4" v-if="vehicleInfoPopup.show" ref="vehiclePopup">
-                <h3>Name</h3>
-                <img src="vehicleInfoPopup.obj.image" />
-                <p>
-                    Description
-                    <a href="{{ route('wiki.vehicle', [
-                            'nation' => $nation,
-                            'type' => $key,
-                            'ship' => $vehicle['name']
-                        ]) }}">
-                        <span>More info</span>
-                    </a>
-                </p>
-            </div>--}}
             <script>
                 document.addEventListener("DOMContentLoaded", () => {
                     const table = document.getElementById("sortableTable");

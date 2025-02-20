@@ -159,8 +159,7 @@ class PlayerShipService
         // PR formula
         $pr = ceil((700 * $nDmg) + (300 * $nFrags) + (150 * $nWins));
 
-        Log::info("Caclulated some stats for player's ship:  $nDmg, $nFrags, $nWins");
-        Log::info("Caclulated the total PR for player's ship:  $pr");
+
 
         return $pr;
     }
@@ -181,7 +180,6 @@ class PlayerShipService
 
 
         $player_total_pr = ceil($total_battles > 0 ? $total_weighted_pr / $total_battles : 0);
-        Log::info("Caclulated the total PR for player:  $player_total_pr");
 
         return $player_total_pr;
     }
@@ -705,8 +703,8 @@ class PlayerShipService
             $threshold = now()->subDay()->timestamp; // Convert to Unix timestamp
             $playerStatistics = PlayerShip::select(
                 DB::raw('SUM(battles_played) as battles'),
-                DB::raw('SUM(wins_count) as wins'),
-                DB::raw('AVG(ship_tier) as tier'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND((SUM(wins_count)/SUM(battles_played))*100,0) ELSE 0 END as wins'),
+                DB::raw('ROUND(AVG(ship_tier), 1) as tier'),
                 DB::raw('AVG(survival_rate) as survived'),
                 DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(damage_dealt) / SUM(battles_played)) ELSE 0 END as damage'),
                 DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(frags) / SUM(battles_played)) ELSE 0 END as frags'),
@@ -744,8 +742,8 @@ class PlayerShipService
             $threshold = now()->subWeek()->timestamp;
             $playerStatistics = PlayerShip::select(
                 DB::raw('SUM(battles_played) as battles'),
-                DB::raw('SUM(wins_count) as wins'),
-                DB::raw('AVG(ship_tier) as tier'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND((SUM(wins_count)/SUM(battles_played))*100,0) ELSE 0 END as wins'),
+                DB::raw('ROUND(AVG(ship_tier), 1) as tier'),
                 DB::raw('AVG(survival_rate) as survived'),
                 DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(damage_dealt) / SUM(battles_played)) ELSE 0 END as damage'),
                 DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(frags) / SUM(battles_played)) ELSE 0 END as frags'),
@@ -783,8 +781,8 @@ class PlayerShipService
             $threshold = now()->subMonth()->timestamp;
             $playerStatistics = PlayerShip::select(
                 DB::raw('SUM(battles_played) as battles'),
-                DB::raw('SUM(wins_count) as wins'),
-                DB::raw('AVG(ship_tier) as tier'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND((SUM(wins_count)/SUM(battles_played))*100,0) ELSE 0 END as wins'),
+                DB::raw('ROUND(AVG(ship_tier), 1) as tier'),
                 DB::raw('AVG(survival_rate) as survived'),
                 DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(damage_dealt) / SUM(battles_played)) ELSE 0 END as damage'),
                 DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(frags) / SUM(battles_played)) ELSE 0 END as frags'),
@@ -821,8 +819,8 @@ class PlayerShipService
     {
         $playerStatistics = PlayerShip::select(
             DB::raw('SUM(battles_played) as battles'),
-            DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(wins_count) / SUM(battles_played)) ELSE 0 END as wins'),
-            DB::raw('AVG(ship_tier) as tier'),
+            DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND((SUM(wins_count)/SUM(battles_played))*100,0) ELSE 0 END as wins'),
+            DB::raw('ROUND(AVG(ship_tier), 1) as tier'),
             DB::raw('AVG(survival_rate) as survived'),
             DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(damage_dealt) / SUM(battles_played)) ELSE 0 END as damage'),
             DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(frags) / SUM(battles_played)) ELSE 0 END as frags'),
@@ -836,7 +834,6 @@ class PlayerShipService
             ->where('account_id', $account_id)
             ->first();
         Log::info($playerStatistics);
-
 
         return $playerStatistics ? $playerStatistics->toArray() : [
             'battles' => '-',
@@ -857,15 +854,15 @@ class PlayerShipService
     public function getPlayerVehicleData($account_id, $name)
     {
         $playerVehicles = PlayerShip::select(
+            'ship_name as name',
             'ship_nation as nation',
             'ship_type as type',
-            'ship_name as name',
             'ship_tier as tier',
             'battles_played as battles',
-            'frags as frags',
-            'damage_dealt as damage',
-            'wins_count as wins',
-            'xp as xp',
+            DB::raw('CASE WHEN battles_played > 0 THEN CEIL(frags / battles_played) ELSE 0 END as frags'),
+            'average_damage as damage',  // plain value from column
+            DB::raw('CASE WHEN battles_played > 0 THEN ROUND((wins_count / battles_played) * 100, 0) ELSE 0 END as wins'),
+            DB::raw('CASE WHEN battles_played > 0 THEN CEIL(xp / battles_played) ELSE 0 END as xp'),
             'wn8 as wn8'
         )
             ->where('account_id', $account_id)
@@ -873,9 +870,9 @@ class PlayerShipService
             ->get()
             ->map(function ($vehicle) {
                 return [
-                    'nation' => $vehicle->nation,
-                    'tyoe' => $vehicle->type,
                     'name' => $vehicle->name,
+                    'nation' => $vehicle->nation,
+                    'type' => $vehicle->type,
                     'tier' => $vehicle->tier,
                     'battles' => $vehicle->battles,
                     'frags' => $vehicle->frags,
