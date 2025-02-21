@@ -55,6 +55,14 @@ class PlayerShip extends Model
         'rank_frags',
         'rank_xp',
         'rank_survived_battles',
+        'battles_overall',
+        'survived_overall',
+        'wins_count_overall',
+        'damage_overall',
+        'defended_overall',
+        'captured_overall',
+        'xp_overall',
+        'spotted_overall'
     ];
 
 

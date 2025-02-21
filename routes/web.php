@@ -187,6 +187,7 @@ Route::prefix('player-achievements')->group(function () {
 Route::prefix('player-ships')->group(function () {
 
     Route::get('/fetch', [PlayerShipController::class, 'updatePlayerShips']);
+    Route::get('/overall', [PlayerShipController::class, 'updateOverallPlayerShipStats']);
     Route::get('/null-names', [PlayerShipController::class, 'getNullNames']);
     Route::get('/{id}/periodicplayerstats', [PlayerShipController::class, 'getPeriodicPlayerStats']);
     Route::get('/', [PlayerShipController::class, 'index']);

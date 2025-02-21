@@ -382,6 +382,87 @@ class PlayerShipService
     }
 
 
+    public function fetchAndStoreOverallPlayerStats()
+    {
+        // Get global list of player IDs (from clan_members in this example)
+        $playerIds = ClanMember::pluck('account_id')->unique()->all();
+        if (empty($playerIds)) {
+            Log::info("No player ids found for overall stats update.");
+            return false;
+        }
+
+        $batchSize = 100; // API allows up to 100 accounts per request
+
+        // Loop through each server so that no server is skipped
+        foreach ($this->baseUrls as $serverKey => $baseUrl) {
+            $overallUrl = $baseUrl . "/wows/account/info/";
+            foreach (array_chunk($playerIds, $batchSize) as $batch) {
+                $idsString = implode(',', $batch);
+                $response = Http::get($overallUrl, [
+                    'application_id' => $this->apiKey,
+                    'account_id' => $idsString,
+                ]);
+
+                if (!$response->successful()) {
+                    Log::error("Overall stats API request failed", [
+                        'server' => strtoupper($serverKey),
+                        'account_ids' => $idsString,
+                        'status' => $response->status(),
+                        'response' => $response->body()
+                    ]);
+                    continue;
+                }
+
+                $data = $response->json();
+                if (!isset($data['data']) || !is_array($data['data'])) {
+                    Log::warning("Overall stats API returned no data", ['response' => $data]);
+                    continue;
+                }
+
+                // Build updates from the response
+                $updates = [];
+                foreach ($data['data'] as $accountId => $accountData) {
+                    if (!isset($accountData['statistics']['pvp'])) {
+                        Log::warning("Overall stats for account $accountId not in expected format", [
+                            'server' => strtoupper($serverKey),
+                            'data' => $accountData
+                        ]);
+                        continue;
+                    }
+                    $pvp = $accountData['statistics']['pvp'];
+                    $updates[] = [
+                        'account_id'       => $accountId,
+                        'battles_overall'  => $pvp['battles'] ?? 0,
+                        'survived_overall' => $pvp['survived_battles'] ?? 0,
+                        'wins_count_overall' => $pvp['wins'] ?? 0,
+                        'damage_overall'   => $pvp['damage_dealt'] ?? 0,
+                        'defended_overall' => $pvp['dropped_capture_points'] ?? 0,
+                        'captured_overall' => $pvp['capture_points'] ?? 0,
+                        'xp_overall'       => $pvp['xp'] ?? 0,
+                        'spotted_overall'  => $pvp['ships_spotted'] ?? 0,
+                    ];
+                }
+
+                // Update the database for each account in this batch.
+                foreach ($updates as $updateData) {
+                    DB::table('player_ships')
+                        ->where('account_id', $updateData['account_id'])
+                        ->update([
+                            'battles_overall'  => $updateData['battles_overall'],
+                            'survived_overall' => $updateData['survived_overall'],
+                            'wins_count_overall' => $updateData['wins_count_overall'],
+                            'damage_overall'   => $updateData['damage_overall'],
+                            'defended_overall' => $updateData['defended_overall'],
+                            'captured_overall' => $updateData['captured_overall'],
+                            'xp_overall'       => $updateData['xp_overall'],
+                            'spotted_overall'  => $updateData['spotted_overall'],
+                        ]);
+                    Log::info("Updated overall stats for account {$updateData['account_id']} on server " . strtoupper($serverKey));
+                }
+            }
+        }
+        return true;
+    }
 
     public function fetchAndStorePlayerShips()
     {
@@ -672,6 +753,7 @@ class PlayerShipService
             }
 
 
+
             return true;
         } catch (\Exception $e) {
             Log::error("Error in fetchAndStorePlayerShips", [
@@ -681,6 +763,10 @@ class PlayerShipService
             throw $e;
         }
     }
+
+
+
+
 
     //get stats for each player, based on a period: 24, 7, 30, overall
 
@@ -818,16 +904,16 @@ class PlayerShipService
     public function getPlayerStatsOverall($account_id)
     {
         $playerStatistics = PlayerShip::select(
-            DB::raw('SUM(battles_played) as battles'),
-            DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND((SUM(wins_count)/SUM(battles_played))*100,0) ELSE 0 END as wins'),
+            DB::raw('MAX(battles_overall) as battles'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(wins_count)/SUM(battles_overall))*100,0) ELSE 0 END as wins'),
             DB::raw('ROUND(AVG(ship_tier), 1) as tier'),
-            DB::raw('AVG(survival_rate) as survived'),
-            DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(damage_dealt) / SUM(battles_played)) ELSE 0 END as damage'),
-            DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(frags) / SUM(battles_played)) ELSE 0 END as frags'),
-            DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(xp) / SUM(battles_played)) ELSE 0 END as xp'),
-            DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(spotted) / SUM(battles_played)) ELSE 0 END as spotted'),
-            DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(capture) / SUM(battles_played)) ELSE 0 END as capture'),
-            DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(defend) / SUM(battles_played)) ELSE 0 END as defend'),
+            DB::raw('AVG(survived_overall) as survived'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN CEIL(SUM(damage_overall) / SUM(battles_overall)) ELSE 0 END as damage'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN CEIL(SUM(frags) / SUM(battles_overall)) ELSE 0 END as frags'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN CEIL(SUM(xp_overall) / SUM(battles_overall)) ELSE 0 END as xp'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN CEIL(SUM(spotted_overall) / SUM(battles_overall)) ELSE 0 END as spotted'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN CEIL(SUM(captured_overall) / SUM(battles_overall)) ELSE 0 END as capture'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN CEIL(SUM(defended_overall) / SUM(battles_overall)) ELSE 0 END as defend'),
             DB::raw('MAX(total_player_wn8) as wn8'),
             DB::raw('MAX(total_player_pr) as pr')
         )

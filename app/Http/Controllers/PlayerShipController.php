@@ -98,10 +98,20 @@ class PlayerShipController extends Controller
     }
 
 
+    /*  public function updateOverallPlayerShipStats()
+    {
+        $this->playerShipService->fetchAndStoreOverallPlayerStats();
+        return response()->json(['message' => 'Overall player ship statistics fetched and stored successfully.']);
+    } */
     public function updatePlayerShips()
     {
-        $this->playerShipService->fetchAndStorePlayerShips();
-        return response()->json(['message' => 'Player ship statistics fetched and stored successfully.']);
+        // Dispatch the job to fetch per-ship stats.
+        \App\Jobs\FetchPlayerShipsJob::dispatch();
+
+        // Dispatch the job to fetch overall stats concurrently.
+        \App\Jobs\FetchOverallPlayerStatsJob::dispatch();
+
+        return response()->json(['message' => 'Player ship and overall stats jobs dispatched successfully.']);
     }
 
     public function cachePlayerStatistics()
