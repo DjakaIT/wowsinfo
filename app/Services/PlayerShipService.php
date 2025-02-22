@@ -591,39 +591,43 @@ class PlayerShipService
 
 
                                 // Calculate total battles
-                                $totalBattles = ($pvpStats['battles'] ?? 0) + ($pveStats['battles'] ?? 0)
+                                $totalBattles = ($pvpStats['battles'] ?? 0);
+
+                                /* + ($pveStats['battles'] ?? 0)
                                     + ($clubStats['battles'] ?? 0) + ($rankStats['battles'] ?? 0)
                                     + ($rank_div2Stats['battles'] ?? 0) + ($rank_div3Stats['battles'] ?? 0)
                                     + ($pve_soloStats['battles'] ?? 0) + ($pve2Stats['battles'] ?? 0)
                                     + ($pve3Stats['battles'] ?? 0) + ($pvp2Stats['battles'] ?? 0)
-                                    + ($pvp3Stats['battles'] ?? 0);
+                                    + ($pvp3Stats['battles'] ?? 0) */
 
                                 // Calculate total damage
-                                $totalDamageDealt = ($pvpStats['damage_dealt'] ?? 0) + ($pveStats['damage_dealt'] ?? 0)
+                                $totalDamageDealt = ($pvpStats['damage_dealt'] ?? 0);
+                                /*  + ($pveStats['damage_dealt'] ?? 0)
                                     + ($clubStats['damage_dealt'] ?? 0) + ($rankStats['damage_dealt'] ?? 0)
                                     + ($rank_div2Stats['damage_dealt'] ?? 0) + ($rank_div3Stats['damage_dealt'] ?? 0)
                                     + ($pve_soloStats['damage_dealt'] ?? 0) + ($pve2Stats['damage_dealt'] ?? 0)
                                     + ($pve3Stats['damage_dealt'] ?? 0) + ($pvp2Stats['damage_dealt'] ?? 0)
-                                    + ($pvp3Stats['damage_dealt'] ?? 0);
-
+                                    + ($pvp3Stats['damage_dealt'] ?? 0) */
 
                                 $averageDamage = $totalBattles > 0 ? $totalDamageDealt / $totalBattles : 0;
 
                                 //calculate total wins
-                                $totalWins = ($pvpStats['wins'] ?? 0) + ($pveStats['wins'] ?? 0)
+                                $totalWins = ($pvpStats['wins'] ?? 0);
+                                /*  + ($pveStats['wins'] ?? 0)
                                     + ($clubStats['wins'] ?? 0) + ($rankStats['wins'] ?? 0)
                                     + ($rank_div2Stats['wins'] ?? 0) + ($rank_div3Stats['wins'] ?? 0)
                                     + ($pve_soloStats['wins'] ?? 0) + ($pve2Stats['wins'] ?? 0)
                                     + ($pve3Stats['wins'] ?? 0) + ($pvp2Stats['wins'] ?? 0)
-                                    + ($pvp3Stats['wins'] ?? 0);
-
+                                    + ($pvp3Stats['wins'] ?? 0) */
                                 //calculate total frags
-                                $totalFrags = ($pvpStats['frags'] ?? 0) + ($pveStats['frags'] ?? 0)
+                                $totalFrags = ($pvpStats['frags'] ?? 0);
+
+                                /* + ($pveStats['frags'] ?? 0)
                                     + ($clubStats['frags'] ?? 0) + ($rankStats['frags'] ?? 0)
                                     + ($rank_div2Stats['frags'] ?? 0) + ($rank_div3Stats['frags'] ?? 0)
                                     + ($pve_soloStats['frags'] ?? 0) + ($pve2Stats['frags'] ?? 0)
                                     + ($pve3Stats['frags'] ?? 0) + ($pvp2Stats['frags'] ?? 0)
-                                    + ($pvp3Stats['frags'] ?? 0);
+                                    + ($pvp3Stats['frags'] ?? 0) */
 
                                 $totalXp = ($pvpStats['xp'] ?? 0) + ($pveStats['xp'] ?? 0)
                                     + ($clubStats['xp'] ?? 0) + ($rankStats['xp'] ?? 0)
@@ -785,7 +789,16 @@ class PlayerShipService
     }
     public function getPlayerStatsLastDay($account_id)
     {
+
+        $cacheKey = "stats_24h_{$account_id}";
+        if (Cache::has($cacheKey)) {
+            Log::info("Cache hit for key: {$cacheKey}");
+        } else {
+            Log::info("Cache miss for key: {$cacheKey}. Computing and caching value.");
+        }
+
         return Cache::remember("stats_24h_{$account_id}", now()->addDay(), function () use ($account_id) {
+            Log::info("Cache value for key:", ["key" => "stats_24h_{$account_id}"]);
             $threshold = now()->subDay()->timestamp; // Convert to Unix timestamp
             $playerStatistics = PlayerShip::select(
                 DB::raw('SUM(battles_played) as battles'),
@@ -905,15 +918,15 @@ class PlayerShipService
     {
         $playerStatistics = PlayerShip::select(
             DB::raw('MAX(battles_overall) as battles'),
-            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(wins_count)/SUM(battles_overall))*100,0) ELSE 0 END as wins'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(wins_count_overall)/SUM(battles_overall))*100,2) ELSE 0 END as wins'),
             DB::raw('ROUND(AVG(ship_tier), 1) as tier'),
-            DB::raw('AVG(survived_overall) as survived'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(survived_overall)/SUM(battles_overall))*100,2) ELSE 0 END as survived'),
             DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN CEIL(SUM(damage_overall) / SUM(battles_overall)) ELSE 0 END as damage'),
-            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN CEIL(SUM(frags) / SUM(battles_overall)) ELSE 0 END as frags'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(frags) / SUM(battles_overall), 2) )ELSE 0 END as frags'),
             DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN CEIL(SUM(xp_overall) / SUM(battles_overall)) ELSE 0 END as xp'),
-            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN CEIL(SUM(spotted_overall) / SUM(battles_overall)) ELSE 0 END as spotted'),
-            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN CEIL(SUM(captured_overall) / SUM(battles_overall)) ELSE 0 END as capture'),
-            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN CEIL(SUM(defended_overall) / SUM(battles_overall)) ELSE 0 END as defend'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(spotted_overall)  / SUM(battles_overall)) , 2)ELSE 0 END as spotted'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(captured_overall) / SUM(battles_overall)), 2) ELSE 0 END as capture'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(defended_overall) / SUM(battles_overall)), 2) ELSE 0 END as defend'),
             DB::raw('MAX(total_player_wn8) as wn8'),
             DB::raw('MAX(total_player_pr) as pr')
         )
@@ -945,9 +958,9 @@ class PlayerShipService
             'ship_type as type',
             'ship_tier as tier',
             'battles_played as battles',
-            DB::raw('CASE WHEN battles_played > 0 THEN CEIL(frags / battles_played) ELSE 0 END as frags'),
+            DB::raw('CASE WHEN battles_played > 0 THEN ROUND((frags / battles_played), 2) ELSE 0 END as frags'),
             'average_damage as damage',  // plain value from column
-            DB::raw('CASE WHEN battles_played > 0 THEN ROUND((wins_count / battles_played) * 100, 0) ELSE 0 END as wins'),
+            DB::raw('CASE WHEN battles_played > 0 THEN ROUND((wins_count / battles_played) * 100, 2) ELSE 0 END as wins'),
             DB::raw('CASE WHEN battles_played > 0 THEN CEIL(xp / battles_played) ELSE 0 END as xp'),
             'wn8 as wn8'
         )

@@ -33,8 +33,21 @@ Schedule::command('fetch-store:ships')
     });
 
 
+Schedule::command('fetch:overall-stats')
+    ->dailyAt('21:00')
+    ->before(function () {
+        Log::info('Player ships fetching cron started');
+    })
+    ->after(function () {
+        Log::info('Player ships fetching cron completed');
+    })
+    ->onFailure(function () {
+        Log::error('Player ships overall fetching cron failed. Check the logs for detailed error information.');
+    })
+    ->appendOutputTo(storage_path('logs/player_ships_cron.log'));
+
 Schedule::command('fetch-store:player-ships')
-    ->dailyAt('04:00')
+    ->dailyAt('03:00')
     ->before(function () {
         Log::info('Player ships fetching cron started');
     })
