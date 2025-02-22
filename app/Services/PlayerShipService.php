@@ -917,16 +917,15 @@ class PlayerShipService
     public function getPlayerStatsOverall($account_id)
     {
         $playerStatistics = PlayerShip::select(
-            DB::raw('MAX(battles_overall) as battles'),
-            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(wins_count_overall)/SUM(battles_overall))*100,2) ELSE 0 END as wins'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(wins_count_overall)/SUM(battles_overall))*100, 2) ELSE 0 END as wins'),
             DB::raw('ROUND(AVG(ship_tier), 1) as tier'),
-            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(survived_overall)/SUM(battles_overall))*100,2) ELSE 0 END as survived'),
-            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN CEIL(SUM(damage_overall) / SUM(battles_overall)) ELSE 0 END as damage'),
-            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(frags) / SUM(battles_overall), 2) )ELSE 0 END as frags'),
-            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN CEIL(SUM(xp_overall) / SUM(battles_overall)) ELSE 0 END as xp'),
-            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(spotted_overall)  / SUM(battles_overall)) , 2)ELSE 0 END as spotted'),
-            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(captured_overall) / SUM(battles_overall)), 2) ELSE 0 END as capture'),
-            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(defended_overall) / SUM(battles_overall)), 2) ELSE 0 END as defend'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(survived_overall)/SUM(battles_overall))*100, 2) ELSE 0 END as survived'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN CEIL(SUM(damage_overall)/SUM(battles_overall)) ELSE 0 END as damage'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND(SUM(frags)/SUM(battles_overall), 2) ELSE 0 END as frags'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN CEIL(SUM(xp_overall)/SUM(battles_overall)) ELSE 0 END as xp'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND(SUM(spotted_overall)/SUM(battles_overall), 2) ELSE 0 END as spotted'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND(SUM(captured_overall)/SUM(battles_overall), 2) ELSE 0 END as capture'),
+            DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND(SUM(defended_overall)/SUM(battles_overall), 2) ELSE 0 END as defend'),
             DB::raw('MAX(total_player_wn8) as wn8'),
             DB::raw('MAX(total_player_pr) as pr')
         )

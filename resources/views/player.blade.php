@@ -71,10 +71,10 @@
                         </td>
                     <tr class="border-b">
                         <td class="py-2 px-4">Damage Ø</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['overall']['damage'] ?? 'N/A' }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastDay']['damage'] ?? 'N/A' }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['damage'] ?? 'N/A' }}</td>
-                        <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['damage'] ?? 'N/A' }}</td>
+                        <td class="py-2 px-4">{{FrontendHelper::formatDamage($playerStatistics['overall']['damage'] ?? 0, $server) }}</td>
+                        <td class="py-2 px-4">{{FrontendHelper::formatDamage($playerStatistics['lastDay']['damage'] ?? 0, $server) }}</td>
+                        <td class="py-2 px-4">{{FrontendHelper::formatDamage($playerStatistics['lastWeek']['damage'] ?? 0, $server) }}</td>
+                        <td class="py-2 px-4">{{FrontendHelper::formatDamage($playerStatistics['lastMonth']['damage'] ?? 0, $server) }}</td>
                     </tr>
                     <tr class="border-b">
                         <td class="py-2 px-4">Frags Ø</td>
@@ -167,7 +167,7 @@
                             <td class="py-2 px-4">{{ $vehicle['tier'] }}</td>
                             <td class="py-2 px-4">{{ $vehicle['battles'] }}</td>
                             <td class="py-2 px-4">{{ $vehicle['frags'] }}</td>
-                            <td class="py-2 px-4">{{ $vehicle['damage'] }}</td>
+                            <td class="py-2 px-4">{{FrontendHelper::formatDamage($vehicle['damage'] ?? 0, $server) }}</td>
                             <td class="py-2 px-4">{{ $vehicle['xp'] }}</td>
                             <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($vehicle['wins'] ?? 0) }}">{{ $vehicle['wins'] }}%</td>
                             <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($vehicle['wn8']) }}">{{ $vehicle['wn8'] }}</td>

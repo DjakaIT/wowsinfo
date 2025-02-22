@@ -29,6 +29,9 @@ class PlayerShipController extends Controller
     //BLADE
     public function getPlayerPageStats($name, $account_id)
     {
+
+        $server = request()->get('server', 'na');
+
         $metaTitle = "$name - WN8 player statistics for World of Warships";
         $metaDescription = "Latest statistics for player $name in World of Warships, WN8 daily, weekly and monthly updates and statistic.";
         $metaKeywords = "WN8, World of Warships, Statistics, Player statistics, $name";
@@ -63,6 +66,7 @@ class PlayerShipController extends Controller
             'playerInfo' => $playerInfo ?? null,
             'playerStatistics' => $playerStatistics,
             'playerVehicles' => $playerVehicleInfo ?: [],
+            'server' => $server,
         ]);
     }
 
@@ -98,11 +102,11 @@ class PlayerShipController extends Controller
     }
 
 
-    /*  public function updateOverallPlayerShipStats()
+    public function updateOverallPlayerShipStats()
     {
         $this->playerShipService->fetchAndStoreOverallPlayerStats();
         return response()->json(['message' => 'Overall player ship statistics fetched and stored successfully.']);
-    } */
+    }
     public function updatePlayerShips()
     {
         $this->playerShipService->fetchAndStorePlayerShips();
