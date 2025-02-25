@@ -30,7 +30,8 @@ class PlayerShipController extends Controller
     public function getPlayerPageStats($name, $account_id)
     {
 
-        $server = request()->get('server', 'na');
+        $server = request('server', session('server', 'EU'));
+        session(['server' => $server]);
 
         $metaTitle = "$name - WN8 player statistics for World of Warships";
         $metaDescription = "Latest statistics for player $name in World of Warships, WN8 daily, weekly and monthly updates and statistic.";

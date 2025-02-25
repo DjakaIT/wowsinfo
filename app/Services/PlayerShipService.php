@@ -168,20 +168,62 @@ class PlayerShipService
     {
         $playerShips = PlayerShip::where('account_id', $playerId)->get();
 
-        $total_weighted_pr = 0;
-        $total_battles = 0;
+        $total_actual_damage = 0;
+        $total_actual_frags  = 0;
+        $total_actual_wins   = 0;
 
-        foreach ($playerShips as $playerShip) {
-            if ($playerShip->battles_played > 0 && $playerShip->pr !== null) {
-                $total_weighted_pr += $playerShip->pr * $playerShip->battles_played;
-                $total_battles += $playerShip->battles_played;
+        $total_expected_damage = 0;
+        $total_expected_frags  = 0;
+        $total_expected_wins   = 0;
+
+        foreach ($playerShips as $ship) {
+            $battles = $ship->battles_overall;
+            if ($battles > 0) {
+                // Accumulate actual overall values
+                $total_actual_damage += $ship->damage_overall;
+                $total_actual_frags  += $ship->frags_overall;
+                $total_actual_wins   += $ship->wins_count_overall;
+
+                $shipId = $ship->ship_id;
+                if (
+                    !isset($this->expectedValues['data'][$shipId]) ||
+                    empty($this->expectedValues['data'][$shipId])
+                ) {
+                    Log::warning("Expected values not found or empty for ship_id: $shipId");
+                    continue;
+                }
+                $expected = $this->expectedValues['data'][$shipId];
+
+                // Expected totals for this ship based on battles
+                $expected_damage = $expected['average_damage_dealt'] * $battles;
+                $expected_frags  = $expected['average_frags'] * $battles;
+                $expected_wins   = ($expected['win_rate'] / 100) * $battles;
+
+                $total_expected_damage += $expected_damage;
+                $total_expected_frags  += $expected_frags;
+                $total_expected_wins   += $expected_wins;
             }
         }
 
+        // Check to avoid division by zero.
+        if ($total_expected_damage <= 0 || $total_expected_frags <= 0 || $total_expected_wins <= 0) {
+            return 0;
+        }
 
-        $player_total_pr = ceil($total_battles > 0 ? $total_weighted_pr / $total_battles : 0);
+        // Calculate ratios.
+        $rDmg   = $total_actual_damage / $total_expected_damage;
+        $rFrags = $total_actual_frags / $total_expected_frags;
+        $rWins  = $total_actual_wins / $total_expected_wins;
 
-        return $player_total_pr;
+        // Normalize the ratios.
+        $nDmg   = max(0, ($rDmg - 0.4) / (1 - 0.4));
+        $nFrags = max(0, ($rFrags - 0.1) / (1 - 0.1));
+        $nWins  = max(0, ($rWins - 0.7) / (1 - 0.7));
+
+        // Compute PR using the provided weights.
+        $pr = round(700 * $nDmg + 300 * $nFrags + 150 * $nWins, 0);
+
+        return $pr;
     }
 
     private function extractBattleStats($stats, $battleType)
@@ -440,6 +482,7 @@ class PlayerShipService
                         'captured_overall' => $pvp['capture_points'] ?? 0,
                         'xp_overall'       => $pvp['xp'] ?? 0,
                         'spotted_overall'  => $pvp['ships_spotted'] ?? 0,
+                        'frags_overall' => $pvp['frags'] ?? 0,
                     ];
                 }
 
@@ -449,6 +492,7 @@ class PlayerShipService
                         ->where('account_id', $updateData['account_id'])
                         ->update([
                             'battles_overall'  => $updateData['battles_overall'],
+                            'frags_overall' => $updateData['frags_overall'],
                             'survived_overall' => $updateData['survived_overall'],
                             'wins_count_overall' => $updateData['wins_count_overall'],
                             'damage_overall'   => $updateData['damage_overall'],
@@ -917,6 +961,7 @@ class PlayerShipService
     public function getPlayerStatsOverall($account_id)
     {
         $playerStatistics = PlayerShip::select(
+            DB::raw('MAX(battles_overall) as battles'),
             DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(wins_count_overall)/SUM(battles_overall))*100, 2) ELSE 0 END as wins'),
             DB::raw('ROUND(AVG(ship_tier), 1) as tier'),
             DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(survived_overall)/SUM(battles_overall))*100, 2) ELSE 0 END as survived'),
@@ -930,22 +975,23 @@ class PlayerShipService
             DB::raw('MAX(total_player_pr) as pr')
         )
             ->where('account_id', $account_id)
+            ->groupBy('account_id')
             ->first();
         Log::info($playerStatistics);
 
         return $playerStatistics ? $playerStatistics->toArray() : [
-            'battles' => '-',
-            'wins' => '-',
-            'tier' => '-',
+            'battles'  => '-',
+            'wins'     => '-',
+            'tier'     => '-',
             'survived' => '-',
-            'damage' => '-',
-            'frags' => '-',
-            'xp' => '-',
-            'spotted' => '-',
-            'capture' => '-',
-            'defend' => '-',
-            'wn8' => '-',
-            'pr' => '-'
+            'damage'   => '-',
+            'frags'    => '-',
+            'xp'       => '-',
+            'spotted'  => '-',
+            'capture'  => '-',
+            'defend'   => '-',
+            'wn8'      => '-',
+            'pr'       => '-'
         ];
     }
 

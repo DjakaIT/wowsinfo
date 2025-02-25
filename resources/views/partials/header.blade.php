@@ -1,4 +1,3 @@
-
 <script>
     // Check if user is logged in by checking localStorage
     window.onload = function() {
@@ -116,11 +115,13 @@
 		<ul class="navbar-nav">
 			<li class="nav-item relative">
 				<div class="input-group">
-					<button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">EU</button>
+					<button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+						{{ request('server', 'EU') }}
+					</button>
 					<ul class="dropdown-menu">
-						<li><a class="dropdown-item" href="#">EU</a></li>
-						<li><a class="dropdown-item" href="#">NA</a></li>
-						<li><a class="dropdown-item" href="#">ASIA</a></li>
+						<li><a class="dropdown-item" href="{{ request()->fullUrlWithQuery(['server' => 'EU']) }}">EU</a></li>
+						<li><a class="dropdown-item" href="{{ request()->fullUrlWithQuery(['server' => 'NA']) }}">NA</a></li>
+						<li><a class="dropdown-item" href="{{ request()->fullUrlWithQuery(['server' => 'ASIA']) }}">ASIA</a></li>
 						<li><hr class="dropdown-divider"></li>
 						<li><a class="dropdown-item disabled" href="#">RU</a></li>
 					</ul>

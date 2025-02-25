@@ -8,9 +8,11 @@ class FrontendHelper
 
   public static function formatDamage($damage, $server)
   {
-    if (strtolower($server) === 'na') {
+    if ($server === 'NA') {
+      // For NA: use comma as thousands separator (example)
       return number_format($damage, 3, '.', ',');
-    } else {
+    } elseif ($server === 'ASIA' or $server === 'EU') {
+      // For ASIA: use period as thousand separator and comma as decimal separator (example)
       return number_format($damage, 3, ',', '.');
     }
   }

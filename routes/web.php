@@ -111,7 +111,11 @@ Route::view('/contact', 'contact', [
     ],
 ]);
 
-
+//Server
+Route::get('/server/{server}', function ($server) {
+    session(['server' => $server]);
+    return redirect()->back();
+});
 
 
 //START OF BACKEND ROUTES

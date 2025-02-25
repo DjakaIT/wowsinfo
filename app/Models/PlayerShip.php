@@ -62,7 +62,8 @@ class PlayerShip extends Model
         'defended_overall',
         'captured_overall',
         'xp_overall',
-        'spotted_overall'
+        'spotted_overall',
+        'frags_overall',
     ];
 
 
