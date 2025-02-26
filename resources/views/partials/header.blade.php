@@ -73,7 +73,7 @@
                                 listItem.textContent = `${player.nickname}`;
                                 // Add data attribute to store the account_id
                                 listItem.dataset.accountId = player.account_id;
-								listItem.style.cursor = "pointer";
+								listItem.style.cssText = "cursor:pointer";
                                 listItem.addEventListener("click", function() {
                                     // Redirect to player page with name and ID
                                     window.location.href = `/player/${player.nickname}/${player.account_id}`;
