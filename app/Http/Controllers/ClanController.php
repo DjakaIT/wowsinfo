@@ -82,16 +82,6 @@ class ClanController extends Controller
         $members = $this->clanMemberService->getClanMemberData($id);
         $fullName = !empty($members) ? $members[0]['fullName'] : '';
 
-        $memberIds = collect($members)->pluck('account_id')->toArray();
-        $playerShipsCount = DB::table('player_ships')
-            ->whereIn('account_id', $memberIds)
-            ->distinct('account_id')
-            ->count('account_id');
-
-        // If less than 80% of members have stats, trigger a background update
-        if ($playerShipsCount < count($memberIds) * 0.8) {
-            dispatch(new \App\Jobs\FetchClanMemberShipsJob($id));
-        }
 
         return view('clan', [
             'metaSite' => [
