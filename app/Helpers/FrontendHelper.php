@@ -10,10 +10,10 @@ class FrontendHelper
   {
     if ($server === 'NA') {
       // For NA: use comma as thousands separator (example)
-      return number_format($damage, 3, '.', ',');
+      return number_format($damage, 2, '.', ',');
     } elseif ($server === 'ASIA' or $server === 'EU') {
       // For ASIA: use period as thousand separator and comma as decimal separator (example)
-      return number_format($damage, 3, ',', '.');
+      return number_format($damage, 2, ',', '.');
     }
   }
   public static function getWN8Color($value)

@@ -59,6 +59,8 @@ Route::get('/verification', function (Request $request) {
 Route::get('/player/{name}/{id}', [PlayerShipController::class, 'getPlayerPageStats'])->name('player.page');
 // Clan page
 Route::get('/clan/{name}/{id}', [ClanController::class, 'getClanPage'])->name('clan.page');
+Route::post('/admin/refresh-clan-stats/{clanId}', [App\Http\Controllers\ClanController::class, 'refreshClanShipStats']);
+
 // Wiki - group 
 Route::prefix('wiki')->group(function () {
     // Most specific route first, matching 3 parameters
