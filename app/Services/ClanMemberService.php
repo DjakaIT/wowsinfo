@@ -169,12 +169,12 @@ class ClanMemberService
         $playerShipService = app(\App\Services\PlayerShipService::class);
 
         $members = DB::table('clan_members')
-            ->join('player_ships', 'clan_members.account_id', '=', 'player_ships.account_id')
+            ->leftJoin('player_ships', 'clan_members.account_id', '=', 'player_ships.account_id')
             ->join('clans', 'clan_members.clan_id', '=', 'clans.clan_id')
             ->where('clan_members.clan_id', $clanId)
             ->select(
                 'clan_members.account_id',
-                DB::raw('MAX(player_ships.player_name) as player_name'),
+                'clan_members.account_name as player_name',
                 DB::raw('MAX(player_ships.total_player_wn8) as wn8'),
                 DB::raw('CASE WHEN SUM(player_ships.battles_played) > 0 THEN ROUND((SUM(player_ships.wins_count) / SUM(player_ships.battles_played))*100,0) ELSE 0 END as win_rate'),
                 DB::raw('SUM(player_ships.battles_played) as battles'),
@@ -183,7 +183,7 @@ class ClanMemberService
                 'clan_members.joined_at as joined',
                 'clans.tag as fullname'
             )
-            ->groupBy('clan_members.account_id', 'clan_members.role', 'clan_members.joined_at', 'clans.tag')
+            ->groupBy('clan_members.account_id', 'clan_members.account_name', 'clan_members.role', 'clan_members.joined_at', 'clans.tag')
             ->get();
 
         $result = [];
