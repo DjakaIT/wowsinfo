@@ -14,74 +14,121 @@
             document.getElementById('loggedSection').style.display = 'none';
         }
 
-				const searchInput = document.getElementById("playerSearch");
+        const searchInput = document.getElementById("playerSearch");
         const resultsContainer = document.getElementById("results");
         const wargamingId = "746553739e1c6e051e8d4fa24671ac01"; // Fetch from Laravel config
-        const server = "eu"; // Adjust as needed
+        const serverDropdown = document.querySelector('button.dropdown-toggle');
+        let server = serverDropdown.textContent.toLowerCase(); // Get server from dropdown text
+        
+        // Close dropdown when clicking elsewhere - FIXED VERSION
+        document.addEventListener('click', function(event) {
+            const searchContainer = document.querySelector('.input-group');
+            // Check if the click was outside the search container and the dropdown is visible
+            if (!searchContainer.contains(event.target) && resultsContainer.style.display === "block") {
+                resultsContainer.style.display = "none";
+            }
+        });
+
+        // Make search input click stop propagation to prevent immediate closing
+        searchInput.addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+        
+        // Stop propagation for result items clicks to handle them properly
+        resultsContainer.addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+
+        // Update server when dropdown selection changes
+        const serverOptions = document.querySelectorAll('.dropdown-menu:first-of-type .dropdown-item');
+        serverOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                server = this.textContent.toLowerCase();
+                serverDropdown.textContent = this.textContent;
+            });
+        });
 
         let timeout = null;
 
-        searchInput.addEventListener("input", function () {
+        searchInput.addEventListener("input", function() {
             const query = searchInput.value.trim();
 
             if (query.length < 3) {
                 resultsContainer.innerHTML = "";
+                resultsContainer.style.display = "none";
                 return;
             }
 
             clearTimeout(timeout);
             timeout = setTimeout(() => {
                 fetch(`https://api.worldofwarships.${server}/wows/account/list/?application_id=${wargamingId}&search=${query}`)
-								.then(response => response.json())
-                .then(response => {
-									resultsContainer.innerHTML = "";
-									console.log(response)
-                    if (response.data) {
-											response.data.forEach(player => {
-												const listItem = document.createElement("li");
-												listItem.classList.add("dropdown-item");
-												listItem.textContent = `${player.nickname} (ID: ${player.account_id})`;
-												listItem.addEventListener("click", function () {
-														searchInput.value = player.nickname;
-														resultsContainer.style.display = "none";
-												});
-												resultsContainer.appendChild(listItem);
-											});
-											resultsContainer.style.display = "block";
-                    } else {
-											resultsContainer.innerHTML = "<li class='dropdown-item'>No results found</li>";
-											resultsContainer.style.display = "block";
-                    }
-                })
-                .catch(error => console.error("Error fetching data:", error));
+                    .then(response => response.json())
+                    .then(response => {
+                        resultsContainer.innerHTML = "";
+                        
+                        if (response.data && response.data.length > 0) {
+                            response.data.forEach(player => {
+                                const listItem = document.createElement("li");
+                                listItem.classList.add("dropdown-item");
+                                listItem.textContent = `${player.nickname}`;
+                                // Add data attribute to store the account_id
+                                listItem.dataset.accountId = player.account_id;
+								listItem.style.cursor = "pointer";
+                                listItem.addEventListener("click", function() {
+                                    // Redirect to player page with name and ID
+                                    window.location.href = `/player/${player.nickname}/${player.account_id}`;
+                                });
+                                resultsContainer.appendChild(listItem);
+                            });
+                            resultsContainer.style.display = "block";
+                        } else {
+                            resultsContainer.innerHTML = "<li class='dropdown-item'>No results found</li>";
+                            resultsContainer.style.display = "block";
+                        }
+                    })
+                    .catch(error => console.error("Error fetching data:", error));
             }, 500); // Debounce API calls
         });
+
+        // Also trigger search on search button click
+        document.getElementById('button-addon2').addEventListener('click', function() {
+            const query = searchInput.value.trim();
+            if (query.length >= 3) {
+                // Perform the same search as in the input event
+                fetch(`https://api.worldofwarships.${server}/wows/account/list/?application_id=${wargamingId}&search=${query}`)
+                    .then(response => response.json())
+                    .then(response => {
+                        if (response.data && response.data.length > 0) {
+                            // Redirect to the first match
+                            window.location.href = `/player/${response.data[0].nickname}/${response.data[0].account_id}`;
+                        }
+                    })
+                    .catch(error => console.error("Error fetching data:", error));
+            }
+        });
     }
-		
-		function logout() {
-			axios.get(`https://api.worldoftanks.eu/wot/auth/logout/?application_id=746553739e1c6e051e8d4fa24671ac01&access_token=${localStorage.getItem('access_token')}`)
-			.then(response => {
-					// If the logout is successful, clear localStorage or cookies
-					if (response.data.success) {
-							// Clear localStorage (or cookies if used)
-							localStorage.removeItem('access_token');
-							localStorage.removeItem('user_name');
-							localStorage.removeItem('account_id');
-							localStorage.removeItem('expires_at');
+    
+    function logout() {
+        axios.get(`https://api.worldoftanks.eu/wot/auth/logout/?application_id=746553739e1c6e051e8d4fa24671ac01&access_token=${localStorage.getItem('access_token')}`)
+        .then(response => {
+            // If the logout is successful, clear localStorage or cookies
+            if (response.data.success) {
+                // Clear localStorage (or cookies if used)
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('user_name');
+                localStorage.removeItem('account_id');
+                localStorage.removeItem('expires_at');
 
-							// Reload the page to update the login state
-							// window.location.reload();
-					} else {
-							alert('Failed to log out from Wargaming. Please try again.');
-					}
-			})
-			.catch(error => {
-					console.error('Error logging out from Wargaming:', error);
-			});
+                // Reload the page to update the login state
+                window.location.reload(); // Uncommented to ensure proper state update
+            } else {
+                alert('Failed to log out from Wargaming. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error logging out from Wargaming:', error);
+        });
     }
-
-		// Search player api
-
 </script>
 <nav class="navbar navbar-expand-lg navbar-dark shadow4">
 	<a class="navbar-brand" href="/">
@@ -115,13 +162,11 @@
 		<ul class="navbar-nav">
 			<li class="nav-item relative">
 				<div class="input-group">
-					<button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-						{{ request('server', 'EU') }}
-					</button>
+					<button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">EU</button>
 					<ul class="dropdown-menu">
-						<li><a class="dropdown-item" href="{{ request()->fullUrlWithQuery(['server' => 'EU']) }}">EU</a></li>
-						<li><a class="dropdown-item" href="{{ request()->fullUrlWithQuery(['server' => 'NA']) }}">NA</a></li>
-						<li><a class="dropdown-item" href="{{ request()->fullUrlWithQuery(['server' => 'ASIA']) }}">ASIA</a></li>
+						<li><a class="dropdown-item" href="#">EU</a></li>
+						<li><a class="dropdown-item" href="#">NA</a></li>
+						<li><a class="dropdown-item" href="#">ASIA</a></li>
 						<li><hr class="dropdown-divider"></li>
 						<li><a class="dropdown-item disabled" href="#">RU</a></li>
 					</ul>
