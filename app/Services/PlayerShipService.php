@@ -847,7 +847,7 @@ class PlayerShipService
             $playerStatistics = PlayerShip::select(
                 DB::raw('SUM(battles_played) as battles'),
                 DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND((SUM(wins_count)/SUM(battles_played))*100,0) ELSE 0 END as wins'),
-                DB::raw('ROUND(AVG(ship_tier), 1) as tier'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND(SUM(ship_tier * battles_played)/SUM(battles_played),1) ELSE 0 END as tier'),
                 DB::raw('AVG(survival_rate) as survived'),
                 DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(damage_dealt) / SUM(battles_played)) ELSE 0 END as damage'),
                 DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(frags) / SUM(battles_played)) ELSE 0 END as frags'),
@@ -886,7 +886,7 @@ class PlayerShipService
             $playerStatistics = PlayerShip::select(
                 DB::raw('SUM(battles_played) as battles'),
                 DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND((SUM(wins_count)/SUM(battles_played))*100,0) ELSE 0 END as wins'),
-                DB::raw('ROUND(AVG(ship_tier), 1) as tier'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND(SUM(ship_tier * battles_played)/SUM(battles_played),1) ELSE 0 END as tier'),
                 DB::raw('AVG(survival_rate) as survived'),
                 DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(damage_dealt) / SUM(battles_played)) ELSE 0 END as damage'),
                 DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(frags) / SUM(battles_played)) ELSE 0 END as frags'),
@@ -925,7 +925,7 @@ class PlayerShipService
             $playerStatistics = PlayerShip::select(
                 DB::raw('SUM(battles_played) as battles'),
                 DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND((SUM(wins_count)/SUM(battles_played))*100,0) ELSE 0 END as wins'),
-                DB::raw('ROUND(AVG(ship_tier), 1) as tier'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND(SUM(ship_tier * battles_played)/SUM(battles_played),1) ELSE 0 END as tier'),
                 DB::raw('AVG(survival_rate) as survived'),
                 DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(damage_dealt) / SUM(battles_played)) ELSE 0 END as damage'),
                 DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(frags) / SUM(battles_played)) ELSE 0 END as frags'),
@@ -963,7 +963,7 @@ class PlayerShipService
         $playerStatistics = PlayerShip::select(
             DB::raw('MAX(battles_overall) as battles'),
             DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(wins_count_overall)/SUM(battles_overall))*100, 2) ELSE 0 END as wins'),
-            DB::raw('ROUND(AVG(ship_tier), 1) as tier'),
+            DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND(SUM(ship_tier * battles_played)/SUM(battles_played),1) ELSE 0 END as tier'),
             DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND((SUM(survived_overall)/SUM(battles_overall))*100, 2) ELSE 0 END as survived'),
             DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN CEIL(SUM(damage_overall)/SUM(battles_overall)) ELSE 0 END as damage'),
             DB::raw('CASE WHEN SUM(battles_overall) > 0 THEN ROUND(SUM(frags)/SUM(battles_overall), 2) ELSE 0 END as frags'),
