@@ -307,7 +307,7 @@ class PlayerShipService
 
             return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
                 ->where('ship_tier', '>', 5)
-                ->where('battles_played', '>', 120)
+                ->where('battles_overall', '>', 120)
                 ->where('last_battle_time', '>=', $lastMonth)
                 ->groupBy('account_id')
                 ->orderByDesc('total_player_wn8')
@@ -955,5 +955,59 @@ class PlayerShipService
         Log::info("Fetched vehicle for player $account_id", ['player vehicle data: ' => $playerVehicles]);
 
         return $playerVehicles;
+    }
+
+
+    public function fetchSinglePlayerFromSearch($id, $server)
+    {
+        if (!isset($this->baseUrls[$server])) {
+            Log::error("Invalid server key", [
+                'server' => $server,
+                'id' => $id
+            ]);
+            return null;
+        }
+
+        $url = $this->baseUrls[$server] . "wows/account/list/";
+
+        try {
+            $response = Http::get($url, [
+                'application_id' => $this->apiKey,
+                'search' => $id,
+            ]);
+
+            if ($response->failed()) {
+                Log::error("Account lookup API request failed", [
+                    'id' => $id,
+                    'server' => strtoupper($server),
+                    'status' => $response->status()
+                ]);
+                return null;
+            }
+
+            $responseData = $response->json();
+
+            if ($responseData['status'] === 'ok' && !empty($responseData['data'])) {
+                $player = $responseData['data'][0];
+                return [
+                    'account_id' => $player['account_id'],
+                    'nickname' => $player['nickname']
+                ];
+            } else {
+                Log::warning("No account ID found for name: ", [
+                    'id' => $id,
+                    'server' => strtoupper($server)
+                ]);
+                return null;
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to fetch account ID by name", [
+                'id' => $id,
+                'server' => $server,
+                'error' => $e->getMessage()
+            ]);
+
+            return null;
+        }
     }
 }

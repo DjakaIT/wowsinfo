@@ -32,7 +32,6 @@ class ClanController extends Controller
     public function getClanMemberStats() {}
 
 
-    // Add this new method to your existing ClanController
     public function refreshClanShipStats($clanId = null)
     {
         try {
