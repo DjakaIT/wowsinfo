@@ -920,27 +920,33 @@ class PlayerShipService
 
     public function getPlayerStatsOverall($name, $account_id)
     {
+        $stats = DB::table('player_ships')
+            ->where('account_id', $account_id)
+            ->select(
+                DB::raw('COUNT(*) as ship_count'),
+                DB::raw('SUM(CASE WHEN ship_name IS NULL THEN 1 ELSE 0 END) as null_name_count'),
+                DB::raw('SUM(CASE WHEN battles_overall IS NULL THEN 1 ELSE 0 END) as null_overall_count')
+            )
+            ->first();
 
-        $shipsCount = PlayerShip::where('account_id', $account_id)->count();
-
-        if ($shipsCount === 0) {
-            // No ships found for this player, fetch all ship stats
-            Log::info("No ships found for player, fetching ship stats", ['name' => $name, 'account_id' => $account_id]);
+        // Decide what actions to take based on data state
+        if (!$stats || $stats->ship_count === 0) {
+            // No records at all - fetch everything
+            Log::info("Player not found in database, fetching all stats", ['name' => $name, 'account_id' => $account_id]);
             $this->fetchSinglePlayerStats($name, $account_id);
+        } else if ($stats->null_name_count > 0) {
+            // Has ships but some have null names - fetch ship details
+            Log::info("Player has ships with null names, fetching ship details", ['name' => $name, 'account_id' => $account_id]);
+            $this->fetchSinglePlayerStats($name, $account_id);
+        } else if ($stats->null_overall_count > 0) {
+            // Has complete ship data but missing overall stats
+            Log::info("Player missing overall stats, fetching those only", ['name' => $name, 'account_id' => $account_id]);
+            $this->fetchOverallStatsForSinglePlayer($account_id);
         } else {
-            // Player exists with ships, but check if overall stats are present
-            $hasOverallStats = PlayerShip::where('account_id', $account_id)
-                ->whereNotNull('battles_overall')
-                ->exists();
-
-            if (!$hasOverallStats) {
-                // Ships exist but no overall stats, fetch just the overall stats
-                Log::info("Ships found but no overall stats, fetching overall stats", ['name' => $name, 'account_id' => $account_id]);
-                $this->fetchOverallStatsForSinglePlayer($account_id);
-            } else {
-                Log::info("Player has both ships and overall stats - no fetch needed", ['name' => $name, 'account_id' => $account_id]);
-            }
+            // Complete data - no action needed
+            Log::info("Player has complete data - loading from database", ['name' => $name, 'account_id' => $account_id]);
         }
+
 
 
         $playerStatistics = PlayerShip::select(

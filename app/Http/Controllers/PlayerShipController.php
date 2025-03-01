@@ -7,7 +7,7 @@ use App\Services\PlayerShipService;
 use App\Services\ClanMemberService;
 use App\Services\ClanService;
 use App\Services\PlayerService;
-
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 class PlayerShipController extends Controller
@@ -40,8 +40,45 @@ class PlayerShipController extends Controller
         // Get player info
         $playerInfo = $this->clanMemberService->getPlayerMemberInfo($account_id, $name);
         $playerVehicleInfo = $this->playerShipService->getPlayerVehicleData($account_id, $name);
+        // If player doesn't exist in our database, try to fetch their stats
         if (!$playerInfo) {
-            abort(404, 'Player not found');
+            Log::info("Player not found in database, attempting to fetch from API", [
+                'name' => $name,
+                'account_id' => $account_id
+            ]);
+
+            // Try to fetch the player's data from the API
+            $fetchSuccess = $this->playerShipService->fetchSinglePlayerStats($name, $account_id);
+
+            if ($fetchSuccess) {
+                // If fetch was successful, try to get player info again
+                $playerInfo = $this->clanMemberService->getPlayerMemberInfo($account_id, $name);
+            }
+
+            // If we still don't have player info, show a temporary processing page
+            if (!$playerInfo) {
+                return view('player', [
+                    'metaSite' => [
+                        'metaTitle' => "$name - WN8 player statistics for World of Warships",
+                        'metaDescription' => "Latest statistics for player $name in World of Warships, WN8 daily, weekly and monthly updates and statistic.",
+                        'metaKeywords' => "WN8, World of Warships, Statistics, Player statistics, $name",
+                    ],
+                    'playerInfo' => [
+                        'name' => $name,
+                        'createdAt' => 'Processing...',
+                        'clanName' => '',
+                        'clanId' => null
+                    ],
+                    'playerStatistics' => [
+                        'overall' => [
+                            'processing' => true,
+                            'message' => "We're fetching this player's statistics. Please refresh in about a minute."
+                        ]
+                    ],
+                    'playerVehicles' => [],
+                    'server' => request('server', 'EU'),
+                ]);
+            }
         }
 
         $playerStatisticsLastDay = $this->playerShipService->getPlayerStatsLastDay($account_id);
