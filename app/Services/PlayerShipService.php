@@ -6,6 +6,7 @@ use App\Models\ClanMember;
 use App\Models\Player;
 use App\Models\PlayerShip;
 use App\Models\Ship;
+use App\Models\WikiVehicles;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -127,6 +128,10 @@ class PlayerShipService
     private function calculatePR($ship, $totalBattles, $totalFrags, $totalWins, $totalDamageDealt)
     {
         //PR FORMULA - DIFFERENT RATIOS BUT SAME PARAMETERS AS WN8
+        if ($totalBattles <= 0) {
+            return 0;
+        }
+
         $shipId = $ship->ship_id;
 
         if (
@@ -167,56 +172,26 @@ class PlayerShipService
 
     public function totalPlayerPR($playerId)
     {
-        // Get a representative record for overall stats
-        $playerShip = PlayerShip::where('account_id', $playerId)
-            ->orderByDesc('battles_overall')
-            ->first();
 
-        if (!$playerShip || $playerShip->battles_overall <= 0) {
-            return 0;
+
+        $playerShips = PlayerShip::where('account_id', $playerId)
+            ->where('battles_played', '>', 0)
+            ->get();
+
+        $total_weighted_pr = 0;
+        $total_battles = 0;
+
+        foreach ($playerShips as $playerShip) {
+            if ($playerShip->battles_played > 0 && $playerShip->pr !== null) {
+                $total_weighted_pr += $playerShip->pr * $playerShip->battles_played;
+                $total_battles += $playerShip->battles_played;
+            }
         }
 
-        // Use overall stats from this one ship record
-        $actual_damage = $playerShip->damage_overall;
-        $actual_frags  = $playerShip->frags_overall;
-        $actual_wins   = $playerShip->wins_count_overall;
-        $battles       = $playerShip->battles_overall;
 
-        $shipId = $playerShip->ship_id;
-        if (
-            !isset($this->expectedValues['data'][$shipId]) ||
-            empty($this->expectedValues['data'][$shipId])
-        ) {
-            Log::warning("Expected values not found or empty for ship_id: $shipId");
-            return 0;
-        }
+        $player_total_pr = ceil($total_battles > 0 ? $total_weighted_pr / $total_battles : 0);
 
-        $expected = $this->expectedValues['data'][$shipId];
-
-        // Calculate expected totals based on overall battles
-        $expected_damage = $expected['average_damage_dealt'] * $battles;
-        $expected_frags  = $expected['average_frags'] * $battles;
-        $expected_wins   = ($expected['win_rate'] / 100) * $battles;
-
-        // Avoid division by zero
-        if ($expected_damage <= 0 || $expected_frags <= 0 || $expected_wins <= 0) {
-            return 0;
-        }
-
-        // Initial calculations
-        $rDMGa   = $actual_damage / $expected_damage;
-        $rFRAGSa = $actual_frags / $expected_frags;
-        $rWINSa  = $actual_wins / $expected_wins;
-
-        // Normalization
-        $nDMGa   = max(0, ($rDMGa - 0.4) / (1 - 0.4));
-        $nFRAGSa = max(0, ($rFRAGSa - 0.1) / (1 - 0.1));
-        $nWINSa  = max(0, ($rWINSa - 0.7) / (1 - 0.7));
-
-        // Final PR value
-        $pr = round(700 * $nDMGa + 300 * $nFRAGSa + 150 * $nWINSa, 0);
-
-        return $pr;
+        return $player_total_pr;
     }
 
     private function extractBattleStats($stats, $battleType)
@@ -589,8 +564,7 @@ class PlayerShipService
                         if (isset($data['data'][$playerId])) {
                             foreach ($data['data'][$playerId] as $shipStats) {
                                 // Find the ship using ship_id from the API
-                                $ship = Ship::where('ship_id', $shipStats['ship_id'])->first();
-
+                                $ship = WikiVehicles::where('ship_id', $shipStats['ship_id'])->first();
 
                                 if (!$ship) {
                                     Log::warning("Ship not found in database", [
@@ -1000,6 +974,7 @@ class PlayerShipService
         )
             ->where('account_id', $account_id)
             ->where('player_name', $name)
+            ->where('battles_played', '>', 0)
             ->get()
             ->map(function ($vehicle) {
                 return [
@@ -1057,8 +1032,7 @@ class PlayerShipService
                 if (isset($data['data'][$accountId])) {
                     foreach ($data['data'][$accountId] as $shipStats) {
                         // Find the ship using ship_id from the API
-                        $ship = Ship::where('ship_id', $shipStats['ship_id'])->first();
-
+                        $ship = WikiVehicles::where('ship_id', $shipStats['ship_id'])->first();
                         if (!$ship) {
                             Log::warning("Ship not found in database", [
                                 'api_ship_id' => $shipStats['ship_id'],

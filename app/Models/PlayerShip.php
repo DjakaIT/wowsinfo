@@ -75,6 +75,6 @@ class PlayerShip extends Model
 
     public function ship()
     {
-        return $this->belongsTo(Ship::class);
+        return $this->belongsTo(WikiVehicles::class, 'ship_id', 'ship_id');
     }
 }
