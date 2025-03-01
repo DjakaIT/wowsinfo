@@ -51,5 +51,3 @@
     </div>
   </div>
 @endsection
-wikiNation.blade.php
-Prikaz stavke web.php.

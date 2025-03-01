@@ -347,5 +347,3 @@
     </div>
 </div>
 @endsection
-wikiVehicle.blade.php
-Prikaz stavke web.php.

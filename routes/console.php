@@ -107,3 +107,16 @@ Schedule::command('fetch-store:account-creation')
     ->onFailure(function ($exception) {
         Log::error('Account creation date fetching cron failed: ' . $exception->getMessage());
     });
+
+
+Schedule::command('fetch-store:getNullNames')
+    ->monthlyOn(15, '02:00')
+    ->before(function () {
+        Log::info('Null name fetching cron started');
+    })
+    ->after(function () {
+        Log::info('Null name fetching cron completed');
+    })
+    ->onFailure(function ($exception) {
+        Log::error('Null name fetching cron failed: ' . $exception->getMessage());
+    });

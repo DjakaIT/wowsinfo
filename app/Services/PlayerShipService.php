@@ -387,35 +387,75 @@ class PlayerShipService
     {
         $playerIds = PlayerShip::whereNull('player_name')->pluck('account_id')->unique()->all();
 
-        foreach ($this->baseUrls as $serverKey => $baseUrl) {
-            foreach ($playerIds as $playerId) {
-                $url = $baseUrl . "/wows/account/info/";
-                $response = Http::get($url, [
-                    'application_id' => $this->apiKey,
-                    'account_id' => $playerId,
-                ]);
+        if (empty($playerIds)) {
+            Log::info("No players with null names found.");
+            return;
+        }
 
-                if ($response->successful()) {
-                    $data = $response->json();
-                    if (isset($data['data'][$playerId]['nickname'])) {
-                        $playerName = $data['data'][$playerId]['nickname'];
-                        PlayerShip::where('account_id', $playerId)->update(['player_name' => $playerName]);
-                        Log::info("Updated player name for account_id: $playerId", ['player_name' => $playerName]);
+        Log::info("Found " . count($playerIds) . " players with null names.");
+
+        // Group player IDs into batches of 100
+        $batches = array_chunk($playerIds, 100);
+
+        foreach ($this->baseUrls as $serverKey => $baseUrl) {
+            Log::info("Processing server: " . strtoupper($serverKey) . " with " . count($batches) . " batches");
+
+            foreach ($batches as $batchIndex => $batch) {
+                Log::info("Processing batch " . ($batchIndex + 1) . "/" . count($batches) . " with " . count($batch) . " players");
+
+                // Create comma-separated list of account IDs
+                $accountIds = implode(',', $batch);
+
+                $url = $baseUrl . "/wows/account/info/";
+
+                try {
+                    $response = Http::get($url, [
+                        'application_id' => $this->apiKey,
+                        'account_id' => $accountIds,
+                    ]);
+
+                    if ($response->successful()) {
+                        $data = $response->json();
+
+                        if (isset($data['data'])) {
+                            $updatedCount = 0;
+
+                            foreach ($data['data'] as $accountId => $accountData) {
+                                if (isset($accountData['nickname'])) {
+                                    $playerName = $accountData['nickname'];
+                                    PlayerShip::where('account_id', $accountId)->update(['player_name' => $playerName]);
+                                    $updatedCount++;
+                                } else {
+                                    Log::warning("Nickname not found for account_id: $accountId on server " . strtoupper($serverKey));
+                                }
+                            }
+
+                            Log::info("Updated $updatedCount player names from server " . strtoupper($serverKey));
+                        } else {
+                            Log::warning("No data found in API response for batch on server " . strtoupper($serverKey));
+                        }
                     } else {
-                        Log::warning("Nickname not found in API response for account_id: $playerId", ['server' => strtoupper($serverKey)]);
+                        Log::error("API request failed for batch on server " . strtoupper($serverKey), [
+                            'status' => $response->status(),
+                            'body' => $response->body()
+                        ]);
                     }
-                } else {
-                    Log::error("Failed to fetch player name from API", [
-                        'account_id' => $playerId,
-                        'server' => strtoupper($serverKey),
-                        'status' => $response->status(),
-                        'response' => $response->body()
+
+                    // Add a small delay to avoid rate limiting
+                    usleep(100000); // 100ms delay between batches
+
+                } catch (\Exception $e) {
+                    Log::error("Exception while fetching player names on server " . strtoupper($serverKey), [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
                     ]);
                 }
             }
         }
-    }
 
+        $remainingNull = PlayerShip::whereNull('player_name')->count();
+        Log::info("Completed player name update. Remaining null names: $remainingNull");
+    }
 
     public function fetchAndStoreOverallPlayerStats()
     {
@@ -881,12 +921,27 @@ class PlayerShipService
     public function getPlayerStatsOverall($name, $account_id)
     {
 
-        $playerExists = PlayerShip::where('account_id', $account_id)->exists();
+        $shipsCount = PlayerShip::where('account_id', $account_id)->count();
 
-        if (!$playerExists) {
-            Log::info("Player not found in database, fetching his stats");
+        if ($shipsCount === 0) {
+            // No ships found for this player, fetch all ship stats
+            Log::info("No ships found for player, fetching ship stats", ['name' => $name, 'account_id' => $account_id]);
             $this->fetchSinglePlayerStats($name, $account_id);
+        } else {
+            // Player exists with ships, but check if overall stats are present
+            $hasOverallStats = PlayerShip::where('account_id', $account_id)
+                ->whereNotNull('battles_overall')
+                ->exists();
+
+            if (!$hasOverallStats) {
+                // Ships exist but no overall stats, fetch just the overall stats
+                Log::info("Ships found but no overall stats, fetching overall stats", ['name' => $name, 'account_id' => $account_id]);
+                $this->fetchOverallStatsForSinglePlayer($account_id);
+            } else {
+                Log::info("Player has both ships and overall stats - no fetch needed", ['name' => $name, 'account_id' => $account_id]);
+            }
         }
+
 
         $playerStatistics = PlayerShip::select(
             DB::raw('MAX(battles_overall) as battles'),
@@ -1141,7 +1196,7 @@ class PlayerShipService
     }
 
     // New helper method to fetch overall stats for a single player
-    private function fetchOverallStatsForSinglePlayer($accountId)
+    public function fetchOverallStatsForSinglePlayer($accountId)
     {
         foreach ($this->baseUrls as $serverKey => $baseUrl) {
             $overallUrl = $baseUrl . "/wows/account/info/";

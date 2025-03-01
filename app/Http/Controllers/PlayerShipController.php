@@ -125,4 +125,10 @@ class PlayerShipController extends Controller
         $this->playerShipService->cacheTopPlayersList();
         return response()->json(['message' => 'Top players caching method invoked successfully.']);
     }
+
+
+    public function getNullNames()
+    {
+        $this->playerShipService->getNullNamePlayersNames();
+    }
 }
