@@ -684,17 +684,9 @@ class PlayerShipService
 
                                 //wn8
                                 $wn8 =  $this->calculateWN8($ship, $totalBattles, $totalFrags, $totalWins, $totalDamageDealt);
-
-                                //total_player_wn8
-                                $total_player_wn8 = $this->totalPlayerWN8($playerId);
-
                                 //pr
                                 $pr = $this->calculatePR($ship, $totalBattles, $totalFrags, $totalWins, $totalDamageDealt);
                                 $pr = $pr != null ? $pr : 0;
-
-                                //total player pr
-                                $total_player_pr = $this->totalPlayerPR($playerId);
-
                                 Log::info("Processing ship for player", [
                                     'player_id' => $playerId,
                                     'ship_id' => $ship->ship_id,
@@ -727,9 +719,7 @@ class PlayerShipService
                                         'ship_nation' => $shipNation,
                                         'distance' => $shipStats['distance'],
                                         'wn8' => $wn8,
-                                        'total_player_wn8' => $total_player_wn8,
                                         'pr' => $pr,
-                                        'total_player_pr' => $total_player_pr,
                                         'capture' => $totalCapture,
                                         'defend' => $totalDefend,
                                         'spotted' => $totalSpotted,
@@ -764,7 +754,17 @@ class PlayerShipService
                                 'player_id' => $playerId,
                                 'ship_id' => $shipStats['ship_id'],
                             ]);
-                            $this->totalPlayerWN8($playerId);
+
+                            $finalTotalWN8 = $this->totalPlayerWN8($playerId);
+                            $finalTotalPR = $this->totalPlayerPR($playerId);
+
+                            // Update ALL ships for this player with the consistent values
+                            DB::table('player_ships')
+                                ->where('account_id', $playerId)
+                                ->update([
+                                    'total_player_wn8' => $finalTotalWN8,
+                                    'total_player_pr' => $finalTotalPR
+                                ]);
                         }
                     } else {
                         Log::error("Failed to fetch player ships", [
@@ -1109,9 +1109,9 @@ class PlayerShipService
 
                         // Initialize all battle type stats
                         $pvpStats = [];
-                        $pveStats = [];  // These were missing in your original code
-                        $clubStats = [];
-                        $rankStats = [];
+                        $pveStats = []; //not actually used
+                        $clubStats = []; //not acutally used
+                        $rankStats = []; //not acutally used
 
                         if (isset($shipStats['pvp'])) {
                             $pvpStats = $this->extractBattleStats($shipStats, 'pvp');
@@ -1150,10 +1150,8 @@ class PlayerShipService
 
                         // Calculate WN8 and PR
                         $wn8 = $this->calculateWN8($ship, $totalBattles, $totalFrags, $totalWins, $totalDamageDealt);
-                        $total_player_wn8 = $this->totalPlayerWN8($accountId);
                         $pr = $this->calculatePR($ship, $totalBattles, $totalFrags, $totalWins, $totalDamageDealt);
                         $pr = $pr !== null ? $pr : 0;
-                        $total_player_pr = $this->totalPlayerPR($accountId);
 
                         PlayerShip::updateOrCreate(
                             [
@@ -1176,9 +1174,7 @@ class PlayerShipService
                                 'ship_nation' => $shipNation,
                                 'distance' => $shipStats['distance'] ?? 0,
                                 'wn8' => $wn8,
-                                'total_player_wn8' => $total_player_wn8,
                                 'pr' => $pr,
-                                'total_player_pr' => $total_player_pr,
                                 'capture' => $totalCapture,
                                 'defend' => $totalDefend,
                                 'spotted' => $totalSpotted,
