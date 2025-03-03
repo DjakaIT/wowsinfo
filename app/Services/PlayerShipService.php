@@ -975,6 +975,7 @@ class PlayerShipService
             ->where('account_id', $account_id)
             ->where('player_name', $name)
             ->where('battles_played', '>', 0)
+            ->orderBy('battles_played', 'desc')
             ->get()
             ->map(function ($vehicle) {
                 return [
