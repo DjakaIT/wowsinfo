@@ -172,26 +172,85 @@ class PlayerShipService
 
     public function totalPlayerPR($playerId)
     {
-
+        // Load expected values if not already loaded
+        if (!isset($this->expectedValues)) {
+            try {
+                $this->loadExpectedValues();
+            } catch (\Exception $e) {
+                Log::error("Failed to load expected values for PR calculation", [
+                    'error' => $e->getMessage()
+                ]);
+                return 0;
+            }
+        }
 
         $playerShips = PlayerShip::where('account_id', $playerId)
             ->where('battles_played', '>', 0)
             ->get();
 
-        $total_weighted_pr = 0;
-        $total_battles = 0;
-
-        foreach ($playerShips as $playerShip) {
-            if ($playerShip->battles_played > 0 && $playerShip->pr !== null) {
-                $total_weighted_pr += $playerShip->pr * $playerShip->battles_played;
-                $total_battles += $playerShip->battles_played;
-            }
+        if ($playerShips->isEmpty()) {
+            return 0;
         }
 
+        // Initialize variables to accumulate values
+        $totalActualDamage = 0;
+        $totalActualWins = 0;
+        $totalActualFrags = 0;
 
-        $player_total_pr = ceil($total_battles > 0 ? $total_weighted_pr / $total_battles : 0);
+        $totalExpectedDamage = 0;
+        $totalExpectedWins = 0;
+        $totalExpectedFrags = 0;
 
-        return $player_total_pr;
+        foreach ($playerShips as $playerShip) {
+            $shipId = $playerShip->ship_id;
+            $battles = $playerShip->battles_played;
+
+            if ($battles <= 0) {
+                continue;
+            }
+
+            // Skip if expected values not available
+            if (
+                !isset($this->expectedValues['data']) ||
+                !isset($this->expectedValues['data'][$shipId]) ||
+                empty($this->expectedValues['data'][$shipId])
+            ) {
+                Log::warning("Expected values not found for ship_id: $shipId in PR calculation");
+                continue;
+            }
+
+            $expected = $this->expectedValues['data'][$shipId];
+
+            // Accumulate actual values
+            $totalActualDamage += $playerShip->damage_dealt;
+            $totalActualWins += $playerShip->wins_count;
+            $totalActualFrags += $playerShip->frags;
+
+            // Accumulate expected values (expected × battles)
+            $totalExpectedDamage += $expected['average_damage_dealt'] * $battles;
+            $totalExpectedWins += ($expected['win_rate'] / 100) * $battles;
+            $totalExpectedFrags += $expected['average_frags'] * $battles;
+        }
+
+        // Avoid division by zero
+        if ($totalExpectedDamage <= 0 || $totalExpectedWins <= 0 || $totalExpectedFrags <= 0) {
+            return 0;
+        }
+
+        // Calculate ratios
+        $rDmg = $totalActualDamage / $totalExpectedDamage;
+        $rFrags = $totalActualFrags / $totalExpectedFrags;
+        $rWins = $totalActualWins / $totalExpectedWins;
+
+        // Normalize
+        $nDmg = max(0, ($rDmg - 0.4) / (1 - 0.4));
+        $nFrags = max(0, ($rFrags - 0.1) / (1 - 0.1));
+        $nWins = max(0, ($rWins - 0.7) / (1 - 0.7));
+
+        // PR formula
+        $pr = round(700 * $nDmg + 300 * $nFrags + 150 * $nWins);
+
+        return $pr;
     }
 
     private function extractBattleStats($stats, $battleType)
@@ -1156,8 +1215,17 @@ class PlayerShipService
                         ]);
                     } // End foreach ship
 
-                    // Update total player WN8 after processing all ships
-                    $this->totalPlayerWN8($accountId);
+                    // AFTER all processing is done, calculate the final values ONCE
+                    $finalTotalWN8 = $this->totalPlayerWN8($accountId);
+                    $finalTotalPR = $this->totalPlayerPR($accountId);
+
+                    // Update ALL ships for this player with consistent values
+                    DB::table('player_ships')
+                        ->where('account_id', $accountId)
+                        ->update([
+                            'total_player_wn8' => $finalTotalWN8,
+                            'total_player_pr' => $finalTotalPR
+                        ]);
 
                     // Also fetch the overall stats for this player
                     $this->fetchOverallStatsForSinglePlayer($accountId);
