@@ -15,13 +15,15 @@
     <div class="page-padding">
         <!-- Player info -->
         <p class="player-title">{{ $playerInfo['name'] }}
-        @if ($playerInfo['clanName'] !== '')
-            <a class="pointer gray-link" href="{{ route('clan.page', [
-                'name' => urlencode($playerInfo['clanName']),
-                'id' => $playerInfo['clanId']
-            ]) }}">[{{ $playerInfo['clanName'] }}]</a>
-        @endif
-        </p>
+            @if ($playerInfo['clanName'] !== '' && !is_null($playerInfo['clanId']))
+                <a class="pointer gray-link" href="{{ route('clan.page', [
+                    'name' => urlencode($playerInfo['clanName']),
+                    'id' => $playerInfo['clanId']
+                ]) }}">[{{ $playerInfo['clanName'] }}]</a>
+            @elseif ($playerInfo['clanName'] !== '')
+                <span class="gray-link">[{{ $playerInfo['clanName'] }}]</span>
+            @endif
+            </p>
         <p class="player-info">Created at: {{ $playerInfo['createdAt'] }}</p>
         <!-- ### Player info -->
         <!-- Player statistics -->
