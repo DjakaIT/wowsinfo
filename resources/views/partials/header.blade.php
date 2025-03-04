@@ -130,27 +130,10 @@
         });
     }
 
-
-    const languageOptions = document.querySelectorAll('#languageDropdown + .dropdown-menu .dropdown-item');
-const languageDropdown = document.getElementById('languageDropdown');
-
-// Get saved language or use default
-const savedLang = localStorage.getItem('selectedLanguage') || 'EN';
-languageDropdown.textContent = savedLang;
-
-languageOptions.forEach(option => {
-    option.addEventListener('click', function(e) {
-        e.preventDefault();
-        const lang = this.getAttribute('data-lang').toUpperCase();
-        languageDropdown.textContent = lang;
-        
-        // Save selection to localStorage
-        localStorage.setItem('selectedLanguage', lang);
-        
-        // Here you would typically trigger a language change in your application
-        // For example: window.location.href = `?lang=${lang.toLowerCase()}`;
-    });
-});
+    function changeLanguage() {
+    var locale = document.getElementById('language').value;
+    window.location.href = '/locale/' + locale;
+}
 
 </script>
 <nav class="navbar navbar-expand-lg navbar-dark shadow4">
@@ -171,37 +154,19 @@ languageOptions.forEach(option => {
 			</li>
 			<li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    EN
+                    {{ App::getLocale() }}
                 </a>
-                <ul class="dropdown-menu" aria-labelledby="languageDropdown" style="max-height: 400px; overflow-y: auto;">
-                    <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="bg">Български</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="de">Deutsch</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="cs">Česky</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="es">Español</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="fi">Suomi</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="fr">Français</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="hr">Hrvatski</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="ko">한국의</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="hu">Magyar</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="it">Italiano</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="nl">Nederlands</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="pl">Polski</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="pt">Português</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="ru">Русский</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="ro">Românesc</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="sk">Slovenčina</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="sr">Srpski</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="tr">Türkçe</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="uk">Yкраїнський</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="ja">Japanese</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="ar">Arabian</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="tl">Philipines</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="gr">Greece</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="se">Sweeden</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="vn">Viet Nam</a></li>
-                    <li><a class="dropdown-item" href="#" data-lang="af">Afrikaans</a></li>
-                </ul>
+                <div class="dropdown-menu" aria-labelledby="languageDropdown" style="max-height: 400px; overflow-y: auto;">
+                    <form id="localeForm" class="px-3 py-2">
+                        <select name="locale" id="language" class="form-select" onchange="changeLanguage()">
+                            @foreach(config('app.available_locales') as $name => $locale)
+                                <option value="{{ $locale }}" {{ app()->getLocale() == $locale ? 'selected' : '' }}>
+                                    {{ $name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+                </div>
             </li>
 		</ul>
 

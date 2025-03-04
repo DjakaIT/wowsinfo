@@ -8,6 +8,7 @@ USE `wows-laravel`;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\ClanController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\ShipController;
@@ -120,7 +121,17 @@ Route::get('/server/{server}', function ($server) {
     return redirect()->back();
 });
 
+Route::get('locale/{locale}', function ($locale) {
 
+    // Check if the passed locale is available in our configuration
+    if (in_array($locale, array_values(config('app.available_locales')))) {
+
+        // If valid, store the locale in the session
+        Session::put('locale', $locale);
+    }
+    // Redirect back to the previous page
+    return redirect()->back();
+});
 //START OF BACKEND ROUTES
 
 //TO DO: API PARAMETERS FOR SHIP ROUTE
