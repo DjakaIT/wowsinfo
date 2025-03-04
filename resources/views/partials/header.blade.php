@@ -129,6 +129,29 @@
             console.error('Error logging out from Wargaming:', error);
         });
     }
+
+
+    const languageOptions = document.querySelectorAll('#languageDropdown + .dropdown-menu .dropdown-item');
+const languageDropdown = document.getElementById('languageDropdown');
+
+// Get saved language or use default
+const savedLang = localStorage.getItem('selectedLanguage') || 'EN';
+languageDropdown.textContent = savedLang;
+
+languageOptions.forEach(option => {
+    option.addEventListener('click', function(e) {
+        e.preventDefault();
+        const lang = this.getAttribute('data-lang').toUpperCase();
+        languageDropdown.textContent = lang;
+        
+        // Save selection to localStorage
+        localStorage.setItem('selectedLanguage', lang);
+        
+        // Here you would typically trigger a language change in your application
+        // For example: window.location.href = `?lang=${lang.toLowerCase()}`;
+    });
+});
+
 </script>
 <nav class="navbar navbar-expand-lg navbar-dark shadow4">
 	<a class="navbar-brand" href="/">
@@ -146,15 +169,40 @@
 			<li class="nav-item">
 				<a class="nav-link" href="/wiki">Wiki</a>
 			</li>
-			{{-- <li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-					nav_lang
-				</a>
-				<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-					<li><a class="dropdown-item" href="#" >KEY1 VALUE1</a></li>
-					<li><a class="dropdown-item" href="#" >KEY2 VALUE2</a></li>
-				</ul>
-			</li>--}}
+			<li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    EN
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="languageDropdown" style="max-height: 400px; overflow-y: auto;">
+                    <li><a class="dropdown-item" href="#" data-lang="en">English</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="bg">Български</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="de">Deutsch</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="cs">Česky</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="es">Español</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="fi">Suomi</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="fr">Français</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="hr">Hrvatski</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="ko">한국의</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="hu">Magyar</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="it">Italiano</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="nl">Nederlands</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="pl">Polski</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="pt">Português</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="ru">Русский</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="ro">Românesc</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="sk">Slovenčina</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="sr">Srpski</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="tr">Türkçe</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="uk">Yкраїнський</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="ja">Japanese</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="ar">Arabian</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="tl">Philipines</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="gr">Greece</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="se">Sweeden</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="vn">Viet Nam</a></li>
+                    <li><a class="dropdown-item" href="#" data-lang="af">Afrikaans</a></li>
+                </ul>
+            </li>
 		</ul>
 
 		<!-- Right-aligned nav items -->
