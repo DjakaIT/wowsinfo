@@ -4,16 +4,16 @@
           <div class="col">
             <ul>
                 <li>
-                  <a href="/faq">FAQ</a>
+                  <a href="/faq">{{ __('footer_link_faq')  }}</a>
                 </li>
                 <li>
-                  <a href="/imprint">Imprint</a>
+                  <a href="/imprint">{{ __('footer_link_imprint')  }}</a>
                 </li>
                 <li>
-                  <a href="/privacy">Privacy</a>
+                  <a href="/privacy">{{ __('footer_link_privacy') }}</a>
                 </li>
                 <li>
-                  <a href="/contact">Contact</a>
+                  <a href="/contact">{{ __('footer_link_contact')  }}</a>
                 </li>
             </ul>
           </div>
@@ -21,7 +21,7 @@
         <div class="row">
           <div class="col">
             <p class="disclaimer">
-              wows.wn8.info is a free web service for World of Warships. We are not official website of Wargaming.net or any of its services. World of Warships is a trademark of Wargaming.net
+              {{ __('footer')  }}
             </p>
           </div>
         </div>

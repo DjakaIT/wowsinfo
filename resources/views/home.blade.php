@@ -3,9 +3,9 @@
 @endphp
 @extends('layout.layout')
 
-@section('metaTitle', $metaSite['metaTitle'])
-@section('metaDescription', $metaSite['metaDescription'])
-@section('metaKeywords', $metaSite['metaKeywords'])
+@section('metaTitle', __('seo_home_title'))
+@section('metaDescription', __('seo_home_content'))
+@section('metaKeywords', __('seo_home_keywords'))
 
 @section('content')
 <div class="container">
