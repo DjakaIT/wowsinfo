@@ -1,6 +1,6 @@
 @extends('layout.layout')
 
-@section('metaTitle', __('login_title'))
+@section('metaTitle', __('seo_login_title'))
 @section('metaDescription', __('_login_description'))
 @section('metaKeywords', __('seo_login_keywords'))
 
