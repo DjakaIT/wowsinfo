@@ -147,10 +147,10 @@
 	<div class="collapse navbar-collapse" id="nav-collapse">
 		<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 			<li class="nav-item">
-				<a class="nav-link" href="/">Home</a>
+				<a class="nav-link" href="/">{{ __('nav_home') }}</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link" href="/wiki">Wiki</a>
+				<a class="nav-link" href="/wiki">{{ __('nav_wiki') }}</a>
 			</li>
 			<li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -183,19 +183,19 @@
 						<li><hr class="dropdown-divider"></li>
 						<li><a class="dropdown-item disabled" href="#">RU</a></li>
 					</ul>
-					<button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Player</button>
+					<button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">{{ __( 'nav_player') }}</button>
 					<ul class="dropdown-menu">
-						<li><a class="dropdown-item" href="#">Player</a></li>
-						<li><a class="dropdown-item" href="#">Clan</a></li>
+						<li><a class="dropdown-item" href="#">{{ __('nav_player') }}</a></li>
+						<li><a class="dropdown-item" href="#">{{ __('nav_clan') }}</a></li>
 					</ul>
 					<input id="playerSearch" type="text" class="form-control" aria-label="Text input with dropdown button">
-					<button class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
+					<button class="btn btn-outline-secondary" type="button" id="button-addon2">{{ __('nav_search') }}</button>
 					<ul id="results" class="dropdown-menu show w-100 player-search-dropdown" style="display: none;"></ul>
 				</div>
 			</li>
 
 			<li id="loginLink" class="nav-item">
-				<a class="nav-link" href="/login">Login</a>
+				<a class="nav-link" href="/login">{{ __('nav_login') }}</a>
 			</li>
 
 			<li id="loggedSection" class="nav-item dropdown">
@@ -203,8 +203,8 @@
 					<em id="userName"></em>
 				</a>
 				<ul class="dropdown-menu" aria-labelledby="userDropdown">
-					<li><a class="dropdown-item" href="/dashboard">Dashboard</a></li>
-					<li><a class="dropdown-item" href="#" onclick="logout()">Logout</a></li>
+					<li><a class="dropdown-item" href="/dashboard">{{ __('nav_dashboard') }}</a></li>
+					<li><a class="dropdown-item" href="#" onclick="logout()">{{ __('nav_logout') }}</a></li>
 				</ul>
 			</li>
 		</ul>
