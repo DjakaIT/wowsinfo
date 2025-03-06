@@ -24,7 +24,7 @@
                 <span class="gray-link">[{{ $playerInfo['clanName'] }}]</span>
             @endif
             </p>
-        <p class="player-info">Created at: {{ $playerInfo['createdAt'] }}</p>
+        <p class="player-info">{{ __('account_created_at') }}:   {{ $playerInfo['createdAt'] }}</p>
         <!-- ### Player info -->
         <!-- Player statistics -->
         <!-- <div v-if="playerStatistics === null">Loading</div> -->
@@ -33,36 +33,36 @@
                 <thead>
                     <tr class="bg-gray-100 text-left">
                         <th class="border-b">Stats</th>
-                        <th class="border-b">Overall</th>
-                        <th class="border-b">Last Day</th>
-                        <th class="border-b">Last 7 days</th>
-                        <th class="border-b">Last month</th>
+                        <th class="border-b">{{ __('th_player_1') }}</th>
+                        <th class="border-b">{{ __('th_player_2') }}</th>
+                        <th class="border-b">{{ __('th_player_3') }}</th>
+                        <th class="border-b">{{ __('th_player_4') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Battles</td>
+                        <td class="py-2 px-4">{{ __('t_player_1') }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['battles'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['battles'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['battles'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['battles'] ?? '-' }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Wins</td>
+                        <td class="py-2 px-4">{{ __('t_player_10') }}</td>
                         <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($playerStatistics['overall']['wins'] ?? 0) }}">{{ $playerStatistics['overall']['wins'] ?? '-' }}%</td>
                         <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($playerStatistics['lastDay']['wins'] ?? 0) }}">{{ $playerStatistics['lastDay']['wins'] ?? '-' }}%</td>
                         <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($playerStatistics['lastWeek']['wins'] ?? 0) }}">{{ $playerStatistics['lastWeek']['wins'] ?? '-' }}%</td>
                         <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($playerStatistics['lastMonth']['wins'] ?? 0) }}">{{ $playerStatistics['lastMonth']['wins'] ?? '-' }}%</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Tier Ø</td>
+                        <td class="py-2 px-4">{{ __('t_player_2') }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['tier'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['tier'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['tier'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['tier'] ?? '-' }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Survived</td>
+                        <td class="py-2 px-4">{{ __('t_player_3') }}</td>
                         <td class="py-2 px-4">
                             {{ isset($playerStatistics['overall']['survived']) ? round($playerStatistics['overall']['survived'], 2) . '%' : '-' }}
                         </td>
@@ -76,41 +76,41 @@
                             {{ isset($playerStatistics['lastMonth']['survived']) ? round($playerStatistics['lastMonth']['survived'], 2) . '%' : '-' }}
                         </td>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Damage Ø</td>
+                        <td class="py-2 px-4">{{ __('t_player_4') }}</td>
                         <td class="py-2 px-4">{{FrontendHelper::formatDamage($playerStatistics['overall']['damage'] ?? 0, $server) }}</td>
                         <td class="py-2 px-4">{{FrontendHelper::formatDamage($playerStatistics['lastDay']['damage'] ?? 0, $server) }}</td>
                         <td class="py-2 px-4">{{FrontendHelper::formatDamage($playerStatistics['lastWeek']['damage'] ?? 0, $server) }}</td>
                         <td class="py-2 px-4">{{FrontendHelper::formatDamage($playerStatistics['lastMonth']['damage'] ?? 0, $server) }}</td> </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Frags Ø</td>
+                        <td class="py-2 px-4">{{ __('t_player_5') }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['frags'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['frags'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['frags'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['frags'] ?? '-' }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Spotted Ø</td>
+                        <td class="py-2 px-4">{{ __('t_player_6') }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['spotted'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['spotted'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['spotted'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['spotted'] ?? '-' }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Experience Ø</td>
+                        <td class="py-2 px-4">{{ __('t_player_7') }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['xp'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['xp'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['xp'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['xp'] ?? '-' }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Captured Ø</td>
+                        <td class="py-2 px-4">{{ __('t_player_8') }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['capture'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['capture'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['capture'] ?? '-' }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastMonth']['capture'] ?? '-' }}</td>
                     </tr>
                     <tr class="border-b">
-                        <td class="py-2 px-4">Defended Ø</td>
+                        <td class="py-2 px-4">{{ __('t_player_9') }}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['overall']['defend']  ?? '-'}}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastDay']['defend']  ?? '-'}}</td>
                         <td class="py-2 px-4">{{ $playerStatistics['lastWeek']['defend']  ?? '-'}}</td>
@@ -148,15 +148,15 @@
             <table id="sortableTable" class="table table-striped table-bordered customRedefine playerTable">
                 <thead>
                     <tr class="bg-gray-100 text-left">
-                        <th class="border-b">Name</th>
-                        <th class="border-b" style="width: 100px">Nation</th>
-                        <th class="border-b">Type</th>
-                        <th class="border-b">Tier</th>
-                        <th class="border-b">Battles</th>
-                        <th class="border-b">Frags Ø</th>
-                        <th class="border-b">Damage Ø</th>
+                        <th class="border-b">{{ __('th_vehicle_2') }}</th>
+                        <th class="border-b" style="width: 100px">{{ __('th_vehicle_1') }}</th>
+                        <th class="border-b">{{ __('wiki_type') }}</th>
+                        <th class="border-b">{{ __('th_vehicle_3') }}</th>
+                        <th class="border-b">{{ __('th_vehicle_4') }}</th>
+                        <th class="border-b">{{ __('th_vehicle_5') }}</th>
+                        <th class="border-b">{{ __('th_vehicle_6') }}</th>
                         <th class="border-b">XP</th>
-                        <th class="border-b">Wins</th>
+                        <th class="border-b">{{ __('th_vehicle_7') }}</th>
                         <th class="border-b">WN8</th>
                     </tr>
                 </thead>

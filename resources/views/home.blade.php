@@ -16,13 +16,13 @@
 	</div>
 	<div class="row mb-20">
 		<div class="col">
-			<h2 class="heading2"> Top Player: Past 24 hours </h2>
+			<h2 class="heading2">{{ __('home_table_title_1') }}</h2>
 			<div class="table-container">
 				<div class="shadow4 customRedefine vehicleTable table-responsive mb-10">
 					<table class="table b-table table-striped table-bordered">
 						<thead>
 							<tr class="bg-gray-100 text-left">
-									<th class="border-b">Player</th>
+									<th class="border-b">{{ __('nav_player') }}</th>
 									<th class="border-b">WN8</th>
 							</tr>
 						</thead>
@@ -45,16 +45,16 @@
 					</table>
 				</div>
 			</div>
-			<p class="table-info-para"> Statistics for players whose tier is above 5 and who have 5+ battles </p>
+			<p class="table-info-para">{{ __('home_table_player_text_1') }}</p>
 		</div>
 		<div class="col">
-			<h2 class="heading2"> Top Player: Past 7 days </h2>
+			<h2 class="heading2">{{ __('home_table_title_2') }}</h2>
 			<div class="table-container">
 				<div class="shadow4 customRedefine vehicleTable table-responsive mb-10">
 					<table class="table b-table table-striped table-bordered">
 						<thead>
 							<tr class="bg-gray-100 text-left">
-								<th class="border-b">Player</th>
+								<th class="border-b">{{ __('nav_player') }}</th>
 								<th class="border-b">WN8</th>
 							</tr>
 						</thead>
@@ -77,16 +77,16 @@
 					</table>
 				</div>
 			</div>
-			<p class="table-info-para"> Statistics for players whose tier is above 5 and who have 30+ battles </p>
+			<p class="table-info-para"> {{ __('home_table_player_text_2') }}</p>
 		</div>
 		<div class="col">
-			<h2 class="heading2"> Top Player: Past month </h2>
+			<h2 class="heading2">{{ __('home_table_title_3') }}</h2>
 			<div class="table-container">
 				<div class="shadow4 customRedefine vehicleTable table-responsive mb-10">
 					<table class="table b-table table-striped table-bordered">
 						<thead>
 							<tr class="bg-gray-100 text-left">
-								<th class="border-b">Player</th>
+								<th class="border-b">{{ __('nav_player') }}</th>
 								<th class="border-b">WN8</th>
 							</tr>
 						</thead>
@@ -109,7 +109,7 @@
 					</table>
 				</div>
 			</div>
-			<p class="table-info-para"> Statistics for players whose tier is above 5 and who have 120+ battles </p>
+			<p class="table-info-para">{{ __('home_table_player_text_3') }}</p>
 		</div>
 	</div>
 	<div class="row mb-20">
@@ -119,13 +119,13 @@
 	</div>
 	<div class="row mb-10">
 		<div class="col">
-			<h2 class="heading2"> Top Player: Overall </h2>
+			<h2 class="heading2">{{ __('home_table_title_4') }}</h2>
 			<div class="table-container">
 				<div class="shadow4 customRedefine vehicleTable table-responsive mb-10">
 					<table class="table b-table table-striped table-bordered">
 						<thead>
 							<tr class="bg-gray-100 text-left">
-								<th class="border-b">Player</th>
+								<th class="border-b">{{ __('nav_player') }}</th>
 								<th class="border-b">WN8</th>
 							</tr>
 						</thead>
@@ -148,16 +148,16 @@
 					</table>
 				</div>
 			</div>
-			<p class="table-info-para"> Statistics for players whose tier is above 5 and who have 500+ battles </p>
+			<p class="table-info-para"> {{ __('home_table_player_text_4') }}</p>
 		</div>
 		<div class="col">
-			<h2 class="heading2"> Top Clans </h2>
+			<h2 class="heading2">{{ __('home_table_title_5') }}</h2>
 			<div class="table-container">
 				<div class="shadow4 customRedefine vehicleTable table-responsive mb-10">
 					<table class="table b-table table-striped table-bordered">
 						<thead>
 							<tr class="bg-gray-100 text-left">
-								<th class="border-b">Clan</th>
+								<th class="border-b">{{ __('nav_clan') }}</th>
 								<th class="border-b">WN8</th>
 							</tr>
 						</thead>
@@ -180,7 +180,7 @@
 					</table>
 				</div>
 			</div>
-			<p class="table-info-para"> Statistics for clans whose tier is above 5 and who have 120+ battles </p>
+			<p class="table-info-para">{{ __('home_table_clan_text') }}</p>
 		</div>
 	</div>
 </div>
