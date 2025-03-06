@@ -5,9 +5,9 @@
 @endphp
 @extends('layout.layout')
 
-@section('metaTitle', $metaSite['metaTitle'])
-@section('metaDescription', $metaSite['metaDescription'])
-@section('metaKeywords', $metaSite['metaKeywords'])
+@section('metaTitle',__('seo_player_title')))
+@section('metaDescription',__('seo_player_content'))
+@section('metaKeywords', __('seo_player_keywords'))
 
 
 
