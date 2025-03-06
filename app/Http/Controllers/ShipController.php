@@ -102,7 +102,7 @@ class ShipController extends Controller
                 'metaKeywords' => $metaKeywords,
             ],
             'modulesImages' => [
-                'engine' => 'https://wows-gloss-icons.wgcdn.co/icons/module/icon_module_Engine_8a3a974ed03540ecbcbff0646581c5757c2b732956189372797319a43826f504.png',
+                __('wiki_engine') => 'https://wows-gloss-icons.wgcdn.co/icons/module/icon_module_Engine_8a3a974ed03540ecbcbff0646581c5757c2b732956189372797319a43826f504.png',
                 'artillery' => 'https://wows-gloss-icons.wgcdn.co/icons/module/icon_module_Artillery_dea4595bc2cd93d9ce334c9b5a8d3d0738bd57088de2a5ac144aba65e5113e02.png',
                 'torpedoes' => 'https://wows-gloss-icons.wgcdn.co/icons/module/icon_module_Torpedoes_708da4505863050c47bacaed4f081b16ad953443dbf304000fa8901c4d280234.png',
                 'hull' => 'https://wows-gloss-icons.wgcdn.co/icons/module/icon_module_Hull_8b65981f2dc5ee48f07f85187e8622aec1abc2b4e9399b1c6f054d4dbf055467.png',
@@ -183,6 +183,7 @@ class ShipController extends Controller
             ],
             'nation' => $nation, // Ovde ide iz parametra nacija
             'description' => __("_wiki_nation_{$nation}_description"),
+
             'types' => $orderedShips,
         ]);
     }
@@ -214,7 +215,7 @@ class ShipController extends Controller
                 'metaKeywords' => $metaKeywords,
             ],
             'type' => $type, // Ovde ide iz parametra nacija
-            'description' => "{$type} description",
+            'description' =>  __('_wiki_type_' . str_replace(' ', '', ucwords(str_replace('_', ' ', $type))) . '_description'),
             'nationImages' => [
                 'usa' => 'https://wiki.wgcdn.co/images/f/f2/Wows_flag_USA.png',
                 'pan_asia' => 'https://wiki.wgcdn.co/images/3/33/Wows_flag_Pan_Asia.png',
@@ -247,7 +248,7 @@ class ShipController extends Controller
         // Base URL for images
         $imageBaseUrl = "https://wows-gloss-icons.wgcdn.co/icons/module/icon_module_";
         $moduleImages = [
-            'Engine' => 'https://wows-gloss-icons.wgcdn.co/icons/module/icon_module_Engine_8a3a974ed03540ecbcbff0646581c5757c2b732956189372797319a43826f504.png',
+            __('wiki_engine') => 'https://wows-gloss-icons.wgcdn.co/icons/module/icon_module_Engine_8a3a974ed03540ecbcbff0646581c5757c2b732956189372797319a43826f504.png',
             'Torpedoes' => 'https://wows-gloss-icons.wgcdn.co/icons/module/icon_module_Torpedoes_708da4505863050c47bacaed4f081b16ad953443dbf304000fa8901c4d280234.png',
             'Suo' => 'https://wows-gloss-icons.wgcdn.co/icons/module/icon_module_Suo_1c13698e19a8e9d88086d5b00361d1e3217c848ae9680b39a14310a3287f9dc9.png',
             'Sonar' => 'https://wows-gloss-icons.wgcdn.co/icons/module/icon_module_Sonar_4eb5e83d9d28acbe17715ffdcf5401a450bdcdca53c636f7dc1f5c72d38ed311.png',
@@ -298,7 +299,7 @@ class ShipController extends Controller
             ],
             'name' => $decodedData['name'],
             'image' => $decodedData['images']['large'],
-            'description' => $decodedData['description'],
+            'description' => __('_wiki_type_' . str_replace(' ', '', ucwords(str_replace('_', ' ', $type))) . '_description'),
             'nation' => $nation,
             'type' => $type,
             'tier' => $decodedData['tier'],
@@ -324,11 +325,11 @@ class ShipController extends Controller
                 ],
                 'concealment' => [
                     'total' => $decodedData['default_profile']['concealment']['total'],
-                    'detect_distance_by_plane' => $decodedData['default_profile']['concealment']['detect_distance_by_plane'],
-                    'detect_distance_by_submarine' => $decodedData['default_profile']['concealment']['detect_distance_by_submarine'],
-                    'detect_distance_by_ship' => $decodedData['default_profile']['concealment']['detect_distance_by_ship']
+                    __('_detect_ distance_by_plane') => $decodedData['default_profile']['concealment']['detect_distance_by_plane'],
+                    __('_detect_ distance_by_submarine') => $decodedData['default_profile']['concealment']['detect_distance_by_submarine'],
+                    __('_detect_ distance_by_ship') => $decodedData['default_profile']['concealment']['detect_distance_by_ship']
                 ],
-                'artilery' => $decodedData['default_profile']['artillery'],
+                __('wiki_artillery') => $decodedData['default_profile']['artillery'],
                 'atbas' => $decodedData['default_profile']['atbas'],
                 'torpedos' => $decodedData['default_profile']['torpedoes'],
                 'anti_aircraft' => $decodedData['default_profile']['anti_aircraft'],

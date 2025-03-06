@@ -1,9 +1,9 @@
 
 @extends('layout.layout')
 
-@section('metaTitle', $metaSite['metaTitle'])
-@section('metaDescription', $metaSite['metaDescription'])
-@section('metaKeywords', $metaSite['metaKeywords'])
+@section('metaTitle', __('seo_wiki_nation_title'))
+@section('metaDescription', __('seo_wiki_nation_content'))
+@section('metaKeywords', __('seo_wiki_nation_keywords'))
 
 @section('content')
 <div class="wiki">

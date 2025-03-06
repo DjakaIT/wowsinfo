@@ -1,9 +1,9 @@
 
 @extends('layout.layout')
 
-@section('metaTitle', $metaSite['metaTitle'])
-@section('metaDescription', $metaSite['metaDescription'])
-@section('metaKeywords', $metaSite['metaKeywords'])
+@section('metaTitle', __('seo_wiki_vehicle_title'))
+@section('metaDescription', __('seo_wiki_vehicle_content'))
+@section('metaKeywords', __('seo_wiki_vehicle_keywords'))
 
 @php
     // Function to calculate torpedoDPM
@@ -39,18 +39,17 @@
                         <img src="{{ $image }}" alt="{{ $name }}">
                     </div>
                     <div class="col-md-4">
-                        <h2>Decription</h2>
+                        <h2>{{ __('description') }}</h2>
                         <p>{{ $description }}</p>
                         <div class="border-separator"></div>
                         <ul class="wiki-info-list">
-                            <li><span class="bullet">Nation: </span><span class="value">{{ $nation }}</span></li>
-                            <li><span class="bullet">Tier: </span><span class="value">{{ $tier }}</span></li>
-                            <li><span class="bullet">Type: </span><span class="value">{{ $type }}</span></li>
+                          <li><span class="bullet">{{ __('nation') }}: </span><span class="value">{{ __('wiki_nation_' . $nation) }}</span></li>                            <li><span class="bullet">{{ __('tier') }}: </span><span class="value">{{ $tier }}</span></li>
+                            <li><span class="bullet">{{ __('type') }}: </span><span class="value">{{ __('wiki_' . str_replace(' ', '', ucwords(str_replace('_', ' ', $type)))) }}</span></li>
                             @if($price_credit > 0)
-                                <li><span class="bullet">Price credit: </span><span class="value">{{ $price_credit }}</span></li>
+                                <li><span class="bullet">{{ __('wiki_price') }}: </span><span class="value">{{ $price_credit }}</span></li>
                             @endif
                             @if($price_gold > 0)
-                                <li><span class="bullet">Price gold: </span><span class="value">{{ $price_gold }}</span></li>
+                                <li><span class="bullet">{{ __('wiki_price_gold') }} </span><span class="value">{{ $price_gold }}</span></li>
                             @endif
                         </ul>
                     </div>
@@ -58,14 +57,14 @@
                 <!-- Modules Info -->
                 <div class="row mt-4">
                     <div class="col-12">
-                      <h2 class="page-heading">Basic configuration</h2>
+                      <h2 class="page-heading">{{ __('_wiki_basic_configuration') }}</h2>
                     </div>
                 </div>
                 <div class="row">
                     <!-- Modules Column -->
                     <div class="col-md-4">
                         <div class="wiki-module-title-holder">
-                            <h3 class="wiki-module-title">Modules</h3>
+                            <h3 class="wiki-module-title">{{ __('wiki_modules') }}</h3>
                             {{-- <span class="wiki-switch pointer" onclick="switchModuleInfo()">{{ __($moduleSwitchText) }}</span> --}}
                         </div>
                         <ul class="modules-tree-list">
@@ -88,7 +87,7 @@
                     <!-- Performance Column -->
                     <div class="col-md-4">
                         <div class="wiki-module-title-holder">
-                          <h3 class="wiki-module-title">Performance</h3>
+                          <h3 class="wiki-module-title">{{ __('wiki_performance') }}</h3>
                         </div>
                         @foreach($performance as $key => $stat)
                           <div class="stat-box mb-3">
@@ -103,7 +102,7 @@
                     <!-- Armament Column -->
                     <div class="col-md-4">
                         <div class="wiki-module-title-holder">
-                            <h3 class="wiki-module-title">Armament</h3>
+                            <h3 class="wiki-module-title">{{ __('_wiki_armament') }}</h3>
                         </div>
                         @foreach($armament as $key => $weapon)
                             <div class="stat-box mb-3">
@@ -118,7 +117,7 @@
                 <!-- Detailed Profile -->
                 <div class="row mt-4">
                     <div class="col-12">
-                        <h2 class="page-heading">Details</h2>
+                        <h2 class="page-heading">{{ __('wiki_details') }}</h2>
                     </div>
                     <div class="col-12 mb-50">
                         <div class="row">
@@ -126,7 +125,7 @@
                             @if(!empty($details['hull']))
                                 <div class="col-md-4">
                                     <div class="wiki-module-title-holder">
-                                        <h3 class="wiki-module-title">Hull</h3>
+                                        <h3 class="wiki-module-title">{{ __('wiki_hull') }}</h3>
                                     </div>
                                     @foreach($details['hull'] as $key => $stat)
                                       @if($stat !== null)
@@ -140,7 +139,7 @@
                             @if(!empty($details['mobility']))
                                 <div class="col-md-4">
                                     <div class="wiki-module-title-holder">
-                                        <h3 class="wiki-module-title">Mobility</h3>
+                                        <h3 class="wiki-module-title">{{ __('wiki_stat_mobility') }}</h3>
                                     </div>
                                     @foreach($details['mobility'] as $key => $stat)
                                       @if($stat !== null)
@@ -154,7 +153,7 @@
                             @if(!empty($details['concealment']))
                                 <div class="col-md-4">
                                     <div class="wiki-module-title-holder">
-                                        <h3 class="wiki-module-title">Concealment</h3>
+                                        <h3 class="wiki-module-title">{{ __('wiki_stat_concealment') }}</h3>
                                     </div>
                                     @foreach($details['concealment'] as $key => $stat)
                                       @if($stat !== null)
@@ -172,29 +171,29 @@
                             @if(!empty($details['artilery']))
                               <div class="col-5">
                                   <div class="wiki-module-title-holder">
-                                      <h3 class="wiki-module-title">Artilery</h3>
+                                      <h3 class="wiki-module-title">{{ __('wiki_artillery') }}</h3>
                                   </div>
                                   <div class="row">
                                     <div class="col-6">
-                                      <p class="wikie-details-subtitles">Main turrets:</p>
+                                      <p class="wikie-details-subtitles">{{ __('_main_turrets') }}:</p>
                                       @foreach($details['artilery']['slots'] as $key => $slot)
                                         <p>
                                           {{ $slot['guns'] }} x {{ $slot['name'] }}
                                         </p>
                                       @endforeach
-                                      <p class="wikie-details-subtitles">Hull turrets:</p>
+                                      <p class="wikie-details-subtitles">{{ __('wiki_hull') }}s:</p>
                                       <p>
                                         {{ $details['hull']['atba_barrels'] }}
                                       </p>
-                                      <p class="wikie-details-subtitles">Firing Range:</p>
-                                      <p>{{ $details['artilery']['distance'] }} km</p>
-                                      <p class="wikie-details-subtitles">Rate of fire:</p>
-                                      <p>{{ $details['artilery']['gun_rate'] }} rounds/min</p>
-                                      <p class="wikie-details-subtitles">Maximum dispersion:</p>
-                                      <p>{{ $details['artilery']['max_dispersion'] }} m</p>
-                                      <p class="wikie-details-subtitles">180 Degree Turn Time:</p>
+                                      <p class="wikie-details-subtitles">{{ __('_firing_range') }}:</p>
+                                      <p>{{ $details['artilery']['distance'] }} {{ __('_m_km') }}</p>
+                                      <p class="wikie-details-subtitles">{{ __('_rate_of_fire') }}:</p>
+                                      <p>{{ $details['artilery']['gun_rate'] }} {{ __('_m_rounds_min') }}</p>
+                                      <p class="wikie-details-subtitles">{{ __('_max_dispersion') }}:</p>
+                                      <p>{{ $details['artilery']['max_dispersion'] }} {{ __('_m_m') }}</p>
+                                      <p class="wikie-details-subtitles">{{ __('_rotation_time') }}:</p>
                                       <p>{{ $details['artilery']['rotation_time'] }} sec</p>
-                                      <p class="wikie-details-subtitles">Reload time:</p>
+                                      <p class="wikie-details-subtitles">{{ __('_shot_delay') }}:</p>
                                       <p>{{ $details['artilery']['shot_delay'] }} sec</p>
                                     </div>
                                     <div class="col-6">
@@ -202,14 +201,14 @@
                                         <div>
                                           <p class="wikie-details-subtitles">{{ $key }} shell</p>
                                           <p>{{ $shell['name'] }}</p>
-                                          <p>Damage: {{ $shell['damage'] }}</p>
-                                          <p>Shell speed: {{ $shell['bullet_speed'] }}</p>
+                                          <p>{{ __('_wiki_damage') }}: {{ $shell['damage'] }}</p>
+                                          <p>{{ __('_bullet_speed') }}: {{ $shell['bullet_speed'] }}</p>
                                           @if(!empty($shell['burn_probability']))
                                             <p>
-                                              Chance of burning: {{ $shell['burn_probability'] }}
+                                              {{ __('_burn_probability') }}: {{ $shell['burn_probability'] }}
                                             </p>
                                           @endif
-                                          <p>Bomb weight: {{ $shell['bullet_mass'] }}</p>
+                                          <p>{{ __('_bullet_mass') }}: {{ $shell['bullet_mass'] }}</p>
                                         </div>
                                       @endforeach
                                     </div>
@@ -220,23 +219,23 @@
                             @if(isset($details['atbas']['slots']) && $details['atbas']['distance'] > 0)
                               <div class="col">
                                   <div class="wiki-module-title-holder">
-                                    <h3 class="wiki-module-title">Armament</h3>
+                                    <h3 class="wiki-module-title">{{ __('_wiki_armament') }}</h3>
                                   </div>
                                   <div class="row">
                                     <div class="col">
-                                      <p class="wikie-details-subtitles">Hull turrets:</p>
+                                      <p class="wikie-details-subtitles">{{ __('wiki_hull') }}:</p>
                                       <p>{{ $details['hull']['atba_barrels'] }}</p>
-                                      <p class="wikie-details-subtitles">Range:</p>
+                                      <p class="wikie-details-subtitles">{{ __('_firing_range') }}:</p>
                                       <p>{{ $details['atbas']['distance'] }} km</p>
                                       @foreach($details['atbas']['slots'] as $key => $slot)
                                         <div>
                                           <p class="wikie-details-subtitles">{{ $slot['name'] }} - {{ $slot['type'] }}:</p>
-                                          <p>Damage: {{ $slot['damage'] }}</p>
-                                          <p>Chance of burning: {{ $slot['burn_probability'] }}%</p>
-                                          <p>Shell speed: {{ $slot['bullet_speed'] }} m/s</p>
-                                          <p>Bomb weight: {{ $slot['bullet_mass'] }} kg</p>
-                                          <p>Rate of fire: {{ $slot['gun_rate'] }} rounds/min</p>
-                                          <p>Reload time: {{ $slot['shot_delay'] }} sec</p>
+                                          <p>{{ __('_wiki_damage') }}: {{ $slot['damage'] }}</p>
+                                          <p>{{ __('_burn_probability') }}: {{ $slot['burn_probability'] }}%</p>
+                                          <p>{{ __('_bullet_speed') }}: {{ $slot['bullet_speed'] }} m/s</p>
+                                          <p>{{ __('_bullet_mass') }}: {{ $slot['bullet_mass'] }} kg</p>
+                                          <p>{{ __('_rate_of_fire') }}: {{ $slot['gun_rate'] }} rounds/min</p>
+                                          <p>{{ __('shot_delay') }}: {{ $slot['shot_delay'] }} sec</p>
                                         </div>
                                       @endforeach
                                     </div>
@@ -252,23 +251,23 @@
                                   <div class="row">
                                     <div class="col">
                                       <p class="wikie-details-subtitles">{{ $details['torpedos']['torpedo_name'] }}:</p>
-                                      <p>Damage: {{ $details['torpedos']['max_damage'] }}</p>
-                                      <p>Firing Range: {{ $details['torpedos']['distance'] }} km</p>
-                                      <p>Torpedo speed: {{ $details['torpedos']['torpedo_speed'] }} knots</p>
-                                      <p>Reload time: {{$details['torpedos']['reload_time'] }} sec</p>
-                                      <p>180 Degree Turn Time: {{ $details['torpedos']['rotation_time'] }} sec</p>
+                                      <p>{{ __('_wiki_damage') }}: {{ $details['torpedos']['max_damage'] }}</p>
+                                      <p>{{ __('_firing_range') }}: {{ $details['torpedos']['distance'] }} km</p>
+                                      <p>{{ __('_torpedo_speed') }}: {{ $details['torpedos']['torpedo_speed'] }} knots</p>
+                                      <p>{{ __('shot_delay') }}: {{$details['torpedos']['reload_time'] }} sec</p>
+                                      <p>{{ __('_rotation_time') }}: {{ $details['torpedos']['rotation_time'] }} sec</p>
                                       @foreach($details['torpedos']['slots'] as $key => $slot)
                                         <div>
                                           <p class="wikie-details-subtitles">
-                                            Tube - {{ $slot['name'] }}:
+                                            {{ __('_wiki_tube') }} - {{ $slot['name'] }}:
                                           </p>
-                                          <p>Caliber: {{ $slot['caliber'] }} mm</p>
-                                          <p>Guns: {{ $slot['guns'] }}</p>
-                                          <p>Torpedo tubes: {{ $slot['barrels'] }}</p>
-                                          <p>Damage per salve:
+                                          <p>{{ __('_wiki_calibre') }}: {{ $slot['caliber'] }} mm</p>
+                                          <p>{{ __('_wiki_guns') }}: {{ $slot['guns'] }}</p>
+                                          <p>{{ __('_torpedoes_barrels') }}: {{ $slot['barrels'] }}</p>
+                                          <p>{{ __('_damage_per_salve') }}:
                                             {{ ($slot['guns'] * $slot['barrels']) * $details['torpedos']['max_damage'] }}
                                           </p>
-                                          <p>Damage per min:
+                                          <p>{{ __('_damage_per_min') }}:
                                             {{ torpedoDPM(
                                                 $slot['guns'],
                                                 $slot['barrels'],
@@ -286,7 +285,7 @@
                             @if(!is_null($details['anti_aircraft']))
                               <div class="col">
                                   <div class="wiki-module-title-holder">
-                                    <h3 class="wiki-module-title">Anti Aircraft</h3>
+                                    <h3 class="wiki-module-title">{{ __('wiki_anti_aircraft') }}</h3>
                                   </div>
                                   <div class="row">
                                     <div class="col">
@@ -295,8 +294,8 @@
                                           <p class="wikie-details-subtitles">
                                             {{ $slot['name'] }}:
                                           </p>
-                                          <p>Celiber: {{ $slot['caliber'] }} mm</p>
-                                          <p>Guns: {{ $slot['guns'] }}</p>
+                                          <p>{{ __('_wiki_calibre') }}: {{ $slot['caliber'] }} mm</p>
+                                          <p>{{ __('_wiki_guns') }}: {{ $slot['guns'] }}</p>
                                         </div>
                                       @endforeach
                                     </div>
@@ -307,32 +306,32 @@
                             @if(!is_null($details['submarine_sonar']))
                               <div class="col">
                                   <div class="wiki-module-title-holder">
-                                    <h3 class="wiki-module-title">Sonar</h3>
+                                    <h3 class="wiki-module-title">{{ __('wiki_sonar') }}</h3>
                                   </div>
                                   <div class="row">
                                     <div class="col">
                                     <p class="wikie-details-subtitles">
-                                      Duration of a ping effect on a sector highlighted once
+                                      {{ __('_wave_duration_0') }}
                                     </p>
                                     <p>{{ $details['submarine_sonar']['wave_duration_0'] }} s</p>
                                     <p class="wikie-details-subtitles">
-                                      Duration of a ping effect on a sector highlighted twice
+                                      {{ __('_wave_duration_1') }}
                                     </p>
                                     <p>{{ $details['submarine_sonar']['wave_duration_1'] }} s</p>
                                     <p class="wikie-details-subtitles">
-                                      Maximum range
+                                      {{ __('_wiki_range') }}
                                     </p>
                                     <p>{{ $details['submarine_sonar']['wave_max_dist'] }}</p>
                                     <p class="wikie-details-subtitles">
-                                      Reload time
+                                      {{ __('_wave_max_dist') }}
                                     </p>
                                     <p>{{ $details['submarine_sonar']['wave_shot_delay'] }}</p>
                                     <p class="wikie-details-subtitles">
-                                      Ping velocity
+                                      {{ __('_wave_speed_max') }}
                                     </p>
                                     <p>{{ $details['submarine_sonar']['wave_speed_max'] }}</p>
                                     <p class="wikie-details-subtitles">
-                                      Ping width
+                                      {{ __('_wave_width') }}
                                     </p>
                                     <p>{{ $details['submarine_sonar']['wave_width'] }}</p>
                                     </div>
@@ -347,3 +346,4 @@
     </div>
 </div>
 @endsection
+

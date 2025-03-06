@@ -24,7 +24,7 @@
 		<div class="wiki-type-group-home">
 			@foreach ($types as $type)
 				<div class="wiki-type-item">
-					<a href="{{ route('wiki.type', ['type' => $type]) }}">
+					<a href="{{ route('wiki.type', ['type' => strtolower(str_replace(' ', '_', $type)) ]) }}">
 						<img src="{{ asset('images/' . $type . '.png') }}" />
 						<span>{{ __('wiki_' . str_replace(' ', '', $type)) }}</span>
 					</a>

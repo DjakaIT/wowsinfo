@@ -1,9 +1,9 @@
 
 @extends('layout.layout')
 
-@section('metaTitle', $metaSite['metaTitle'])
-@section('metaDescription', $metaSite['metaDescription'])
-@section('metaKeywords', $metaSite['metaKeywords'])
+@section('metaTitle', __('seo_wiki_type_title'))
+@section('metaDescription', __('seo_wiki_type_content'))
+@section('metaKeywords', __('seo_wiki_type_keywords'))
 
 @section('content')
 <div class="wiki">
@@ -11,17 +11,17 @@
         <div class="row mb-50">
             <div class="col-12">
                 <h1 class="page-heading">
-                    {{ __('wiki_' . $type) }}
+                    <span>{{ __('wiki_' . str_replace(' ', '', ucwords(str_replace('_', ' ', $type)))) }}</span>
                 </h1>
                 <ul class="wiki-breadcrumb">
                   <li><a href="/wiki/" class="router-link-active"> Wiki </a><span> / &nbsp;</span></li>
-                  <li class="capitalize"><span>{{ $type }}</span></li>
+                  <li class="capitalize"><span>{{ __('wiki_' . str_replace(' ', '', ucwords(str_replace('_', ' ', $type)))) }}</span></li>
                 </ul>
             </div>
             @if($type !== 'Submarine')
                 <div class="col-12">
                     <p class="wiki-text-info">
-                        {{ __('_wiki_type_' . $type . '_description') }}
+                       {{ $description }} 
                     </p>
                 </div>
             @endif
