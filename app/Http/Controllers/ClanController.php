@@ -80,6 +80,7 @@ class ClanController extends Controller
         // Call the service to get clan member data (including last month stats)
         $members = $this->clanMemberService->getClanMemberData($id);
         $fullName = !empty($members) ? $members[0]['fullName'] : '';
+        $clanDescription = !empty($members) ? $members[0]['description'] : 'Clan description';
 
 
         return view('clan', [
@@ -90,7 +91,7 @@ class ClanController extends Controller
             ],
             'shortName' => $name,
             'fullName' => $fullName,
-            'clanDescription' => 'Clan description',
+            'clanDescription' => $clanDescription,
             'members' => $members,
         ]);
     }

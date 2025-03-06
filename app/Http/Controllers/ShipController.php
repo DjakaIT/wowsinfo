@@ -131,7 +131,7 @@ class ShipController extends Controller
                 'Cruiser' => 'https://wiki.wgcdn.co/images/f/f5/Wows-cruiser-icon.png',
                 'Battleship' => 'https://wiki.wgcdn.co/images/2/24/Wows-battleship-icon.png',
                 'Destroyer' => 'https://wiki.wgcdn.co/images/d/d2/Wows-destroyer-icon.png',
-                'AirCarrier' => 'https://wiki.wgcdn.co/images/d/d8/Wows-aircarrier-icon.png',
+                'Air Carrier' => 'https://wiki.wgcdn.co/images/d/d8/Wows-aircarrier-icon.png',
                 'Submarine' => '',
             ],
             'modulesImages' => [
@@ -161,11 +161,11 @@ class ShipController extends Controller
                 'pan_america'
             ],
             'types' => [
-                'cruiser',
-                'battleship',
-                'destroyer',
-                'air_carrier',
-                'submarine'
+                'Cruiser',
+                'Battleship',
+                'Destroyer',
+                'Air Carrier',
+                'Submarine'
             ],
         ]);
     }

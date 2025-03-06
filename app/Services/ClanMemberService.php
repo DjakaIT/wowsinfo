@@ -124,6 +124,7 @@ class ClanMemberService
     protected function processClanData($clanInfo, $clanId, $serverKey)
     {
         $clanName = $clanInfo['name'];
+        $clanDescription = $clanInfo['description'];
         $members = $clanInfo['members'] ?? [];
 
         Log::info("Found members in clan", [
@@ -147,6 +148,8 @@ class ClanMemberService
                         ]
                     );
 
+
+
                     Log::info("Updated/Created clan member", [
                         'account_id' => $player['account_id'],
                         'clan_id' => $clanId,
@@ -160,6 +163,13 @@ class ClanMemberService
                     ]);
                 }
             }
+
+            Clan::updateOrCreate(
+                ['clan_id' => $clanId],
+                [
+                    'clan_description' => $clanDescription
+                ]
+            );
         } else {
             Log::info("No members found for this clan", ['clan_id' => $clanId]);
         }
@@ -181,9 +191,10 @@ class ClanMemberService
                 DB::raw('MAX(player_ships.last_battle_time) as lastBattle'),
                 'clan_members.role as position',
                 'clan_members.joined_at as joined',
-                'clans.tag as fullname'
+                'clans.tag as fullname',
+                'clans.clan_description as description'
             )
-            ->groupBy('clan_members.account_id', 'clan_members.account_name', 'clan_members.role', 'clan_members.joined_at', 'clans.tag')
+            ->groupBy('clan_members.account_id', 'clan_members.account_name', 'clan_members.role', 'clan_members.joined_at', 'clans.tag', 'clans.clan_description')
             ->get();
 
         $result = [];
@@ -201,7 +212,8 @@ class ClanMemberService
                 'joined'       => $member->joined,
                 'wn8Month'     => $lastMonthStats['wn8'] ?? '-',
                 'battlesMonth' => $lastMonthStats['battles'] ?? '-',
-                'fullName'     => $member->fullname
+                'fullName'     => $member->fullname,
+                'description' => $member->description
             ];
         }
 

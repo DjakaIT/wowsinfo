@@ -226,5 +226,11 @@
    "_wave_duration_1": "Trajanje efekta pinga na dvaput označenom sektoru",
    "_wave_max_dist": "Maksimalni domet",
    "_wave_speed_max": "Brzina pinga",
-   "_wave_width": "Širina pinga"
-}
+   "_wave_width": "Širina pinga",
+   "wn8_last_month": "WN8 prošli mjesec",
+   "battles_last_month": "Bitke prošli mjesec",
+   "win_rate": "Postotak pobjeda",
+   "last_battle": "Posljednja bitka",
+   "position": "Pozicija",
+   "joined": "Učlanjen"
+  }

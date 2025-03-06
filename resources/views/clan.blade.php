@@ -3,7 +3,7 @@
 @endphp
 @extends('layout.layout')
 
-@section('metaTitle',__('seo_clan_title')))
+@section('metaTitle',__('seo_clan_title'))
 @section('metaDescription',__('seo_clan_content'))
 @section('metaKeywords', __('seo_clan_keywords'))
 
@@ -19,15 +19,15 @@
     <table class="table table-striped table-bordered customRedefine playerTable">
         <thead>
             <tr class="bg-gray-100 text-left">
-                <th class="border-b">Player name</th>
-                <th class="border-b">WN8 last Month</th>
-                <th class="border-b">Battles last Month</th>
+                <th class="border-b">{{ __('nav_player') }}</th>
+                <th class="border-b">{{ __('wn8_last_month') }}</th>
+                <th class="border-b">{{ __('battles_last_month') }}</th>
                 <th class="border-b">WN8</th>
-                <th class="border-b">Win Rate</th>
-                <th class="border-b">Battles</th>
-                <th class="border-b">Last battle</th>
-                <th class="border-b">Position</th>
-                <th class="border-b">Joined</th>
+                <th class="border-b">{{ __('win_rate') }}</th>
+                <th class="border-b">{{ __('t_player_1') }}</th>
+                <th class="border-b">{{ __('last_battle') }}</th>
+                <th class="border-b">{{ __('position') }}</th>
+                <th class="border-b">{{ __('joined') }}</th>
             </tr>
         </thead>
         <tbody>
