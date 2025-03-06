@@ -25,7 +25,8 @@
 			@foreach ($types as $type)
 				<div class="wiki-type-item">
 					<a href="{{ route('wiki.type', ['type' => $type]) }}">
-						<img src="{{ asset('images/' . str_replace(' ', '_', strtolower($type)) . '.png') }}" />						<span>{{ $type }}</span>
+						<img src="{{ asset('images/' . $type . '.png') }}" />
+						<span>{{ $type }}</span>
 					</a>
 				</div>
 			@endforeach
