@@ -182,7 +182,7 @@ class ShipController extends Controller
                 'metaKeywords' => $metaKeywords,
             ],
             'nation' => $nation, // Ovde ide iz parametra nacija
-            'description' => "{$nation} description",
+            'description' => __("_wiki_nation_{$nation}_description"),
             'types' => $orderedShips,
         ]);
     }

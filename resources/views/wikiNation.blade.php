@@ -10,7 +10,7 @@
     <div class="container">
       <div class="row mb-50">
         <div class="col-12">
-          <h1 class="page-heading">{{ $nation }}</h1>
+          <h1 class="page-heading">{{ ucfirst($nation) }}</h1>
           <ul class="wiki-breadcrumb">
 						<li><a href="/wiki/" class="router-link-active"> Wiki </a><span> / &nbsp;</span></li>
 						<li><span>{{ $nation }}</span></li>
@@ -27,7 +27,7 @@
 						<div class="col-12">
 								<div class="row">
 										<div class="col-12 wiki-section-title">
-											<h2>{{ 'wiki_' . $key }}</h2>
+											<h2>{{ __('wiki_' . str_replace(' ', '', $key)) }}</h2>
 										</div>
 								</div>
 								<div class="row">
