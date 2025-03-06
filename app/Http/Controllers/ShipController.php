@@ -131,7 +131,7 @@ class ShipController extends Controller
                 'Cruiser' => 'https://wiki.wgcdn.co/images/f/f5/Wows-cruiser-icon.png',
                 'Battleship' => 'https://wiki.wgcdn.co/images/2/24/Wows-battleship-icon.png',
                 'Destroyer' => 'https://wiki.wgcdn.co/images/d/d2/Wows-destroyer-icon.png',
-                'Air Carrier' => 'https://wiki.wgcdn.co/images/d/d8/Wows-aircarrier-icon.png',
+                'Air_Carrier' => 'https://wiki.wgcdn.co/images/d/d8/Wows-aircarrier-icon.png',
                 'Submarine' => '',
             ],
             'modulesImages' => [
