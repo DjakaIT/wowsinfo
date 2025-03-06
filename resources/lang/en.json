@@ -223,6 +223,12 @@
   "_wave_duration_1": "Duration of a ping effect on a sector highlighted twice",
   "_wave_max_dist": "Maximum range",
   "_wave_speed_max": "Ping velocity",
-  "_wave_width": "Ping width"
+  "_wave_width": "Ping width",
+  "wn8_last_month": "WN8 last month",
+"battles_last_month": "Battles last month",
+"win_rate": "Win rate",
+"last_battle": "Last battle",
+"position": "Position",
+"joined": "Joined"
 
 }

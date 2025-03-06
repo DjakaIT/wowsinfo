@@ -225,5 +225,11 @@
    "_wave_duration_1": "Duur van 'n ping-effek op 'n sektor wat twee keer uitgelig is",
    "_wave_max_dist": "Maksimum omvang",
    "_wave_speed_max": "Ping snelheid",
-   "_wave_width": "Ping breedte"
+   "_wave_width": "Ping breedte",
+   "wn8_last_month": "WN8 verlede maand",
+"battles_last_month": "Gevegte verlede maand",
+"win_rate": "Wenskoers",
+"last_battle": "Laaste geveg",
+"position": "Posisie",
+"joined": "Aangesluit"
 }

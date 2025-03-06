@@ -224,6 +224,12 @@
    "_wave_duration_1": "Διάρκεια ενός εφέ ping σε έναν τομέα που επισημαίνεται δύο φορές",
    "_wave_max_dist": "Μέγιστο εύρος",
    "_wave_speed_max": "Ταχύτητα ping",
-   "_wave_width": "Πλάτος ping"
+   "_wave_width": "Πλάτος ping",
+   "wn8_last_month": "WN8 τον περασμένο μήνα",
+"battles_last_month": "Μάχες τον περασμένο μήνα",
+"win_rate": "Ποσοστό νίκης",
+"last_battle": "Τελευταία μάχη",
+"position": "Θέση",
+"joined": "Εντάχθηκε"
 
 }

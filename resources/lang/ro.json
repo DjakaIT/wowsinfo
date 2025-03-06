@@ -225,5 +225,11 @@
      "_wave_duration_1": "Durata unui efect ping pe un sector evidențiat de două ori",
      "_wave_max_dist": "Raza maxima",
      "_wave_speed_max": "Viteza ping",
-     "_wave_width": "Lățimea pingului"
+     "_wave_width": "Lățimea pingului",
+     "wn8_last_month": "WN8 luna trecută",
+"battles_last_month": "Bătălii luna trecută",
+"win_rate": "Rată de victorie",
+"last_battle": "Ultima bătălie",
+"position": "Poziție",
+"joined": "Alăturat"
 }

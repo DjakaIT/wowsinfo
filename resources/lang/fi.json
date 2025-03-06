@@ -224,5 +224,11 @@
    "_wave_duration_1": "Kahdesti korostetun sektorin ping-tehosteen kesto",
    "_wave_max_dist": "Maksimialue",
    "_wave_speed_max": "Ping-nopeus",
-   "_wave_width": "Ping-leveys" 
+   "_wave_width": "Ping-leveys",
+   "wn8_last_month": "WN8 viime kuussa",
+"battles_last_month": "Taistelut viime kuussa",
+"win_rate": "Voittoprosentti",
+"last_battle": "Viimeisin taistelu",
+"position": "Sijainti",
+"joined": "Liittynyt"
 }

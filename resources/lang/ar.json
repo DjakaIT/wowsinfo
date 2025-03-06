@@ -224,5 +224,11 @@
    "_wave_duration_1": "مدة تأثير ping على القطاع المميز مرتين",
    "_wave_max_dist": "النطاق الأقصى",
    "_wave_speed_max": "سرعة الاتصال",
-   "_wave_width": "عرض اختبار الاتصال"
+   "_wave_width": "عرض اختبار الاتصال",
+   "wn8_last_month": "معدل WN8 للشهر الماضي",
+"battles_last_month": "معارك الشهر الماضي",
+"win_rate": "نسبة الفوز",
+"last_battle": "آخر معركة",
+"position": "المركز",
+"joined": "انضم"
 }

@@ -226,5 +226,11 @@
      "_wave_duration_1": "두 번 강조 표시된 섹터에 대한 핑 효과의 지속 시간",
      "_wave_max_dist": "최대 범위",
      "_wave_speed_max": "핑 속도",
-     "_wave_width": "핑 폭"
+     "_wave_width": "핑 폭",
+     "wn8_last_month": "지난 달 WN8",
+"battles_last_month": "지난 달 전투",
+"win_rate": "승률",
+"last_battle": "마지막 전투",
+"position": "위치",
+"joined": "가입"
 }

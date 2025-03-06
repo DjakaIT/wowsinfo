@@ -224,5 +224,11 @@
    "_wave_duration_1": "Doba trvání efektu ping na dvakrát zvýrazněný sektor",
    "_wave_max_dist": "Maximální rozsah",
    "_wave_speed_max": "Rychlost pingu",
-   "_wave_width": "Šířka pingu"
+   "_wave_width": "Šířka pingu",
+   "wn8_last_month": "WN8 minulý měsíc",
+"battles_last_month": "Bitvy minulý měsíc",
+"win_rate": "Poměr výher",
+"last_battle": "Poslední bitva",
+"position": "Pozice",
+"joined": "Připojen"
 }

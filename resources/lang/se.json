@@ -225,5 +225,11 @@
      "_wave_duration_1": "Längden på en pingeffekt på en sektor som är markerad två gånger",
      "_wave_max_dist": "Maximalt räckvidd",
      "_wave_speed_max": "Pinghastighet",
-     "_wave_width": "Pingbredd"
+     "_wave_width": "Pingbredd",
+     "wn8_last_month": "WN8 förra månaden",
+"battles_last_month": "Strider förra månaden",
+"win_rate": "Vinstfrekvens",
+"last_battle": "Senaste strid",
+"position": "Position",
+"joined": "Gick med"
 }

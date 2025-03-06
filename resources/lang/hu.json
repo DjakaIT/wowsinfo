@@ -225,5 +225,11 @@
      "_wave_duration_1": "A ping effektus időtartama kétszer kiemelt szektoron",
      "_wave_max_dist": "Maximális hatótáv",
      "_wave_speed_max": "Ping sebesség",
-     "_wave_width": "Ping szélessége"
+     "_wave_width": "Ping szélessége",
+     "wn8_last_month": "WN8 múlt hónapban",
+"battles_last_month": "Csaták múlt hónapban",
+"win_rate": "Győzelmi arány",
+"last_battle": "Utolsó csata",
+"position": "Pozíció",
+"joined": "Csatlakozott"
 }

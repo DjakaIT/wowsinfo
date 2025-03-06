@@ -224,5 +224,11 @@
    "_wave_duration_1": "Duração do efeito de ping em um setor destacado duas vezes",
    "_wave_max_dist": "Alcance máximo",
    "_wave_speed_max": "Velocidade do ping",
-   "_wave_width": "Largura do ping"
+   "_wave_width": "Largura do ping",
+   "wn8_last_month": "WN8 mês passado",
+"battles_last_month": "Batalhas mês passado",
+"win_rate": "Taxa de vitórias",
+"last_battle": "Última batalha",
+"position": "Posição",
+"joined": "Ingressou"
 }

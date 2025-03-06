@@ -225,5 +225,11 @@
      "_wave_duration_1": "2 回強調表示されたセクターに対する ping 効果の継続時間",
      "_wave_max_dist": "最大範囲",
      "_wave_speed_max": "Ping 速度",
-     "_wave_width": "Ping 幅"
+     "_wave_width": "Ping 幅",
+     "wn8_last_month": "先月のWN8",
+"battles_last_month": "先月の戦闘数",
+"win_rate": "勝率",
+"last_battle": "最後の戦闘",
+"position": "ポジション",
+"joined": "参加"
 }

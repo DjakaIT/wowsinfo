@@ -226,5 +226,11 @@
    "_wave_duration_1": "İki kez vurgulanan bir sektör üzerindeki ping etkisinin süresi",
    "_wave_max_dist": "Maksimum aralık",
    "_wave_speed_max": "Ping hızı",
-   "_wave_width": "Ping genişliği"
+   "_wave_width": "Ping genişliği",
+   "wn8_last_month": "Geçen ay WN8",
+"battles_last_month": "Geçen ay savaşlar",
+"win_rate": "Kazanma oranı",
+"last_battle": "Son savaş",
+"position": "Pozisyon",
+"joined": "Katıldı"
 }

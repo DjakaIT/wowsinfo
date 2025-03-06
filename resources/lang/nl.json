@@ -226,5 +226,11 @@
    "_wave_duration_1": "Duur van een ping-effect op een sector die twee keer is gemarkeerd",
    "_wave_max_dist": "Maximum bereik",
    "_wave_speed_max": "Pingsnelheid",
-   "_wave_width": "Pingbreedte"
+   "_wave_width": "Pingbreedte",
+   "wn8_last_month": "WN8 vorige maand",
+"battles_last_month": "Gevechten vorige maand",
+"win_rate": "Winstpercentage",
+"last_battle": "Laatste gevecht",
+"position": "Positie",
+"joined": "Toegetreden"
 }

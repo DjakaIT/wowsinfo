@@ -224,5 +224,11 @@
    "_wave_duration_1": "ระยะเวลาของเอฟเฟกต์ ping บนส่วนที่ไฮไลต์สองครั้ง",
    "_wave_max_dist": "ช่วงสูงสุด",
    "_wave_speed_max": "ความเร็วในการปิง",
-   "_wave_width": "ความกว้างของการปิง"
+   "_wave_width": "ความกว้างของการปิง",
+   "wn8_last_month": "WN8 noong nakaraang buwan",
+"battles_last_month": "Mga labanan noong nakaraang buwan",
+"win_rate": "Porsyento ng panalo",
+"last_battle": "Huling labanan",
+"position": "Posisyon",
+"joined": "Sumali"
 }

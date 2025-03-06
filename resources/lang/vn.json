@@ -225,5 +225,11 @@
    "_wave_duration_1": "Thời lượng của hiệu ứng ping trên một khu vực được đánh dấu hai lần",
    "_wave_max_dist": "Phạm vi tối đa",
    "_wave_speed_max": "Tốc độ Ping",
-   "_wave_width": "Độ rộng Ping"
+   "_wave_width": "Độ rộng Ping",
+   "wn8_last_month": "WN8 tháng trước",
+"battles_last_month": "Trận đấu tháng trước",
+"win_rate": "Tỷ lệ thắng",
+"last_battle": "Trận đấu gần nhất",
+"position": "Vị trí",
+"joined": "Đã tham gia"
 }
