@@ -26,7 +26,7 @@
 				<div class="wiki-type-item">
 					<a href="{{ route('wiki.type', ['type' => $type]) }}">
 						<img src="{{ asset('images/' . $type . '.png') }}" />
-						<span>{{ $type }}</span>
+						<span>{{ __('wiki_' . str_replace(' ', '', $type)) }}</span>
 					</a>
 				</div>
 			@endforeach
