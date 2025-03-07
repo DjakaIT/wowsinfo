@@ -19,6 +19,9 @@
         const wargamingId = "746553739e1c6e051e8d4fa24671ac01"; // Fetch from Laravel config
         const serverDropdown = document.querySelector('button.dropdown-toggle');
         let server = serverDropdown.textContent.toLowerCase(); // Get server from dropdown text
+
+        const searchTypeDropdown = document.querySelectorAll('button.dropdown-toggle')[1];
+        let searchType = searchTypeDropdown.textContent.trim().toLowerCase(); // Get search type from dropdown text
         
         // Close dropdown when clicking elsewhere - FIXED VERSION
         document.addEventListener('click', function(event) {
@@ -50,6 +53,26 @@
 
         let timeout = null;
 
+
+        const searchTypeOptions = document.querySelectorAll('.dropdown-menu:nth-of-type(2) .dropdown-item');
+        searchTypeOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            searchType = this.textContent.trim().toLowerCase();
+            searchTypeDropdown.textContent = this.textContent;
+
+            const optionText = this.textContent.trim().toLowerCase();
+            
+            // Update placeholder based on search type
+            if (optionText.includes('{{ strtolower(__("nav_clan")) }}')) {
+            searchInput.placeholder = "{{ __('nav_clan') }} | TAG";
+        } else {
+            searchInput.placeholder = "{{ __('nav_player') }}";
+        }
+    });
+    });
+
+
+
         searchInput.addEventListener("input", function() {
             const query = searchInput.value.trim();
 
@@ -61,23 +84,43 @@
 
             clearTimeout(timeout);
             timeout = setTimeout(() => {
-                fetch(`https://api.worldofwarships.${server}/wows/account/list/?application_id=${wargamingId}&search=${query}`)
+                // Choose API endpoint based on search type
+                let endpoint;
+                if (searchType.includes('clan')) {
+                    endpoint = "wows/clans/list/";
+                } else {
+                    endpoint = "wows/account/list/";
+                }
+
+                fetch(`https://api.worldofwarships.${server}/${endpoint}?application_id=${wargamingId}&search=${query}`)
                     .then(response => response.json())
                     .then(response => {
                         resultsContainer.innerHTML = "";
                         
                         if (response.data && response.data.length > 0) {
-                            response.data.forEach(player => {
+                            response.data.forEach(item => {
                                 const listItem = document.createElement("li");
                                 listItem.classList.add("dropdown-item");
-                                listItem.textContent = `${player.nickname}`;
-                                // Add data attribute to store the account_id
-                                listItem.dataset.accountId = player.account_id;
-								listItem.style.cssText = "cursor:pointer";
-                                listItem.addEventListener("click", function() {
-                                    // Redirect to player page with name and ID
-                                    window.location.href = `/player/${player.nickname}/${player.account_id}`;
-                                });
+                                listItem.style.cssText = "cursor:pointer";
+                                
+                                if (searchType.includes('clan')) {
+                                    // For clan results
+                                    listItem.textContent = `[${item.tag}] ${item.name}`;
+                                    listItem.dataset.clanId = item.clan_id;
+                                    listItem.addEventListener("click", function() {
+                                        // Redirect to clan page with tag and ID
+                                        window.location.href = `/clan/${item.tag}/${item.clan_id}`;
+                                    });
+                                } else {
+                                    // For player results (existing code)
+                                    listItem.textContent = `${item.nickname}`;
+                                    listItem.dataset.accountId = item.account_id;
+                                    listItem.addEventListener("click", function() {
+                                        // Redirect to player page with name and ID
+                                        window.location.href = `/player/${item.nickname}/${item.account_id}`;
+                                    });
+                                }
+                                
                                 resultsContainer.appendChild(listItem);
                             });
                             resultsContainer.style.display = "block";
@@ -90,17 +133,29 @@
             }, 500); // Debounce API calls
         });
 
-        // Also trigger search on search button click
+        // Also update the search button click handler
         document.getElementById('button-addon2').addEventListener('click', function() {
             const query = searchInput.value.trim();
             if (query.length >= 3) {
-                // Perform the same search as in the input event
-                fetch(`https://api.worldofwarships.${server}/wows/account/list/?application_id=${wargamingId}&search=${query}`)
+                // Choose API endpoint based on search type
+                let endpoint;
+                if (searchType.includes('clan')) {
+                    endpoint = "wows/clans/list/";
+                } else {
+                    endpoint = "wows/account/list/";
+                }
+                
+                fetch(`https://api.worldofwarships.${server}/${endpoint}?application_id=${wargamingId}&search=${query}`)
                     .then(response => response.json())
                     .then(response => {
                         if (response.data && response.data.length > 0) {
-                            // Redirect to the first match
-                            window.location.href = `/player/${response.data[0].nickname}/${response.data[0].account_id}`;
+                            if (searchType.includes('clan')) {
+                                // Redirect to the first matching clan
+                                window.location.href = `/clan/${response.data[0].tag}/${response.data[0].clan_id}`;
+                            } else {
+                                // Redirect to the first matching player
+                                window.location.href = `/player/${response.data[0].nickname}/${response.data[0].account_id}`;
+                            }
                         }
                     })
                     .catch(error => console.error("Error fetching data:", error));
