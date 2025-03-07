@@ -27,11 +27,11 @@ class PlayerShipController extends Controller
     }
 
     //BLADE
-    public function getPlayerPageStats($name, $account_id)
+    public function getPlayerPageStats($locale, $server, $name, $account_id)
     {
-
-        $server = request('server', session('server', 'EU'));
-        session(['server' => $server]);
+        // Set locale and server in session
+        app()->setLocale($locale);
+        session(['locale' => $locale, 'server' => strtoupper($server)]);
 
         $metaTitle = "$name - WN8 player statistics for World of Warships";
         $metaDescription = "Latest statistics for player $name in World of Warships, WN8 daily, weekly and monthly updates and statistic.";

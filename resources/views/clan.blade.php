@@ -33,7 +33,20 @@
         <tbody>
           @foreach ($members as $member)
             <tr class="border-b">
-                <td class="py-2 px-4">{{ $member['name'] }}</td>
+                <td class="py-2 px-4">
+                    @if (!empty($member['account_id']) || !empty($member['id']))
+                        <a href="{{ route('player.page', [
+                            'locale' => app()->getLocale(),
+                            'server' => strtolower(session('server', 'eu')),
+                            'name' => $member['name'],
+                            'id' => $member['account_id'] ?? $member['id']
+                        ]) }}">
+                            {{ $member['name'] }}
+                        </a>
+                    @else
+                        {{ $member['name'] }}
+                    @endif
+                </td>
                 <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($member['wn8Month']) }}">{{ $member['wn8Month'] }}</td>
                 <td class="py-2 px-4">{{ $member['battlesMonth'] }}</td>
                 <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($member['wn8']) }}">{{ $member['wn8'] }}</td>

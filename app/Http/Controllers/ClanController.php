@@ -71,8 +71,12 @@ class ClanController extends Controller
         }
     }
 
-    public function getClanPage($name, $id)
+    public function getClanPage($locale, $server, $name, $id)
     {
+        // Set locale and server in session
+        app()->setLocale($locale);
+        session(['locale' => $locale, 'server' => strtoupper($server)]);
+
         $metaTitle = "$name - WN8 clan statistics in World of Warships";
         $metaDescription = "Latest statistics for clan $name in World of Warships, WN8 daily, weekly and monthly updates and statistic.";
         $metaKeywords = "WN8, World of Warships, Statistics, Clan statistics, $name";
@@ -81,7 +85,6 @@ class ClanController extends Controller
         $members = $this->clanMemberService->getClanMemberData($id);
         $fullName = !empty($members) ? $members[0]['fullName'] : '';
         $clanDescription = !empty($members) ? $members[0]['description'] : 'Clan description';
-
 
         return view('clan', [
             'metaSite' => [

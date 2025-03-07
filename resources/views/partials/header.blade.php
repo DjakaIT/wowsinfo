@@ -92,7 +92,10 @@
                     endpoint = "wows/account/list/";
                 }
 
-                fetch(`https://api.worldofwarships.${server}/${endpoint}?application_id=${wargamingId}&search=${query}`)
+                // Map server to correct domain
+                const apiDomain = server === 'na' ? 'com' : (server === 'asia' ? 'asia' : 'eu');
+
+                fetch(`https://api.worldofwarships.${apiDomain}/${endpoint}?application_id=${wargamingId}&search=${query}`)
                     .then(response => response.json())
                     .then(response => {
                         resultsContainer.innerHTML = "";
@@ -108,16 +111,22 @@
                                     listItem.textContent = `[${item.tag}] ${item.name}`;
                                     listItem.dataset.clanId = item.clan_id;
                                     listItem.addEventListener("click", function() {
-                                        // Redirect to clan page with tag and ID
-                                        window.location.href = `/clan/${item.tag}/${item.clan_id}`;
+                                        // Get current locale and server
+                                        const locale = "{{ app()->getLocale() }}";
+                                        const serverVal = server || "eu";
+                                        // Redirect to clan page with locale and server
+                                        window.location.href = `/${locale}/${serverVal}/clan/${item.tag}/${item.clan_id}`;
                                     });
                                 } else {
                                     // For player results (existing code)
                                     listItem.textContent = `${item.nickname}`;
                                     listItem.dataset.accountId = item.account_id;
                                     listItem.addEventListener("click", function() {
-                                        // Redirect to player page with name and ID
-                                        window.location.href = `/player/${item.nickname}/${item.account_id}`;
+                                        // Get current locale and server
+                                        const locale = "{{ app()->getLocale() }}";
+                                        const serverVal = server || "eu";
+                                        // Redirect to player page with locale and server
+                                        window.location.href = `/${locale}/${serverVal}/player/${item.nickname}/${item.account_id}`;
                                     });
                                 }
                                 
@@ -145,16 +154,25 @@
                     endpoint = "wows/account/list/";
                 }
                 
-                fetch(`https://api.worldofwarships.${server}/${endpoint}?application_id=${wargamingId}&search=${query}`)
+                // Map server to correct domain
+                const apiDomain = server === 'na' ? 'com' : (server === 'asia' ? 'asia' : 'eu');
+                
+                fetch(`https://api.worldofwarships.${apiDomain}/${endpoint}?application_id=${wargamingId}&search=${query}`)
                     .then(response => response.json())
                     .then(response => {
                         if (response.data && response.data.length > 0) {
                             if (searchType.includes('clan')) {
+                                // Get current locale and server
+                                const locale = "{{ app()->getLocale() }}";
+                                const serverVal = server || "eu";
                                 // Redirect to the first matching clan
-                                window.location.href = `/clan/${response.data[0].tag}/${response.data[0].clan_id}`;
+                                window.location.href = `/${locale}/${serverVal}/clan/${response.data[0].tag}/${response.data[0].clan_id}`;
                             } else {
+                                // Get current locale and server
+                                const locale = "{{ app()->getLocale() }}";
+                                const serverVal = server || "eu";
                                 // Redirect to the first matching player
-                                window.location.href = `/player/${response.data[0].nickname}/${response.data[0].account_id}`;
+                                window.location.href = `/${locale}/${serverVal}/player/${response.data[0].nickname}/${response.data[0].account_id}`;
                             }
                         }
                     })

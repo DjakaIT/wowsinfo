@@ -31,7 +31,12 @@
 								<tr class="border-b">
 									<td class="py-2 px-4">
 										@if (!empty($player['name']) && !empty($player['wid']))
-											<a href="{{ route('player.page', ['name' => $player['name'], 'id' => $player['wid']]) }}">
+											<a href="{{ route('player.page', [
+												'locale' => app()->getLocale(),
+												'server' => strtolower(session('server', 'eu')),
+												'name' => $player['name'],
+												'id' => $player['wid']
+											]) }}">
 												{{ $player['name'] }}
 											</a>
 										@else
@@ -63,7 +68,12 @@
 								<tr class="border-b">
 									<td class="py-2 px-4">
 										@if (!empty($player['name']) && !empty($player['wid']))
-											<a href="{{ route('player.page', ['name' => $player['name'], 'id' => $player['wid']]) }}">
+											<a href="{{ route('player.page', [
+												'locale' => app()->getLocale(),
+												'server' => strtolower(session('server', 'eu')),
+												'name' => $player['name'],
+												'id' => $player['wid']
+											]) }}">
 												{{ $player['name'] }}
 											</a>
 										@else
@@ -95,7 +105,12 @@
 								<tr class="border-b">
 									<td class="py-2 px-4">
 										@if (!empty($player['name']) && !empty($player['wid']))
-											<a href="{{ route('player.page', ['name' => $player['name'], 'id' => $player['wid']]) }}">
+											<a href="{{ route('player.page', [
+												'locale' => app()->getLocale(),
+												'server' => strtolower(session('server', 'eu')),
+												'name' => $player['name'],
+												'id' => $player['wid']
+											]) }}">
 												{{ $player['name'] }}
 											</a>
 										@else
@@ -134,7 +149,12 @@
 								<tr class="border-b">
 									<td class="py-2 px-4">
 										@if (!empty($player['name']) && !empty($player['wid']))
-											<a href="{{ route('player.page', ['name' => $player['name'], 'id' => $player['wid']]) }}">
+											<a href="{{ route('player.page', [
+												'locale' => app()->getLocale(),
+												'server' => strtolower(session('server', 'eu')),
+												'name' => $player['name'],
+												'id' => $player['wid']
+											]) }}">
 												{{ $player['name'] }}
 											</a>
 										@else
@@ -166,7 +186,12 @@
 								<tr class="border-b">
 									<td class="py-2 px-4">
 										@if (!empty($clan['name']) && !empty($clan['wid']))
-											<a href="{{ route('clan.page', ['name' => $clan['name'], 'id' => $clan['wid']]) }}">
+											<a href="{{ route('clan.page', [
+												'locale' => app()->getLocale(),
+												'server' => strtolower(session('server', 'eu')),
+												'name' => $clan['name'],
+												'id' => $clan['wid']
+											]) }}">
 												{{ $clan['name'] }}
 											</a>
 										@else

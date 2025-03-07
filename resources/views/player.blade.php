@@ -5,7 +5,7 @@
 @endphp
 @extends('layout.layout')
 
-@section('metaTitle',__('seo_player_title')))
+@section('metaTitle',__('seo_player_title'))
 @section('metaDescription',__('seo_player_content'))
 @section('metaKeywords', __('seo_player_keywords'))
 
@@ -17,6 +17,8 @@
         <p class="player-title">{{ $playerInfo['name'] }}
             @if ($playerInfo['clanName'] !== '' && !is_null($playerInfo['clanId']))
                 <a class="pointer gray-link" href="{{ route('clan.page', [
+                    'locale' => app()->getLocale(),
+                    'server' => strtolower(session('server', 'eu')),
                     'name' => urlencode($playerInfo['clanName']),
                     'id' => $playerInfo['clanId']
                 ]) }}">[{{ $playerInfo['clanName'] }}]</a>

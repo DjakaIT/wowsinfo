@@ -1,4 +1,3 @@
-
 <?php
 /*
 DROP DATABASE `wows-laravel`;
@@ -57,11 +56,16 @@ Route::get('/verification', function (Request $request) {
     return redirect()->route('login')->with('error', 'Login failed. Please try again.');
 });
 // Player page
-Route::get('/player/{name}/{id}', [PlayerShipController::class, 'getPlayerPageStats'])->name('player.page');
-
+Route::get('/{locale}/{server}/player/{name}/{id}', [PlayerShipController::class, 'getPlayerPageStats'])
+    ->name('player.page')
+    ->where('locale', implode('|', config('app.available_locales')))
+    ->where('server', 'eu|na|asia');
 
 // Clan page
-Route::get('/clan/{name}/{id}', [ClanController::class, 'getClanPage'])->name('clan.page');
+Route::get('/{locale}/{server}/clan/{name}/{id}', [ClanController::class, 'getClanPage'])
+    ->name('clan.page')
+    ->where('locale', implode('|', config('app.available_locales')))
+    ->where('server', 'eu|na|asia');
 
 // Wiki - group 
 Route::prefix('wiki')->group(function () {
@@ -117,19 +121,39 @@ Route::view('/contact', 'contact', [
 
 //Server
 Route::get('/server/{server}', function ($server) {
+    $currentUrl = url()->previous();
+    $locale = app()->getLocale();
+
+    // If we're on a player or clan page, redirect to the new URL format
+    if (preg_match('#/[a-z]{2}/(eu|na|asia)/(player|clan)/(.+)#', $currentUrl, $matches)) {
+        $type = $matches[2]; // player or clan
+        $rest = $matches[3]; // name/id
+        return redirect("/$locale/$server/$type/$rest");
+    }
+
+    // Otherwise use the old behavior
     session(['server' => $server]);
     return redirect()->back();
 });
 
 Route::get('locale/{locale}', function ($locale) {
-
-    // Check if the passed locale is available in our configuration
     if (in_array($locale, array_values(config('app.available_locales')))) {
+        $currentUrl = url()->previous();
+        $server = strtolower(session('server', 'eu'));
 
-        // If valid, store the locale in the session
+        // If we're on a player or clan page, redirect to the new URL format
+        if (preg_match('#/[a-z]{2}/(eu|na|asia)/(player|clan)/(.+)#', $currentUrl, $matches)) {
+            $server = $matches[1];
+            $type = $matches[2]; // player or clan
+            $rest = $matches[3]; // name/id
+            return redirect("/$locale/$server/$type/$rest");
+        }
+
+        // Otherwise use the old behavior
         Session::put('locale', $locale);
+        return redirect()->back();
     }
-    // Redirect back to the previous page
+
     return redirect()->back();
 });
 //START OF BACKEND ROUTES
@@ -158,8 +182,6 @@ Route::prefix('players')->group(function () {
     Route::delete('/{id}', [PlayerController::class, 'destroy']);
 });
 
-
-
 Route::prefix('ships')->group(function () {
 
     Route::get('/fetch', [ShipController::class, 'fetchAndStoreShips']);
@@ -169,7 +191,6 @@ Route::prefix('ships')->group(function () {
     Route::put('/{id}', [ShipController::class, 'update']);
     Route::delete('/{id}', [ShipController::class, 'destroy']);
 });
-
 
 Route::prefix('clan-members')->group(function () {
 
@@ -200,8 +221,6 @@ Route::prefix('player-achievements')->group(function () {
     Route::delete('/{id}', [PlayerAchievementController::class, 'destroy']);
 });
 
-
-
 Route::prefix('player-ships')->group(function () {
 
     Route::get('/fetch', [PlayerShipController::class, 'updatePlayerShips']);
@@ -214,7 +233,6 @@ Route::prefix('player-ships')->group(function () {
     Route::put('/{id}', [PlayerShipController::class, 'update']);
     Route::delete('/{id}', [PlayerShipController::class, 'destroy']);
 });
-
 
 Route::prefix('player-stats')->group(function () {
 
