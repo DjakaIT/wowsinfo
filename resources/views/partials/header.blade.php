@@ -109,26 +109,34 @@
     }
     
     function logout() {
-        axios.get(`https://api.worldoftanks.eu/wot/auth/logout/?application_id=746553739e1c6e051e8d4fa24671ac01&access_token=${localStorage.getItem('access_token')}`)
-        .then(response => {
-            // If the logout is successful, clear localStorage or cookies
-            if (response.data.success) {
-                // Clear localStorage (or cookies if used)
-                localStorage.removeItem('access_token');
-                localStorage.removeItem('user_name');
-                localStorage.removeItem('account_id');
-                localStorage.removeItem('expires_at');
-
-                // Reload the page to update the login state
-                window.location.reload(); // Uncommented to ensure proper state update
-            } else {
-                alert('Failed to log out from Wargaming. Please try again.');
-            }
+    // Get the server the user logged in from
+    const server = localStorage.getItem('server') || 'eu';
+    
+    // Clear localStorage first (so logout works even if API call fails)
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('account_id');
+    localStorage.removeItem('expires_at');
+    localStorage.removeItem('server');
+    
+    // Determine the correct API domain
+    const apiDomain = server === 'na' ? 'com' : (server === 'asia' ? 'asia' : 'eu');
+    const accessToken = localStorage.getItem('access_token') || '';
+    
+    // Call the Wargaming API with the correct domain
+    fetch(`https://api.worldoftanks.${apiDomain}/wot/auth/logout/?application_id=746553739e1c6e051e8d4fa24671ac01&access_token=${accessToken}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Logout successful');
+            // Redirect to home page to refresh state
+            window.location.href = '/';
         })
         .catch(error => {
-            console.error('Error logging out from Wargaming:', error);
+            console.error('Error during logout:', error);
+            // Still redirect even if API call fails
+            window.location.href = '/';
         });
-    }
+}
 
     function changeLanguage() {
     var locale = document.getElementById('language').value;

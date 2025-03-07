@@ -13,8 +13,14 @@
     <li class="pointer">
       <a href="https://api.worldoftanks.eu/wot/auth/login/?application_id=746553739e1c6e051e8d4fa24671ac01&redirect_uri=http://wows.wn8.info/verification">
         {{ __('_login_eu_server') }}</a></li>
-    <li class="pointer">{{ __('_login_asia_server') }}</li>
-    <li class="pointer">{{ __('_login_na_server') }}</li>
+        <li class="pointer">
+          <a href="https://api.worldoftanks.asia/wot/auth/login/?application_id=746553739e1c6e051e8d4fa24671ac01&redirect_uri=http://wows.wn8.info/verification?server=asia">
+            {{ __('_login_asia_server') }}</a>
+        </li>
+        <li class="pointer">
+          <a href="https://api.worldoftanks.com/wot/auth/login/?application_id=746553739e1c6e051e8d4fa24671ac01&redirect_uri=http://wows.wn8.info/verification?server=na">
+            {{ __('_login_na_server') }}</a>
+        </li>
   </ul>
 </div>
 @endsection
