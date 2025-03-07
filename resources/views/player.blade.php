@@ -189,20 +189,47 @@
                     const headers = table.querySelectorAll("th");
                     const tbody = table.querySelector("tbody");
 
+                    // Initialize headers with sort indicators
+                    headers.forEach(header => {
+                        header.dataset.originalText = header.textContent;
+                        header.style.cursor = "pointer";
+                        // Add a subtle sort indicator to show it's sortable
+                        header.innerHTML = `${header.textContent} <span class="sort-indicator">↕</span>`;
+                        header.dataset.originalText = header.innerHTML;
+                    });
+
                     headers.forEach((header, columnIndex) => {
                         header.addEventListener("click", () => {
                             const rows = Array.from(tbody.querySelectorAll("tr"));
-                            const isAscending = header.dataset.order === "asc";
-                            header.dataset.order = isAscending ? "desc" : "asc";
+                            // Get current sort order or default to none
+                            const currentOrder = header.dataset.order || 'none';
+                            let newOrder;
+                            
+                            if (currentOrder === 'none' || currentOrder === 'desc') {
+                                newOrder = 'asc';
+                            } else {
+                                newOrder = 'desc';
+                            }
+                            
+                            // Reset all headers
+                            headers.forEach(h => {
+                                h.innerHTML = h.dataset.originalText;
+                                h.dataset.order = 'none';
+                            });
+                            
+                            // Set new order and add indicator
+                            header.dataset.order = newOrder;
+                            const indicator = newOrder === 'asc' ? '▲' : '▼';
+                            header.innerHTML = header.innerHTML.replace('↕', indicator);
 
                             rows.sort((rowA, rowB) => {
                                 const cellA = rowA.cells[columnIndex].textContent.trim();
                                 const cellB = rowB.cells[columnIndex].textContent.trim();
 
-                                const isNumeric = !isNaN(cellA) && !isNaN(cellB);
-                                return isAscending
-                                    ? (isNumeric ? cellA - cellB : cellA.localeCompare(cellB))
-                                    : (isNumeric ? cellB - cellA : cellB.localeCompare(cellA));
+                                const isNumeric = !isNaN(parseFloat(cellA)) && !isNaN(parseFloat(cellB));
+                                return newOrder === 'asc'
+                                    ? (isNumeric ? parseFloat(cellA) - parseFloat(cellB) : cellA.localeCompare(cellB))
+                                    : (isNumeric ? parseFloat(cellB) - parseFloat(cellA) : cellB.localeCompare(cellA));
                             });
 
                             tbody.append(...rows);

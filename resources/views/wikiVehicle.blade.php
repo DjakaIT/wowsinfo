@@ -261,7 +261,7 @@
                                           <p class="wikie-details-subtitles">
                                             {{ __('_wiki_tube') }} - {{ $slot['name'] }}:
                                           </p>
-                                          <p>{{ __('_wiki_calibre') }}: {{ $slot['caliber'] }} mm</p>
+                                          <p>{{ __('_wiki_caliber') }}: {{ $slot['caliber'] }} mm</p>
                                           <p>{{ __('_wiki_guns') }}: {{ $slot['guns'] }}</p>
                                           <p>{{ __('_torpedoes_barrels') }}: {{ $slot['barrels'] }}</p>
                                           <p>{{ __('_damage_per_salve') }}:
@@ -294,7 +294,7 @@
                                           <p class="wikie-details-subtitles">
                                             {{ $slot['name'] }}:
                                           </p>
-                                          <p>{{ __('_wiki_calibre') }}: {{ $slot['caliber'] }} mm</p>
+                                          <p>{{ __('_wiki_caliber') }}: {{ $slot['caliber'] }} mm</p>
                                           <p>{{ __('_wiki_guns') }}: {{ $slot['guns'] }}</p>
                                         </div>
                                       @endforeach
