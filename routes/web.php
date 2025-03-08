@@ -81,7 +81,7 @@ Route::prefix('wiki')->group(function () {
     // Then route for type matching just vehicle type
     Route::get('/{type}', [ShipController::class, 'getWikiTypePage'])
         ->name('wiki.type')
-        ->where('type', 'cruiser|destroyer|battleship|air_carrier|submarine');
+        ->where('type', 'cruiser|destroyer|battleship|aircarrier|submarine');
 
     // Home route (this is the default page for /wiki)
     Route::get('/', [ShipController::class, 'getWikiHomePage'])->name('wiki.home');

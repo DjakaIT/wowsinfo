@@ -11,11 +11,23 @@
         <div class="row mb-50">
             <div class="col-12">
                 <h1 class="page-heading">
-                    <span>{{ __('wiki_' . str_replace(' ', '', ucwords(str_replace('_', ' ', $type)))) }}</span>
+                    <span>
+                        @if ($type === 'aircarrier')
+                            {{ __('wiki_AirCarrier') }}
+                        @else
+                            {{ __('wiki_' . str_replace(' ', '', ucwords(str_replace('_', ' ', $type)))) }}
+                        @endif
+                    </span>
                 </h1>
                 <ul class="wiki-breadcrumb">
                   <li><a href="/wiki/" class="router-link-active"> Wiki </a><span> / &nbsp;</span></li>
-                  <li class="capitalize"><span>{{ __('wiki_' . str_replace(' ', '', ucwords(str_replace('_', ' ', $type)))) }}</span></li>
+                  <li class="capitalize"> <span>
+                    @if ($type === 'aircarrier')
+                        {{ __('wiki_AirCarrier') }}
+                    @else
+                        {{ __('wiki_' . str_replace(' ', '', ucwords(str_replace('_', ' ', $type)))) }}
+                    @endif
+                </span></li>
                 </ul>
             </div>
             @if($type !== 'Submarine')

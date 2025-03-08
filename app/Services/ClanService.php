@@ -109,14 +109,15 @@ class ClanService
 
     public function getTopClans()
     {
-        return Clan::select('clan_id', DB::raw('name as clan_name'), DB::raw('MAX(clanwn8) as total_clan_wn8'))
-            ->groupBy('clan_id', 'clan_name')
+        return Clan::select('clan_id', DB::raw('name as clan_name'), DB::raw('tag as tag'), DB::raw('MAX(clanwn8) as total_clan_wn8'))
+            ->groupBy('clan_id', 'clan_name', 'tag')
             ->orderByDesc('total_clan_wn8')
             ->limit(10)
             ->get()
             ->map(function ($clan) {
                 return [
                     'name' => $clan->clan_name,
+                    'tag' => $clan->tag,
                     'wid' => $clan->clan_id,
                     'wn8' => $clan->total_clan_wn8
                 ];

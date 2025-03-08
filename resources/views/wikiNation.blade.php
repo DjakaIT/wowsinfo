@@ -33,15 +33,15 @@
 								<div class="row">
 										@foreach ($type as $vehicle)
 												<div class="col-2 wiki-type-item">
-														<a href="{{ route('wiki.vehicle', [
-																'nation' => $nation,
-																'type' => $key,
-																'ship' => $vehicle['name'],
-																'shipId' => $vehicle['id']
-														]) }}">
-																<img src="{{ $vehicle['image'] }}" alt="{{ $vehicle['name'] }}">
-																<span>{{ $vehicle['name'] }}</span>
-														</a>
+													<a href="{{ route('wiki.vehicle', [
+														'nation' => $nation,
+														'type' => strtolower(str_replace(' ', '', $key)),
+														'ship' => $vehicle['name'],
+														'shipId' => $vehicle['id']
+													]) }}">
+														<img src="{{ $vehicle['image'] }}" alt="{{ $vehicle['name'] }}">
+														<span>{{ $vehicle['name'] }}</span>
+													</a>
 												</div>
 										@endforeach
 								</div>

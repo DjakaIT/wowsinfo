@@ -189,10 +189,10 @@
 											<a href="{{ route('clan.page', [
 												'locale' => app()->getLocale(),
 												'server' => strtolower(session('server', 'eu')),
-												'name' => $clan['name'],
+												'name' => $clan['tag'],
 												'id' => $clan['wid']
 											]) }}">
-												{{ $clan['name'] }}
+												{{ $clan['tag'] }}
 											</a>
 										@else
 												<span>Missing name or wid</span>

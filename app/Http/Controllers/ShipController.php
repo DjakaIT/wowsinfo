@@ -153,7 +153,7 @@ class ShipController extends Controller
                 'Cruiser',
                 'Battleship',
                 'Destroyer',
-                'Air Carrier',
+                'Aircarrier',
                 'Submarine'
             ],
         ]);
@@ -202,6 +202,12 @@ class ShipController extends Controller
 
         // Now map over the ships and prepare the data to return
 
+        if ($type === 'aircarrier') {
+            $descriptionKey = '_wiki_type_AirCarrier_description';
+        } else {
+            $descriptionKey = '_wiki_type_' . str_replace(' ', '', ucwords(str_replace('_', ' ', $type))) . '_description';
+        }
+
         $orderedShips = $shipsByType->map(fn($group) => $group->map(fn($ship) => [
             'name' => $ship->name,
             'id' => $ship->id,
@@ -215,7 +221,7 @@ class ShipController extends Controller
                 'metaKeywords' => $metaKeywords,
             ],
             'type' => $type, // Ovde ide iz parametra nacija
-            'description' =>  __('_wiki_type_' . str_replace(' ', '', ucwords(str_replace('_', ' ', $type))) . '_description'),
+            'description' => __($descriptionKey),
             'nationImages' => [
                 'usa' => 'https://wiki.wgcdn.co/images/f/f2/Wows_flag_USA.png',
                 'pan_asia' => 'https://wiki.wgcdn.co/images/3/33/Wows_flag_Pan_Asia.png',
@@ -244,6 +250,7 @@ class ShipController extends Controller
         $ship = Ship::find($shipId);
         $shipDetails = $ship->detail->toArray();
         $decodedData = json_decode($shipDetails["raw_data"], true);
+
         // CONSTRUCT MODULES
         // Base URL for images
         $imageBaseUrl = "https://wows-gloss-icons.wgcdn.co/icons/module/icon_module_";
@@ -280,6 +287,11 @@ class ShipController extends Controller
             }
         }
 
+        if ($type === 'aircarrier') {
+            $descriptionKey = '_wiki_type_AirCarrier_description';
+        } else {
+            $descriptionKey = '_wiki_type_' . str_replace(' ', '', ucwords(str_replace('_', ' ', $type))) . '_description';
+        }
         // END CONSTRUCT MODULES
         // PEFORMANCE OBJECT CREATION
         $performance = [];
@@ -299,7 +311,7 @@ class ShipController extends Controller
             ],
             'name' => $decodedData['name'],
             'image' => $decodedData['images']['large'],
-            'description' => __('_wiki_type_' . str_replace(' ', '', ucwords(str_replace('_', ' ', $type))) . '_description'),
+            'description' => __($descriptionKey),
             'nation' => $nation,
             'type' => $type,
             'tier' => $decodedData['tier'],
