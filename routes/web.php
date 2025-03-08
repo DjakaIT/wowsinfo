@@ -120,11 +120,11 @@ Route::get('/server/{server}', function ($server) {
     $currentUrl = url()->previous();
     $locale = app()->getLocale();
 
-    // If we're on a player or clan page, redirect to the new URL format
-    if (preg_match('#/[a-z]{2}/(eu|na|asia)/(player|clan)/(.+)#', $currentUrl, $matches)) {
-        $type = $matches[2]; // player or clan
-        $rest = $matches[3]; // name/id
-        return redirect("/$locale/$server/$type/$rest");
+    // Update the regex pattern to include wiki pages
+    if (preg_match('#/[a-z]{2}/(eu|na|asia)/(player|clan|wiki)(.*)#', $currentUrl, $matches)) {
+        $type = $matches[2]; // player, clan, or wiki
+        $rest = $matches[3]; // The rest of the URL (including slashes)
+        return redirect("/$locale/$server/$type$rest");
     }
 
     // Otherwise use the old behavior

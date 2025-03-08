@@ -28,9 +28,15 @@
 				@foreach ($types as $key => $type)
 						<div class="col-12">
 								<div class="row">
-										<div class="col-12 wiki-section-title">
-											<h2>{{ __('wiki_' . str_replace(' ', '', $key)) }}</h2>
-										</div>
+									<div class="col-12 wiki-section-title">
+										<h2>
+											@if(strtolower($key) === 'aircarrier' || strtolower($key) === 'air carrier')
+												{{ __('wiki_AirCarrier') }}
+											@else
+												{{ __('wiki_' . ucfirst(strtolower(str_replace(' ', '', $key)))) }}
+											@endif
+										</h2>
+									</div>
 								</div>
 								<div class="row">
 										@foreach ($type as $vehicle)

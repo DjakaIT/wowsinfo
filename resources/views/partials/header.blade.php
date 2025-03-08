@@ -46,8 +46,9 @@
         const serverOptions = document.querySelectorAll('.dropdown-menu:first-of-type .dropdown-item');
         serverOptions.forEach(option => {
             option.addEventListener('click', function() {
-                server = this.textContent.toLowerCase();
-                serverDropdown.textContent = this.textContent;
+                const newServer = this.textContent.toLowerCase();
+                // Don't just update the text, navigate to the server change URL
+                window.location.href = `/server/${newServer}`;
             });
         });
 
