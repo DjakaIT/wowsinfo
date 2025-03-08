@@ -89,8 +89,12 @@ class ShipController extends Controller
 
     // WIKI ROUTES
     // Ovo bi trebalo u kontroler za wiki
-    public function getWikiHomePage()
+    public function getWikiHomePage($locale, $server)
     {
+        // Set locale and server in session
+        app()->setLocale($locale);
+        session(['locale' => $locale, 'server' => strtoupper($server)]);
+
         $metaTitle = 'World of Warships - Battleships wiki - wows.WN8.info';
         $metaDescription = 'World of Warships battleships information wiki page';
         $metaKeywords = 'WN8, World of Warships, ship, ships, warships, warship, wiki, battleships, battleship, description, information, info, modules, configuration';
@@ -159,8 +163,12 @@ class ShipController extends Controller
         ]);
     }
 
-    public function getWikiNationPage($nation)
+    public function getWikiNationPage($locale, $server, $nation)
     {
+        // Set locale and server
+        app()->setLocale($locale);
+        session(['locale' => $locale, 'server' => strtoupper($server)]);
+
         $metaTitle = 'World of Warships - Battleships wiki - wows.WN8.info';
         $metaDescription = 'World of Warships battleships information wiki page';
         $metaKeywords = 'WN8, World of Warships, ship, ships, warships, warship, wiki, battleships, battleship, description, information, info, modules, configuration';
@@ -188,8 +196,12 @@ class ShipController extends Controller
         ]);
     }
 
-    public function getWikiTypePage($type)
+    public function getWikiTypePage($locale, $server, $type)
     {
+        // Set locale and server
+        app()->setLocale($locale);
+        session(['locale' => $locale, 'server' => strtoupper($server)]);
+
         $metaTitle = 'World of Warships - Battleships wiki - wows.WN8.info';
         $metaDescription = 'World of Warships battleships information wiki page';
         $metaKeywords = 'WN8, World of Warships, ship, ships, warships, warship, wiki, battleships, battleship, description, information, info, modules, configuration';
@@ -241,8 +253,12 @@ class ShipController extends Controller
         ]);
     }
 
-    public function getWikiVehiclePage($nation, $type, $ship)
+    public function getWikiVehiclePage($locale, $server, $nation, $type, $ship)
     {
+        // Set locale and server
+        app()->setLocale($locale);
+        session(['locale' => $locale, 'server' => strtoupper($server)]);
+
         $metaTitle = 'World of Warships - Battleships wiki - wows.WN8.info';
         $metaDescription = 'World of Warships battleships information wiki page';
         $metaKeywords = 'WN8, World of Warships, ship, ships, warships, warship, wiki, battleships, battleship, description, information, info, modules, configuration';

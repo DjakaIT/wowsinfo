@@ -68,24 +68,20 @@ Route::get('/{locale}/{server}/clan/{name}/{id}', [ClanController::class, 'getCl
     ->where('server', 'eu|na|asia');
 
 // Wiki - group 
-Route::prefix('wiki')->group(function () {
-    // Most specific route first, matching 3 parameters
-    Route::get('/{nation}/{type}/{ship}', [ShipController::class, 'getWikiVehiclePage'])
-        ->name('wiki.vehicle');
-
-    // Next, more general route matching just nation
-    Route::get('/{nation}', [ShipController::class, 'getWikiNationPage'])
-        ->name('wiki.nation')
-        ->where('nation', 'usa|germany|japan|pan_asia|ussr|europe|uk|netherlands|italy|france|commonwealth|spain|pan_america');
-
-    // Then route for type matching just vehicle type
-    Route::get('/{type}', [ShipController::class, 'getWikiTypePage'])
-        ->name('wiki.type')
-        ->where('type', 'cruiser|destroyer|battleship|aircarrier|submarine');
-
-    // Home route (this is the default page for /wiki)
+Route::prefix('{locale}/{server}/wiki')->group(function () {
     Route::get('/', [ShipController::class, 'getWikiHomePage'])->name('wiki.home');
-});
+    Route::get('/nation/{nation}', [ShipController::class, 'getWikiNationPage'])->name('wiki.nation');
+    Route::get('/type/{type}', [ShipController::class, 'getWikiTypePage'])->name('wiki.type');
+    Route::get('/vehicle/{nation}/{type}/{ship}', [ShipController::class, 'getWikiVehiclePage'])->name('wiki.vehicle');
+})->where([
+    'locale' => implode('|', config('app.available_locales')),
+    'server' => 'eu|na|asia'
+]);
+
+// Add a redirect for the old wiki URLs
+Route::redirect('/wiki', '/' . app()->getLocale() . '/eu/wiki');
+Route::redirect('/wiki/nation/{nation}', '/' . app()->getLocale() . '/eu/wiki/nation/{nation}');
+Route::redirect('/wiki/type/{type}', '/' . app()->getLocale() . '/eu/wiki/type/{type}');
 // FAQ
 Route::view('/faq', 'faq', [
     'metaSite' => [
@@ -141,16 +137,17 @@ Route::get('locale/{locale}', function ($locale) {
         $currentUrl = url()->previous();
         $server = strtolower(session('server', 'eu'));
 
-        // If we're on a player or clan page, redirect to the new URL format
-        if (preg_match('#/[a-z]{2}/(eu|na|asia)/(player|clan)/(.+)#', $currentUrl, $matches)) {
+        // If we're on a player, clan, or wiki page, redirect to the new URL format with updated locale
+        if (preg_match('#/[a-z]{2}/(eu|na|asia)/(player|clan|wiki)(.*)#', $currentUrl, $matches)) {
             $server = $matches[1];
-            $type = $matches[2]; // player or clan
-            $rest = $matches[3]; // name/id
-            return redirect("/$locale/$server/$type/$rest");
+            $type = $matches[2]; // player, clan, or wiki
+            $rest = $matches[3]; // The rest of the URL (including slashes)
+            return redirect("/$locale/$server/$type$rest");
         }
 
         // Otherwise use the old behavior
         Session::put('locale', $locale);
+        app()->setLocale($locale);
         return redirect()->back();
     }
 

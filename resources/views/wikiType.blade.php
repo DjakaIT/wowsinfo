@@ -1,4 +1,3 @@
-
 @extends('layout.layout')
 
 @section('metaTitle', __('seo_wiki_type_title'))
@@ -20,7 +19,10 @@
                     </span>
                 </h1>
                 <ul class="wiki-breadcrumb">
-                  <li><a href="/wiki/" class="router-link-active"> Wiki </a><span> / &nbsp;</span></li>
+                  <li><a href="{{ route('wiki.home', [
+                      'locale' => app()->getLocale(),
+                      'server' => strtolower(session('server', 'eu'))
+                  ]) }}" class="router-link-active"> Wiki </a><span> / &nbsp;</span></li>
                   <li class="capitalize"> <span>
                     @if ($type === 'aircarrier')
                         {{ __('wiki_AirCarrier') }}
@@ -52,6 +54,8 @@
                         @foreach($nation as $vehicle)
                             <div class="col-2 wiki-type-item">
                                 <a href="{{ route('wiki.vehicle', [
+                                    'locale' => app()->getLocale(),
+                                    'server' => strtolower(session('server', 'eu')),
                                     'nation' => $key,
                                     'type' => $type,
                                     'ship' => $vehicle['name'],

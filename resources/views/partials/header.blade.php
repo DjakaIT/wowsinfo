@@ -213,7 +213,22 @@
 
     function changeLanguage() {
     var locale = document.getElementById('language').value;
-    window.location.href = '/locale/' + locale;
+    
+    // Get current URL to check if we're on a locale-aware page
+    const currentPath = window.location.pathname;
+    const match = currentPath.match(/^\/([a-z]{2})\/(eu|na|asia)\/(wiki|player|clan)(.*)$/);
+    
+    if (match) {
+        // If we're on a locale-aware page, just change the locale part
+        const currentLocale = match[1];
+        const server = match[2];
+        const type = match[3];
+        const rest = match[4];
+        window.location.href = `/${locale}/${server}/${type}${rest}`;
+    } else {
+        // Otherwise use the old route
+        window.location.href = '/locale/' + locale;
+    }
 }
 
 </script>
@@ -231,7 +246,10 @@
 				<a class="nav-link" href="/">{{ __('nav_home') }}</a>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link" href="/wiki">{{ __('nav_wiki') }}</a>
+				<a class="nav-link" href="{{ route('wiki.home', [
+                'locale' => app()->getLocale(),
+                'server' => strtolower(session('server', 'eu'))
+            ]) }}">{{ __('nav_wiki') }}</a>
 			</li>
 			<li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">

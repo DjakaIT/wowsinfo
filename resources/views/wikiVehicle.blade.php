@@ -1,4 +1,3 @@
-
 @extends('layout.layout')
 
 @section('metaTitle', __('seo_wiki_vehicle_title'))
@@ -25,9 +24,22 @@
                     <div class="col-12">
                         <h1 class="page-heading">{{ $name }}</h1>
                         <ul class="wiki-breadcrumb">
-                          <li><a href="/wiki/" class="router-link-active"> Wiki </a><span> / &nbsp;</span></li>
-                          <li><a href="{{ route('wiki.nation', ['nation' => $nation]) }}" class="router-link-active">{{ $nation }}</a><span> / &nbsp;</span></li>
-                          <li><a href="{{ route('wiki.type', ['type' => $type]) }}" class="router-link-active">{{ $type }}</a><span> / &nbsp;</span></li>
+                          <li><a href="{{ route('wiki.home', [
+    'locale' => app()->getLocale(),
+    'server' => strtolower(session('server', 'eu'))
+]) }}" class="router-link-active"> Wiki </a><span> / &nbsp;</span></li>
+
+<li><a href="{{ route('wiki.nation', [
+    'locale' => app()->getLocale(),
+    'server' => strtolower(session('server', 'eu')),
+    'nation' => $nation
+]) }}" class="router-link-active">{{ $nation }}</a><span> / &nbsp;</span></li>
+
+<li><a href="{{ route('wiki.type', [
+    'locale' => app()->getLocale(),
+    'server' => strtolower(session('server', 'eu')),
+    'type' => $type
+]) }}" class="router-link-active">{{ $type }}</a><span> / &nbsp;</span></li>
                           <li><span>{{ $name }}</span></li>
                         </ul>
                     </div>

@@ -1,4 +1,3 @@
-
 @extends('layout.layout')
 
 @section('metaTitle', __('seo_wiki_nation_title'))
@@ -12,7 +11,10 @@
         <div class="col-12">
           <h1 class="page-heading">{{ ucfirst($nation) }}</h1>
           <ul class="wiki-breadcrumb">
-						<li><a href="/wiki/" class="router-link-active"> Wiki </a><span> / &nbsp;</span></li>
+						<li><a href="{{ route('wiki.home', [
+    'locale' => app()->getLocale(),
+    'server' => strtolower(session('server', 'eu'))
+]) }}" class="router-link-active"> Wiki </a><span> / &nbsp;</span></li>
 						<li><span>{{ $nation }}</span></li>
 					</ul>
         </div>
@@ -34,6 +36,8 @@
 										@foreach ($type as $vehicle)
 												<div class="col-2 wiki-type-item">
 													<a href="{{ route('wiki.vehicle', [
+														'locale' => app()->getLocale(),
+														'server' => strtolower(session('server', 'eu')),
 														'nation' => $nation,
 														'type' => strtolower(str_replace(' ', '', $key)),
 														'ship' => $vehicle['name'],

@@ -14,7 +14,11 @@
 		<div class="wiki-nation-group mb-50">
 			@foreach ($nations as $nation)
 				<div class="wiki-nation-item">
-					<a href="{{ route('wiki.nation', ['nation' => $nation]) }}">
+					<a href="{{ route('wiki.nation', [
+					    'locale' => app()->getLocale(),
+					    'server' => strtolower(session('server', 'eu')),
+					    'nation' => $nation
+					]) }}">
 						<img src="{{ $nationImages[$nation] }}" />
 					</a>
 				</div>
@@ -24,7 +28,11 @@
 		<div class="wiki-type-group-home">
 			@foreach ($types as $type)
 				<div class="wiki-type-item">
-					<a href="{{ route('wiki.type', ['type' => strtolower($type)]) }}">
+					<a href="{{ route('wiki.type', [
+					    'locale' => app()->getLocale(), 
+					    'server' => strtolower(session('server', 'eu')),
+					    'type' => strtolower($type)
+					]) }}">
 						<img src="{{ asset('images/' . $type . '.png') }}" />
 						@if ($type === 'Aircarrier')
 							<span>{{ __('wiki_AirCarrier') }}</span>
