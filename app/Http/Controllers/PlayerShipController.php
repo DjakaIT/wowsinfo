@@ -168,4 +168,30 @@ class PlayerShipController extends Controller
     {
         $this->playerShipService->getNullNamePlayersNames();
     }
+
+
+    public function updatePlayerStatsByUsername(Request $request)
+    {
+        $username = $request->input('username');
+
+        if (empty($username)) {
+            return response()->json(['success' => false, 'message' => 'No username provided']);
+        }
+
+        Log::info("Updating stats for player by username", ['username' => $username]);
+
+        $result = $this->playerShipService->fetchPlayerStatsByUsername($username);
+
+        if ($result) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Player stats updated successfully'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update player stats. Player might not exist.'
+            ]);
+        }
+    }
 }

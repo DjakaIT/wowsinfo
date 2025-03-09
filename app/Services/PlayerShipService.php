@@ -1279,4 +1279,51 @@ class PlayerShipService
 
         return false;
     }
+
+
+    public function fetchPlayerStatsByUsername($username)
+    {
+        Log::info("Attempting to fetch stats for player by username", ['username' => $username]);
+
+        // First try to find the account_id in our database
+        $playerShip = PlayerShip::where('player_name', $username)->first();
+
+        if ($playerShip) {
+            Log::info("Found player in database", ['username' => $username, 'account_id' => $playerShip->account_id]);
+            // Player exists in our database, use the existing account_id
+            return $this->fetchSinglePlayerStats($username, $playerShip->account_id);
+        } else {
+            Log::info("Player not found in database, searching via API", ['username' => $username]);
+            // Player not found in our database, search via the API
+            foreach ($this->baseUrls as $serverKey => $baseUrl) {
+                $url = $baseUrl . "/wows/account/list/";
+
+                $response = Http::get($url, [
+                    'application_id' => $this->apiKey,
+                    'search' => $username,
+                    'limit' => 1
+                ]);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+
+                    if (isset($data['data']) && count($data['data']) > 0) {
+                        $accountData = $data['data'][0];
+                        $accountId = $accountData['account_id'];
+                        $accountName = $accountData['nickname'];
+
+                        Log::info("Found player via API", ['username' => $username, 'account_id' => $accountId]);
+
+                        // Now that we have the account_id, fetch the stats
+                        return $this->fetchSinglePlayerStats($accountName, $accountId);
+                    }
+                }
+
+                Log::warning("Failed to find player on server", ['username' => $username, 'server' => $serverKey]);
+            }
+
+            Log::error("Player not found on any server", ['username' => $username]);
+            return false;
+        }
+    }
 }

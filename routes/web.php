@@ -240,4 +240,9 @@ Route::prefix('player-stats')->group(function () {
     Route::put('/{id}', [PlayerStatisticController::class, 'update']);
     Route::delete('/{id}', [PlayerStatisticController::class, 'destroy']);
 });
+
+
+Route::post('/update-player-stats', [PlayerShipController::class, 'updatePlayerStatsByUsername'])->name('update.player.stats');
+
+
 //END OF BACKEND ROUTES
