@@ -18,9 +18,9 @@
     <div class="container">
       <div class="row">
         <div class="col-12" class="image-page">
-          <h1>Welcome <span id="userNameDashboard"></span></h1>
-          <p>At this page you can force update of your own statistic.</p>
-          <div>Update stats</div>
+          <h1>{{ __('dashboard_welcome') }} <span id="userNameDashboard"></span></h1>
+          <p>{{ __('dashboard_description') }}</p>
+          <div>{{ __('dashboard_update') }}</div>
         </div>
       </div>
     </div>

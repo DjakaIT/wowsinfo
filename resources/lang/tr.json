@@ -232,5 +232,14 @@
 "win_rate": "Kazanma oranı",
 "last_battle": "Son savaş",
 "position": "Pozisyon",
-"joined": "Katıldı"
+"joined": "Katıldı",
+"clan_exec_officer": "İcra Memuru",
+"clan_rec_officer": "İşe Alma Memuru",
+"clan_private": "Rütbe Er",
+"clan_commander": "Komutan",
+"clan_officer": "Memur",
+"clan_commisioned_officer": "Onbaşı",
+"dashboard_welcome": "Hoş Geldiniz",
+"dashboard_description": "Açıklama",
+"dashboard_update": "Güncelle"
 }

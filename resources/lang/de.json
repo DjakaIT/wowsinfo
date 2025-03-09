@@ -230,5 +230,15 @@
 "win_rate": "Siegesrate",
 "last_battle": "Letztes Gefecht",
 "position": "Position",
-"joined": "Beigetreten"
+"joined": "Beigetreten",
+  "clan_exec_officer": "Ausführender Offizier",
+  "clan_rec_officer": "Rekrutierungsoffizier",
+  "clan_private": "Matrose",
+  "clan_commander": "Kommandant",
+  "clan_officer": "Offizier",
+  "clan_commisioned_officer": "Unteroffizier",
+  "dashboard_welcome": "Willkommen",
+  "dashboard_description": "Beschreibung",
+  "dashboard_update": "Update"
+
 }

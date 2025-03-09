@@ -230,5 +230,14 @@
 "win_rate": "Taxa de vitórias",
 "last_battle": "Última batalha",
 "position": "Posição",
-"joined": "Ingressou"
+"joined": "Ingressou",
+"clan_exec_officer": "Oficial Executivo",
+    "clan_rec_officer": "Oficial de recrutamento",
+    "clan_private": "Patente Soldado",
+    "clan_commander": "Comandante",
+    "clan_officer": "Oficial",
+    "clan_commisioned_officer": "Cabo",
+    "dashboard_welcome": "Bem-vindo",
+    "dashboard_description": "Descrição",
+    "dashboard_update": "Atualizar"
 }

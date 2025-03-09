@@ -230,5 +230,14 @@
 "win_rate": "Rată de victorie",
 "last_battle": "Ultima bătălie",
 "position": "Poziție",
-"joined": "Alăturat"
+"joined": "Alăturat",
+"clan_exec_officer": "Ofițer executiv",
+    "clan_rec_officer": "Ofițer de recrutare",
+    "clan_private": "Rang Privat",
+    "clan_commander": "Comandant",
+    "clan_officer": "Ofițer",
+    "clan_commisioned_officer": "Caporal",
+    "dashboard_welcome": "Bun venit",
+    "dashboard_description": "Descriere",
+    "dashboard_update": "Actualizare"
 }

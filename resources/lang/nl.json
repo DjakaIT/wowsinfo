@@ -232,5 +232,14 @@
 "win_rate": "Winstpercentage",
 "last_battle": "Laatste gevecht",
 "position": "Positie",
-"joined": "Toegetreden"
+"joined": "Toegetreden",
+"clan_exec_officer": "Uitvoerend ambtenaar",
+"clan_rec_officer": "Wervingsambtenaar",
+"clan_private": "Rang soldaat",
+"clan_commander": "Commandant",
+"clan_officer": "Agent",
+"clan_commisioned_officer": "Korporaal",
+"dashboard_welcome": "Welkom",
+"dashboard_description": "Beschrijving",
+"dashboard_update": "Update"
 }

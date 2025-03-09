@@ -231,5 +231,14 @@
 "win_rate": "Percentuale vittorie",
 "last_battle": "Ultima battaglia",
 "position": "Posizione",
-"joined": "Iscritto"
+"joined": "Iscritto",
+"clan_exec_officer": "Ufficiale esecutivo",
+    "clan_rec_officer": "Ufficiale reclutamento",
+    "clan_private": "Grado soldato semplice",
+    "clan_commander": "Comandante",
+    "clan_officer": "Ufficiale",
+    "clan_commisioned_officer": "Caporale",
+    "dashboard_welcome": "Benvenuto",
+    "dashboard_description": "Descrizione",
+    "dashboard_update": "Aggiorna"
 }

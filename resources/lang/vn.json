@@ -230,5 +230,14 @@
 "win_rate": "Tỷ lệ thắng",
 "last_battle": "Trận đấu gần nhất",
 "position": "Vị trí",
-"joined": "Đã tham gia"
+"joined": "Đã tham gia",
+"clan_exec_officer": "Sĩ quan điều hành",
+    "clan_rec_officer": "Sĩ quan tuyển dụng",
+    "clan_private": "Cấp bậc Binh nhì",
+    "clan_commander": "Chỉ huy",
+    "clan_officer": "Sĩ quan",
+    "clan_commisioned_officer": "Hạ sĩ",
+    "dashboard_welcome": "Chào mừng",
+    "dashboard_description": "Mô tả",
+    "dashboard_update": "Cập nhật"
 }

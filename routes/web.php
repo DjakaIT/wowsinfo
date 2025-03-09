@@ -72,7 +72,7 @@ Route::prefix('{locale}/{server}/wiki')->group(function () {
     Route::get('/', [ShipController::class, 'getWikiHomePage'])->name('wiki.home');
     Route::get('/nation/{nation}', [ShipController::class, 'getWikiNationPage'])->name('wiki.nation');
     Route::get('/type/{type}', [ShipController::class, 'getWikiTypePage'])->name('wiki.type');
-    Route::get('/vehicle/{nation}/{type}/{ship}', [ShipController::class, 'getWikiVehiclePage'])->name('wiki.vehicle');
+    Route::get('/vehicle/{nation}/{type}/{ship}/{shipId}', [ShipController::class, 'getWikiVehiclePage'])->name('wiki.vehicle');
 })->where([
     'locale' => implode('|', config('app.available_locales')),
     'server' => 'eu|na|asia'

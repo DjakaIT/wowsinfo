@@ -230,6 +230,15 @@
 "win_rate": "Porcentaje de victorias",
 "last_battle": "Última batalla",
 "position": "Posición",
-"joined": "Unido"
+"joined": "Unido",
+"clan_exec_officer": "Oficial ejecutivo",
+    "clan_rec_officer": "Oficial de reclutamiento",
+    "clan_private": "Rango Soldado",
+    "clan_commander": "Comandante",
+    "clan_officer": "Oficial",
+    "clan_commisioned_officer": "Cabo",
+    "dashboard_welcome": "Bienvenido",
+    "dashboard_description": "Descripción",
+    "dashboard_update": "Actualizar"
 }
 

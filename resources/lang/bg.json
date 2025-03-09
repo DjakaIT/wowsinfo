@@ -230,5 +230,14 @@
 "win_rate": "Процент победи",
 "last_battle": "Последна битка",
 "position": "Позиция",
-"joined": "Присъединен"
+"joined": "Присъединен",
+"clan_exec_officer": "Изпълнителен офицер",
+    "clan_rec_officer": "Служител по набиране на персонал",
+    "clan_private": "Ранг частен",
+    "clan_commander": "Командир",
+    "clan_officer": "Офицер",
+    "clan_commisioned_officer": "Ефрейтор",
+    "dashboard_welcome": "Добре дошли",
+    "dashboard_description": "Описание",
+    "dashboard_update": "Актуализация"
 }

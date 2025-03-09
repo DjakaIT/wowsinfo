@@ -230,5 +230,14 @@
 "win_rate": "Vinstfrekvens",
 "last_battle": "Senaste strid",
 "position": "Position",
-"joined": "Gick med"
+"joined": "Gick med",
+"clan_exec_officer": "Executive Officer",
+    "clan_rec_officer": "Rekryteringsansvarig",
+    "clan_private": "Rank privat",
+    "clan_commander": "Befälhavare",
+    "clan_officer": "Officer",
+    "clan_commisioned_officer": "Korporal",
+    "dashboard_welcome": "Välkommen",
+    "dashboard_description": "Beskrivning",
+    "dashboard_update": "Uppdatera"
 }

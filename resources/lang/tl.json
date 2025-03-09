@@ -229,5 +229,14 @@
 "win_rate": "Porsyento ng panalo",
 "last_battle": "Huling labanan",
 "position": "Posisyon",
-"joined": "Sumali"
+"joined": "Sumali",
+"clan_exec_officer": "เจ้าหน้าที่บริหาร",
+"clan_rec_officer": "เจ้าหน้าที่รับสมัคร",
+"clan_private": "ยศสามัญ",
+"clan_commander": "ผู้บังคับบัญชา",
+"clan_officer": "เจ้าหน้าที่",
+"clan_commisioned_officer": "สิบเอก",
+"dashboard_welcome": "ยินดีต้อนรับ",
+"dashboard_description": "คำอธิบาย",
+"dashboard_update": "อัปเดต"
 }

@@ -228,5 +228,14 @@
 "win_rate": "Voittoprosentti",
 "last_battle": "Viimeisin taistelu",
 "position": "Sijainti",
-"joined": "Liittynyt"
+"joined": "Liittynyt",
+"clan_exec_officer": "Toimitusjohtaja",
+"clan_rec_officer": "Rekrytointivastaava",
+"clan_private": "Yksityinen sijoitus",
+"clan_commander": "Komentaja",
+"clan_officer": "Toimija",
+"clan_commisioned_officer": "Korpraali",
+"dashboard_welcome": "Tervetuloa",
+"dashboard_description": "Kuvaus",
+"dashboard_update": "Päivitä"
 }

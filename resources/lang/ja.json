@@ -231,5 +231,14 @@
 "win_rate": "勝率",
 "last_battle": "最後の戦闘",
 "position": "ポジション",
-"joined": "参加"
+"joined": "参加",
+"clan_exec_officer": "執行官",
+"clan_rec_officer": "採用担当官",
+"clan_private": "階級 二等兵",
+"clan_commander": "指揮官",
+"clan_officer": "士官",
+"clan_commisioned_officer": "伍長",
+"dashboard_welcome": "ようこそ",
+"dashboard_description": "説明",
+"dashboard_update": "更新"
 }

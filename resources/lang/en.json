@@ -229,6 +229,15 @@
 "win_rate": "Win rate",
 "last_battle": "Last battle",
 "position": "Position",
-"joined": "Joined"
+"joined": "Joined",
+"clan_exec_officer" : "Executive officer",
+"clan_rec_officer" : "Recruiting officer",
+"clan_private" : "Rank Private",
+"clan_commander" : "Commander",
+"clan_officer" : "Officer",
+"clan_commisioned_officer" : "Commissioned officer",
+"dashboard_welcome"  : "Welcome",
+"dashboard_description" : "Description",
+"dashboard_update" : "Update"
 
 }

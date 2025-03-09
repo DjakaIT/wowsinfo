@@ -230,5 +230,14 @@
 "win_rate": "Wenskoers",
 "last_battle": "Laaste geveg",
 "position": "Posisie",
-"joined": "Aangesluit"
+"joined": "Aangesluit",
+"clan_exec_officer": "Uitvoerende Beampte",
+"clan_rec_officer": "Werwingsbeampte",
+"clan_private": "Rank privaat",
+"clan_commander": "Bevelvoerder",
+"clan_officer": "Beampte",
+"clan_commisioned_officer": "Korporaal",
+"dashboard_welcome": "Welkom",
+"dashboard_description": "Beskrywing",
+"dashboard_update": "Dateer op"
 }

@@ -230,5 +230,14 @@
 "win_rate": "Győzelmi arány",
 "last_battle": "Utolsó csata",
 "position": "Pozíció",
-"joined": "Csatlakozott"
+"joined": "Csatlakozott",
+"clan_exec_officer": "Végvezető tiszt",
+    "clan_rec_officer": "Toborzási tiszt",
+    "clan_private": "Privát helyezés",
+    "clan_commander": "Parancsnok",
+    "clan_officer": "Tiszt",
+    "clan_commisioned_officer": "tizedes",
+    "dashboard_welcome": "Üdvözöljük",
+    "dashboard_description": "Leírás",
+    "dashboard_update": "Frissítés"
 }

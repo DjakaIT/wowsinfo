@@ -231,5 +231,14 @@
 "win_rate": "Wskaźnik wygranych",
 "last_battle": "Ostatnia bitwa",
 "position": "Pozycja",
-"joined": "Dołączył"
+"joined": "Dołączył",
+"clan_exec_officer": "Oficer wykonawczy",
+"clan_rec_officer": "Oficer ds. rekrutacji",
+"clan_private": "Szeregowy rangą",
+"clan_commander": "Dowódca",
+"clan_officer": "Oficer",
+"clan_commisioned_officer": "Kapral",
+"dashboard_welcome": "Witaj",
+"dashboard_description": "Opis",
+"dashboard_update": "Aktualizacja"
 }

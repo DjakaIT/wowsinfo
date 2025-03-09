@@ -231,5 +231,14 @@
 "win_rate": "Taux de victoire",
 "last_battle": "Dernière bataille",
 "position": "Position",
-"joined": "Rejoint"
+"joined": "Rejoint",
+"clan_exec_officer": "Officier exécutif",
+"clan_rec_officer": "Officier de recrutement",
+"clan_private": "Rang Soldat",
+"clan_commander": "Commandant",
+"clan_officer": "Officier",
+"clan_commisioned_officer": "Caporal",
+"dashboard_welcome": "Bienvenue",
+"dashboard_description": "Description",
+"dashboard_update": "Mise à jour"
 }

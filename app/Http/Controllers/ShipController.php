@@ -262,9 +262,30 @@ class ShipController extends Controller
         $metaTitle = 'World of Warships - Battleships wiki - wows.WN8.info';
         $metaDescription = 'World of Warships battleships information wiki page';
         $metaKeywords = 'WN8, World of Warships, ship, ships, warships, warship, wiki, battleships, battleship, description, information, info, modules, configuration';
+
+        // Use the ship name from the URL to find the ship instead of query parameter
         $shipId = request()->query('shipId');
-        $ship = Ship::find($shipId);
-        $shipDetails = $ship->detail->toArray();
+        $shipModel = null;
+
+        if ($shipId) {
+            // Try the query parameter first if available
+            $shipModel = Ship::find($shipId);
+        }
+
+        // If not found by ID, try to find by name, nation, and type
+        if (!$shipModel) {
+            $shipModel = Ship::where('name', $ship)
+                ->where('nation', $nation)
+                ->where('type', $type)
+                ->first();
+        }
+
+        // If still not found, return 404
+        if (!$shipModel) {
+            abort(404, 'Ship not found');
+        }
+
+        $shipDetails = $shipModel->detail->toArray();
         $decodedData = json_decode($shipDetails["raw_data"], true);
 
         // CONSTRUCT MODULES

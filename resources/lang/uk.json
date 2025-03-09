@@ -230,5 +230,14 @@
 "win_rate": "Відсоток перемог",
 "last_battle": "Останній бій",
 "position": "Позиція",
-"joined": "Приєднався"
+"joined": "Приєднався",
+"clan_exec_officer": "Виконавчий офіцер",
+"clan_rec_officer": "Офіцер з вербування",
+"clan_private": "Звання приватного",
+"clan_commander": "Командир",
+"clan_officer": "Офіцер",
+"clan_commisioned_officer": "Капрал",
+"dashboard_welcome": "Ласкаво просимо",
+"dashboard_description": "Опис",
+"dashboard_update": "Оновити"
 }

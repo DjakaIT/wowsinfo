@@ -232,5 +232,14 @@
 "win_rate": "승률",
 "last_battle": "마지막 전투",
 "position": "위치",
-"joined": "가입"
+"joined": "가입",
+"clan_exec_officer": "임원",
+"clan_rec_officer": "모집 담당자",
+"clan_private": "계급 사병",
+"clan_commander": "사령관",
+"clan_officer": "장교",
+"clan_commisioned_officer": "상병",
+"dashboard_welcome": "환영합니다",
+"dashboard_description": "설명",
+"dashboard_update": "업데이트"
 }

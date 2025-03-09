@@ -230,5 +230,14 @@
 "win_rate": "Проценат победа",
 "last_battle": "Последња битка",
 "position": "Позиција",
-"joined": "Придружен"
+"joined": "Придружен",
+"clan_exec_officer": "Извршни службеник",
+    "clan_rec_officer": "Службеник за запошљавање",
+    "clan_private": "Приватан ранг",
+    "clan_commander": "Командант",
+    "clan_officer": "Службеник",
+    "clan_commisioned_officer": "Десетник",
+    "dashboard_welcome": "Добро дошли",
+    "dashboard_description": "Опис",
+    "dashboard_update": "Ажурирај"
 }

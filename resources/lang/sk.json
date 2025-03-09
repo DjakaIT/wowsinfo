@@ -228,5 +228,14 @@
 "win_rate": "Miera výhier",
 "last_battle": "Posledná bitka",
 "position": "Pozícia",
-"joined": "Pripojený"
+"joined": "Pripojený",
+"clan_exec_officer": "Výkonný dôstojník",
+"clan_rec_officer": "Náborový dôstojník",
+"clan_private": "Hodnotenie súkromné",
+"clan_commander": "Veliteľ",
+"clan_officer": "Dôstojník",
+"clan_commisioned_officer": "Desiatnik",
+"dashboard_welcome": "Vitajte",
+"dashboard_description": "Popis",
+"dashboard_update": "Aktualizovať"
 }

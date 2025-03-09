@@ -53,7 +53,30 @@
                 <td class="py-2 px-4">{{ $member['winRate'] }}</td>
                 <td class="py-2 px-4">{{ $member['battles'] }}</td>
                 <td class="py-2 px-4">{{ $member['lastBattle'] }}</td>
-                <td class="py-2 px-4">{{ $member['position'] }}</td>
+                <td class="py-2 px-4">
+                    @switch(strtolower($member['position']))
+                        @case('executive_officer')
+                            {{ __('clan_exec_officer') }}
+                            @break
+                        @case('recruitment_officer')
+                            {{ __('clan_rec_officer') }}
+                            @break
+                        @case('private')
+                            {{ __('clan_private') }}
+                            @break
+                        @case('commander')
+                            {{ __('clan_commander') }}
+                            @break
+                        @case('officer')
+                            {{ __('clan_officer') }}
+                            @break
+                        @case('commissioned_officer')
+                            {{ __('clan_commisioned_officer') }}
+                            @break
+                        @default
+                            {{ $member['position'] }}
+                    @endswitch
+                </td>
                 <td class="py-2 px-4">{{ $member['joined'] }}</td>
             </tr>
           @endforeach

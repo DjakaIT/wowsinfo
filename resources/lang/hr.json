@@ -232,5 +232,14 @@
    "win_rate": "Postotak pobjeda",
    "last_battle": "Posljednja bitka",
    "position": "Pozicija",
-   "joined": "Učlanjen"
+   "joined": "Učlanjen",
+   "clan_exec_officer": "Izvršni dužnosnik",
+    "clan_rec_officer": "Službenik za zapošljavanje",
+    "clan_private": "Rank privatni",
+    "clan_commander": "Zapovjednik",
+    "clan_officer": "Časnik",
+    "clan_commisioned_officer": "Desetar",
+    "dashboard_welcome": "Dobro došli",
+    "dashboard_description": "Opis",
+    "dashboard_update": "Ažuriraj"
   }

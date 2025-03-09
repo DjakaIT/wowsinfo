@@ -229,5 +229,14 @@
 "win_rate": "نسبة الفوز",
 "last_battle": "آخر معركة",
 "position": "المركز",
-"joined": "انضم"
+"joined": "انضم",
+"clan_exec_officer": "ضابط تنفيذي",
+"clan_rec_officer": "ضابط تجنيد",
+"clan_private": "رتبة خاصة",
+"clan_commander": "قائد",
+"clan_officer": "ضابط",
+"clan_commisioned_officer": "عريف",
+"dashboard_welcome": "مرحبًا",
+"dashboard_description": "الوصف",
+"dashboard_update": "تحديث"
 }

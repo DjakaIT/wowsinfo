@@ -230,5 +230,14 @@
 "win_rate": "Poměr výher",
 "last_battle": "Poslední bitva",
 "position": "Pozice",
-"joined": "Připojen"
+"joined": "Připojen",
+"clan_exec_officer": "Výkonný ředitel",
+    "clan_rec_officer": "Náborový úředník",
+    "clan_private": "Hodnocení soukromé",
+    "clan_commander": "Velitel",
+    "clan_officer": "Důstojník",
+    "clan_commisioned_officer": "desátník",
+    "dashboard_welcome": "Vítejte",
+    "dashboard_description": "Popis",
+    "dashboard_update": "Aktualizovat"
 }

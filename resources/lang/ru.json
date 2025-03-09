@@ -230,5 +230,14 @@
 "win_rate": "Процент побед",
 "last_battle": "Последний бой",
 "position": "Позиция",
-"joined": "Присоединился"
+"joined": "Присоединился",
+"clan_exec_officer": "Исполнительный директор",
+"clan_rec_officer": "Офицер по набору персонала",
+"clan_private": "Ранг Рядовой",
+"clan_commander": "Командир",
+"clan_officer": "Офицер",
+"clan_commisioned_officer": "Капрал",
+"dashboard_welcome": "Добро пожаловать",
+"dashboard_description": "Описание",
+"dashboard_update": "Обновление"
 }

@@ -230,6 +230,15 @@
 "win_rate": "Ποσοστό νίκης",
 "last_battle": "Τελευταία μάχη",
 "position": "Θέση",
-"joined": "Εντάχθηκε"
+"joined": "Εντάχθηκε",
+"clan_exec_officer": "Εκτελεστικός Διευθυντής",
+"clan_rec_officer": "Αξιωματικός πρόσληψης",
+"clan_private": "Κατάταξη Ιδιωτικού",
+"clan_commander": "Διοικητής",
+"clan_officer": "Αξιωματικός",
+"clan_commisioned_officer": "Δεκανέας",
+"dashboard_welcome": "Καλώς ήρθατε",
+"dashboard_description": "Περιγραφή",
+"dashboard_update": "Ενημέρωση"
 
 }
