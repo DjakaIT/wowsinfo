@@ -157,6 +157,8 @@ Route::get('locale/{locale}', function ($locale) {
 
 //TO DO: API PARAMETERS FOR SHIP ROUTE
 
+Route::post('/api/player/lookup', [PlayerShipController::class, 'getAccountIdByUsername'])->name('api.player.lookup');
+
 
 Route::prefix('clans')->group(function () {
 

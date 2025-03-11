@@ -170,28 +170,20 @@ class PlayerShipController extends Controller
     }
 
 
-    public function updatePlayerStatsByUsername(Request $request)
+
+    public function getAccountIdByUsername(Request $request)
     {
         $username = $request->input('username');
 
         if (empty($username)) {
-            return response()->json(['success' => false, 'message' => 'No username provided']);
-        }
-
-        Log::info("Updating stats for player by username", ['username' => $username]);
-
-        $result = $this->playerShipService->fetchPlayerStatsByUsername($username);
-
-        if ($result) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Player stats updated successfully'
-            ]);
-        } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to update player stats. Player might not exist.'
-            ]);
+                'message' => 'No username provided'
+            ], 400);
         }
+
+        $result = $this->playerShipService->getAccountIdByUsername($username);
+
+        return response()->json($result);
     }
 }
