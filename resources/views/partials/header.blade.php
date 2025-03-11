@@ -1,19 +1,36 @@
 <script>
-    // Check if user is logged in by checking localStorage
-    window.onload = function() {
+    // Check login state immediately and on DOM content loaded
+    function updateLoginState() {
         const userName = localStorage.getItem('user_name');
-
-        if (userName) {
+        const loginLink = document.getElementById('loginLink');
+        const loggedSection = document.getElementById('loggedSection');
+        const userNameElement = document.getElementById('userName');
+        
+        if (userName && loginLink && loggedSection && userNameElement) {
             // If user is logged in, display their name
-            document.getElementById('userName').textContent = userName;
-            document.getElementById('loginLink').style.display = 'none'; // Hide login link
-            document.getElementById('loggedSection').style.display = 'block'; // Show logout link
+            userNameElement.textContent = userName;
+            loginLink.style.display = 'none'; // Hide login link
+            loggedSection.style.display = 'block'; // Show logout link
+            console.log('User is logged in as:', userName);
         } else {
-            // If user is not logged in, show the login link
-            document.getElementById('loginLink').style.display = 'block';
-            document.getElementById('loggedSection').style.display = 'none';
+            // If user is not logged in or elements not found yet
+            if (loginLink) loginLink.style.display = 'block';
+            if (loggedSection) loggedSection.style.display = 'none';
         }
+    }
 
+    // Run immediately if elements exist
+    updateLoginState();
+    
+    // Also run when DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', updateLoginState);
+    
+    // Keep original onload but call our function first
+    window.onload = function() {
+        // Update login state first
+        updateLoginState();
+        
+        // Rest of your existing code
         const searchInput = document.getElementById("playerSearch");
         const resultsContainer = document.getElementById("results");
         const wargamingId = "746553739e1c6e051e8d4fa24671ac01"; // Fetch from Laravel config
@@ -183,7 +200,7 @@
     }
     
     function logout() {
-    // Get the server the user logged in from
+    // Get the server the user logged in from and preserve it
     const server = localStorage.getItem('server') || 'eu';
     
     // Clear localStorage first (so logout works even if API call fails)
@@ -202,13 +219,13 @@
         .then(response => response.json())
         .then(data => {
             console.log('Logout successful');
-            // Redirect to home page to refresh state
-            window.location.href = '/';
+            // Redirect to server setup route to ensure server is properly set in session
+            window.location.href = `/server/${server}`;
         })
         .catch(error => {
             console.error('Error during logout:', error);
-            // Still redirect even if API call fails
-            window.location.href = '/';
+            // Still redirect to server setup route even if API call fails
+            window.location.href = `/server/${server}`;
         });
 }
 

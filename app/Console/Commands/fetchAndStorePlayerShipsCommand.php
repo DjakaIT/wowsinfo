@@ -26,9 +26,6 @@ class fetchAndStorePlayerShipsCommand extends Command
             // Call the PlayerShipController's method
             app(PlayerShipController::class)->updatePlayerShips();
 
-            app(PlayerShipController::class)->cachePlayerStatistics();
-            app(PlayerShipController::class)->cacheTopPlayers();
-
 
             $logger->info('FetchPlayerShipsCommand executed successfully.');
             $this->info("Players' ships data fetched and stored successfully.");
