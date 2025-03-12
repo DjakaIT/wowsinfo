@@ -493,13 +493,21 @@ class PlayerShipService
 
     public function fetchAndStoreOverallPlayerStats()
     {
-        // Get global list of player IDs (from clan_members in this example)
-        $playerIds = ClanMember::pluck('account_id')->unique()->all();
+        // Get clan member IDs
+        $clanMemberIds = ClanMember::pluck('account_id')->all();
+
+        // Get player IDs from PlayerShip table (self-searching players)
+        $selfSearchPlayerIds = PlayerShip::pluck('account_id')->all();
+
+        // Combine and remove duplicates
+        $playerIds = array_unique(array_merge($clanMemberIds, $selfSearchPlayerIds));
+
         if (empty($playerIds)) {
             Log::info("No player ids found for overall stats update.");
             return false;
         }
 
+        Log::info("total player count: ", ['players_count' => count($playerIds)]);
         $batchSize = 100; // API allows up to 100 accounts per request
 
         // Loop through each server so that no server is skipped
@@ -803,7 +811,14 @@ class PlayerShipService
         Log::info('Starting fetchAndStorePlayerShips');
 
         try {
-            $playerIds = ClanMember::pluck('account_id')->all();
+            // Get clan member IDs
+            $clanMemberIds = ClanMember::pluck('account_id')->all();
+
+            // Get player IDs from PlayerShip table (self-searching players)
+            $selfSearchPlayerIds = PlayerShip::pluck('account_id')->all();
+
+            // Combine and remove duplicates
+            $playerIds = array_unique(array_merge($clanMemberIds, $selfSearchPlayerIds));
             if (empty($playerIds)) {
                 Log::info("No player ids found in database");
                 return false;
