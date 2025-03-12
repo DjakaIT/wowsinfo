@@ -200,32 +200,30 @@
     }
     
     function logout() {
-    // Get the server the user logged in from and preserve it
-    const server = localStorage.getItem('server') || 'eu';
+    // Get and validate the server BEFORE clearing localStorage
+    const rawServer = localStorage.getItem('server') || 'eu';
+    const validServer = ['eu', 'na', 'asia'].includes(rawServer.toLowerCase()) ? rawServer.toLowerCase() : 'eu';
     
-    // Clear localStorage first (so logout works even if API call fails)
+    // Store the validated server in a cookie that won't be cleared with localStorage
+    document.cookie = `last_valid_server=${validServer}; path=/; max-age=60`;
+    
+    // Clear localStorage items
     localStorage.removeItem('access_token');
     localStorage.removeItem('user_name');
     localStorage.removeItem('account_id');
     localStorage.removeItem('expires_at');
     localStorage.removeItem('server');
     
-    // Determine the correct API domain
-    const apiDomain = server === 'na' ? 'com' : (server === 'asia' ? 'asia' : 'eu');
-    const accessToken = localStorage.getItem('access_token') || '';
+    // Get the current locale
+    const locale = "{{ app()->getLocale() }}";
     
-    // Call the Wargaming API with the correct domain
-    fetch(`https://api.worldoftanks.${apiDomain}/wot/auth/logout/?application_id=746553739e1c6e051e8d4fa24671ac01&access_token=${accessToken}`)
+    // Call the Wargaming API
+    fetch(`https://api.worldofwarships.${validServer === 'na' ? 'com' : (validServer === 'asia' ? 'asia' : 'eu')}/wot/auth/logout/?application_id=746553739e1c6e051e8d4fa24671ac01&access_token=`)
         .then(response => response.json())
-        .then(data => {
-            console.log('Logout successful');
-            // Redirect to server setup route to ensure server is properly set in session
-            window.location.href = `/server/${server}`;
-        })
-        .catch(error => {
-            console.error('Error during logout:', error);
-            // Still redirect to server setup route even if API call fails
-            window.location.href = `/server/${server}`;
+        .catch(error => console.error('Error during logout:', error))
+        .finally(() => {
+            // Hard redirect to the home route with explicit server parameter
+            window.location.href = `/${locale}/${validServer}`;
         });
 }
 

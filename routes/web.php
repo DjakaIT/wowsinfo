@@ -117,6 +117,8 @@ Route::view('/contact', 'contact', [
 
 //Server
 Route::get('/server/{server}', function ($server) {
+    $validServer = in_array(strtolower($server), ['eu', 'na', 'asia']) ? strtolower($server) : 'eu';
+
     $currentUrl = url()->previous();
     $locale = app()->getLocale();
 
@@ -128,7 +130,7 @@ Route::get('/server/{server}', function ($server) {
     }
 
     // Otherwise use the old behavior
-    session(['server' => $server]);
+    session(['server' => $validServer]);
     return redirect()->back();
 });
 
