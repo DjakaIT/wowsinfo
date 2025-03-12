@@ -493,14 +493,13 @@ class PlayerShipService
 
     public function fetchAndStoreOverallPlayerStats()
     {
+        // Get player IDs from PlayerShip table (self-searching players)
+        $selfSearchPlayerIds = PlayerShip::pluck('account_id')->all();
         // Get clan member IDs
         $clanMemberIds = ClanMember::pluck('account_id')->all();
 
-        // Get player IDs from PlayerShip table (self-searching players)
-        $selfSearchPlayerIds = PlayerShip::pluck('account_id')->all();
-
         // Combine and remove duplicates
-        $playerIds = array_unique(array_merge($clanMemberIds, $selfSearchPlayerIds));
+        $playerIds = array_unique(array_merge($selfSearchPlayerIds, $clanMemberIds));
 
         if (empty($playerIds)) {
             Log::info("No player ids found for overall stats update.");
@@ -546,6 +545,18 @@ class PlayerShipService
                         ]);
                         continue;
                     }
+
+                    if (isset($accountData['last_battle_time'])) {
+                        $cutoffTime = now()->subDays(40)->timestamp;
+                        if ($accountData['last_battle_time'] < $cutoffTime) {
+                            Log::info("Skipping inactive player overall stats", [
+                                'account_id' => $accountId,
+                                'last_battle_time' => date('Y-m-d', $accountData['last_battle_time'])
+                            ]);
+                            continue;
+                        }
+                    }
+
                     $pvp = $accountData['statistics']['pvp'];
                     $updates[] = [
                         'account_id'       => $accountId,
@@ -811,14 +822,15 @@ class PlayerShipService
         Log::info('Starting fetchAndStorePlayerShips');
 
         try {
-            // Get clan member IDs
-            $clanMemberIds = ClanMember::pluck('account_id')->all();
 
             // Get player IDs from PlayerShip table (self-searching players)
             $selfSearchPlayerIds = PlayerShip::pluck('account_id')->all();
+            // Get clan member IDs
+            $clanMemberIds = ClanMember::pluck('account_id')->all();
+
 
             // Combine and remove duplicates
-            $playerIds = array_unique(array_merge($clanMemberIds, $selfSearchPlayerIds));
+            $playerIds = array_unique(array_merge($selfSearchPlayerIds, $clanMemberIds));
             if (empty($playerIds)) {
                 Log::info("No player ids found in database");
                 return false;
@@ -880,6 +892,23 @@ class PlayerShipService
                     'player_name' => $playerName
                 ]);
                 return false;
+            }
+
+            // Check if player has played recently
+            $mostRecentBattleTime = 0;
+            foreach ($playerShipsData as $shipStats) {
+                $mostRecentBattleTime = max($mostRecentBattleTime, $shipStats['last_battle_time'] ?? 0);
+            }
+
+            // Skip if player hasn't played in the last 40 days
+            $cutoffTime = now()->subDays(40)->timestamp;
+            if ($mostRecentBattleTime < $cutoffTime) {
+                Log::info("Skipping inactive player (no battles in last 40 days)", [
+                    'player_id' => $playerId,
+                    'player_name' => $playerName,
+                    'last_battle_time' => date('Y-m-d', $mostRecentBattleTime)
+                ]);
+                return true; // Return true so the process continues, just skips this player
             }
 
             $processedShipsCount = 0;
