@@ -1,4 +1,3 @@
-
 @extends('layout.layout')
 
 @section('metaTitle', $metaSite['metaTitle'])
@@ -7,15 +6,68 @@
 
 @section('content')
 <script>
-        document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
         const userName = localStorage.getItem('user_name');
+        const updateButton = document.getElementById('updateStatsButton');
+        let countdownInterval;
+        
         if (userName) {
             // If user is logged in, display their name
             document.getElementById('userNameDashboard').textContent = userName;
         }
         
+        // Check if button should be disabled due to rate limiting
+        function checkRateLimit() {
+            const lastUpdateTime = localStorage.getItem('lastStatsUpdate');
+            
+            if (lastUpdateTime) {
+                const now = new Date().getTime();
+                const timeSinceLastUpdate = now - parseInt(lastUpdateTime);
+                const waitTime = 5 * 60 * 1000; // 5 minutes in milliseconds
+                
+                if (timeSinceLastUpdate < waitTime) {
+                    // Calculate remaining time
+                    const remainingTime = Math.ceil((waitTime - timeSinceLastUpdate) / 1000);
+                    
+                    // Disable button and show countdown
+                    updateButton.disabled = true;
+                    updateCountdown(remainingTime);
+                    
+                    return true; // Rate limited
+                }
+            }
+            
+            return false; // Not rate limited
+        }
+        
+        // Update countdown on button
+        function updateCountdown(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            
+            updateButton.innerHTML = `{{ __("dashboard_update") }} (${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds})`;
+            
+            if (seconds > 0) {
+                // Schedule next countdown update
+                clearTimeout(countdownInterval);
+                countdownInterval = setTimeout(() => updateCountdown(seconds - 1), 1000);
+            } else {
+                // Reset when countdown is done
+                updateButton.disabled = false;
+                updateButton.innerHTML = '{{ __("dashboard_update") }}';
+            }
+        }
+        
+        // Check rate limit when page loads
+        checkRateLimit();
+        
         // Add event listener for update button
-        document.getElementById('updateStatsButton').addEventListener('click', function() {
+        updateButton.addEventListener('click', function() {
+            // If already rate limited, don't proceed
+            if (checkRateLimit()) {
+                return;
+            }
+            
             // Get current URL and extract username if on a player page
             const currentPath = window.location.pathname;
             // Check if we're on a player page
@@ -36,7 +88,7 @@
             }
             
             // Show loading indicator
-            this.innerHTML = '{{ __("dashboard_updating") }}...';
+            this.innerHTML = 'Updating...';
             this.disabled = true;
             
             fetch('/api/player/lookup', {
@@ -71,14 +123,19 @@
             })
             .then(response => response.json())
             .then(data => {
-                this.innerHTML = '{{ __("dashboard_update") }}';
-                this.disabled = false;
+                // Save the update timestamp in localStorage
+                localStorage.setItem('lastStatsUpdate', new Date().getTime());
+                
+                // Start the cooldown
+                checkRateLimit();
+                
+                // Show success message
                 alert(data.message);
             })
             .catch(error => {
                 console.error('Error:', error);
-                this.innerHTML = '{{ __("dashboard_update") }}';
-                this.disabled = false;
+                updateButton.innerHTML = '{{ __("dashboard_update") }}';
+                updateButton.disabled = false;
                 alert('Error updating player stats: ' + error.message);
             });
         });
