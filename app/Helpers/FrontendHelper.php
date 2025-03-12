@@ -8,11 +8,15 @@ class FrontendHelper
 
   public static function formatDamage($damage, $server)
   {
+    if ($damage === '-' || $damage === null) return '-';
+
+    $damage = floatval($damage); // Ensure it's a number
+
     if ($server === 'NA') {
-      // For NA: use comma as thousands separator (example)
+      // For NA: use comma as thousands separator
       return number_format($damage, 2, '.', ',');
-    } elseif ($server === 'ASIA' or $server === 'EU') {
-      // For ASIA: use period as thousand separator and comma as decimal separator (example)
+    } else {
+      // Default for all other servers including EU and ASIA
       return number_format($damage, 2, ',', '.');
     }
   }

@@ -182,7 +182,7 @@ class PlayerShipController extends Controller
             ], 400);
         }
 
-        $result = $this->playerShipService->getAccountIdByUsername($username);
+        $result = $this->playerShipService->updatePlayerStats($username);
 
         return response()->json($result);
     }

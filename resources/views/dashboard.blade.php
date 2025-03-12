@@ -7,7 +7,7 @@
 
 @section('content')
 <script>
-    window.onload = function() {
+        document.addEventListener('DOMContentLoaded', function() {
         const userName = localStorage.getItem('user_name');
         if (userName) {
             // If user is logged in, display their name
@@ -82,7 +82,7 @@
                 alert('Error updating player stats: ' + error.message);
             });
         });
-    }
+    });
 </script>
 <div class="home page-padding">
     <div class="container">
