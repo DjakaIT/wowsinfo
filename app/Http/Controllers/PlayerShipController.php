@@ -9,6 +9,7 @@ use App\Services\ClanService;
 use App\Services\PlayerService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class PlayerShipController extends Controller
 {
@@ -122,31 +123,24 @@ class PlayerShipController extends Controller
     // Ovo bi trebalo u kontroler za homepage ili statistiku
     public function getHomePageStats()
     {
-
-        $topPlayersLast24Hours = $this->playerShipService->getTopPlayersLast24Hours();
-        $topPlayersLast7Days = $this->playerShipService->getTopPlayersLast7Days();
-        $topPlayersLastMonth = $this->playerShipService->getTopPlayersLastMonth();
-        $topPlayersOverall = $this->playerShipService->getTopPlayersOverall();
-        $topClans = $this->clanService->getTopClans();
-
-        $metaTitle = 'WN8 - Player statistics in World of Warships';
-        $metaDescription = 'This page provide you with latest information on World of Warships players and clans, WN8 stats, improvement with daily updates.';
-        $metaKeywords = 'WN8, World of Warships, Statistics, Player statistics';
+        // Use a single cache key for all homepage statistics
+        $statistics = Cache::remember('homepage_statistics', now()->addHour(), function () {
+            return [
+                'topPlayersLast24Hours' => $this->playerShipService->getTopPlayersLast24Hours(),
+                'topPlayersLast7Days' => $this->playerShipService->getTopPlayersLast7Days(),
+                'topPlayersLastMonth' => $this->playerShipService->getTopPlayersLastMonth(),
+                'topPlayersOverall' => $this->playerShipService->getTopPlayersOverall(),
+                'topClans' => $this->clanService->getTopClans(),
+            ];
+        });
 
         return view('home', [
             'metaSite' => [
-                'metaTitle' => $metaTitle,
-                'metaDescription' => $metaDescription,
-                'metaKeywords' => $metaKeywords,
+                'metaTitle' => __('seo_home_title'),
+                'metaDescription' => __('seo_home_content'),
+                'metaKeywords' => __('seo_home_keywords')
             ],
-            'statistics' => [
-                'topPlayersLast24Hours' => $topPlayersLast24Hours,
-                'topPlayersLast7Days' => $topPlayersLast7Days,
-                'topPlayersLastMonth' => $topPlayersLastMonth,
-                'topPlayersOverall' => $topPlayersOverall,
-                'topClans' => $topClans,
-
-            ],
+            'statistics' => $statistics
         ]);
     }
 
