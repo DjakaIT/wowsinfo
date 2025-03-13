@@ -86,6 +86,17 @@ class PlayerShipController extends Controller
         $playerStatisticsLastMonth = $this->playerShipService->getPlayerStatsLastMonth($account_id);
         $playerStatisticsOverall = $this->playerShipService->getPlayerStatsOverall($name, $account_id);
 
+        if ($playerStatisticsLastWeek['battles'] === null || $playerStatisticsLastWeek['battles'] === '-') {
+            Log::info("Weekly stats empty for player {$account_id}, using daily stats instead");
+            $playerStatisticsLastWeek = $playerStatisticsLastDay;
+        }
+
+        // Check if monthly stats are empty (null battles) and use weekly stats as fallback
+        if ($playerStatisticsLastMonth['battles'] === null || $playerStatisticsLastMonth['battles'] === '-') {
+            Log::info("Monthly stats empty for player {$account_id}, using weekly stats instead");
+            $playerStatisticsLastMonth = $playerStatisticsLastWeek;
+        }
+
 
         $playerStatistics = [
             'lastDay' => $playerStatisticsLastDay,

@@ -11,7 +11,7 @@
 <div class="container">
 	<div class="row mb-20 mt-30">
 		<div class="col">
-			<iframe src="https://api.wn8.info/tools/wows/twitchlive.php" title="description" class="tw-frame"></iframe>
+			<iframe src="https://api.wn8.info/tools/wows/twitchlive.php" title="description" class="tw-frame" loading="lazy"></iframe>
 		</div>
 	</div>
 	<div class="row mb-20">
@@ -129,7 +129,7 @@
 	</div>
 	<div class="row mb-20">
 		<div class="col">
-		<iframe src="https://api.wn8.info/tools/wows/ytvids.php" title="description" class="yt-frame"></iframe>
+		<iframe src="https://api.wn8.info/tools/wows/ytvids.php" title="description" class="yt-frame" loading="lazy"></iframe>
 		</div>
 	</div>
 	<div class="row mb-10">
