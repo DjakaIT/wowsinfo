@@ -491,88 +491,197 @@ class PlayerShipService
         Log::info("Completed player name update. Remaining null names: $remainingNull");
     }
 
+
     public function fetchAndStoreOverallPlayerStats()
     {
-        // Get player IDs from PlayerShip table (self-searching players)
-        $selfSearchPlayerIds = PlayerShip::pluck('account_id')->all();
-        // Get clan member IDs
-        $clanMemberIds = ClanMember::pluck('account_id')->all();
+        try {
+            // Get players from each server's table - using uppercase table names
+            $euPlayers = DB::table('Player_EU')->pluck('account_id')->unique()->all();
+            $naPlayers = DB::table('Player_NA')->pluck('account_id')->unique()->all();
+            $asiaPlayers = DB::table('Player_ASIA')->pluck('account_id')->unique()->all();
+            $selfSearchPlayerIds = PlayerShip::distinct()->pluck('account_id')->all();
 
-        // Combine and remove duplicates
-        $playerIds = array_unique(array_merge($selfSearchPlayerIds, $clanMemberIds));
+            // Remove players from region tables from self-search to avoid duplicates
+            $selfSearchPlayerIds = array_diff($selfSearchPlayerIds, $euPlayers, $naPlayers, $asiaPlayers);
 
-        if (empty($playerIds)) {
-            Log::info("No player ids found for overall stats update.");
+            Log::info("Overall stats - Player counts by source", [
+                'eu' => count($euPlayers),
+                'na' => count($naPlayers),
+                'asia' => count($asiaPlayers),
+                'self_search' => count($selfSearchPlayerIds)
+            ]);
+
+            // Define server-specific pools and their corresponding endpoint
+            $serverPools = [
+                'eu' => $euPlayers,
+                'na' => $naPlayers,
+                'asia' => $asiaPlayers
+            ];
+
+            $batchSize = 100; // API allows up to 100 accounts per request
+
+            // CHANGED ORDER: Process self-search players first - try all endpoints
+            if (!empty($selfSearchPlayerIds)) {
+                Log::info("Processing self-search players for overall stats", ['count' => count($selfSearchPlayerIds)]);
+
+                // Process players in batches of 100
+                foreach (array_chunk($selfSearchPlayerIds, $batchSize) as $batchIndex => $batch) {
+                    $batchProcessed = false;
+
+                    // Try each server endpoint until we get a successful response
+                    foreach ($this->baseUrls as $serverKey => $baseUrl) {
+                        $overallUrl = $baseUrl . "/wows/account/info/";
+                        $idsString = implode(',', $batch);
+
+                        $response = Http::get($overallUrl, [
+                            'application_id' => $this->apiKey,
+                            'account_id' => $idsString,
+                        ]);
+
+                        if ($response->successful()) {
+                            $data = $response->json();
+
+                            if (isset($data['data']) && !empty($data['data'])) {
+                                Log::info("Processing self-search batch {$batchIndex} on {$serverKey}", [
+                                    'batch_size' => count($batch)
+                                ]);
+
+                                $this->processOverallStats($data, $serverKey);
+                                $batchProcessed = true;
+                                break; // Exit server loop once processed
+                            }
+                        }
+
+                        // Short delay to prevent rate limiting
+                        usleep(10000); // 10ms
+                    }
+
+                    if (!$batchProcessed) {
+                        Log::warning("Could not find overall stats for self-search batch", [
+                            'batch_index' => $batchIndex,
+                            'player_count' => count($batch)
+                        ]);
+                    }
+                }
+            }
+
+            // THEN process players from each server using the appropriate endpoint
+            foreach ($serverPools as $serverKey => $players) {
+                if (empty($players)) {
+                    Log::info("No players from {$serverKey} server to process for overall stats");
+                    continue;
+                }
+
+                $baseUrl = $this->baseUrls[$serverKey];
+                $overallUrl = $baseUrl . "/wows/account/info/";
+
+                Log::info("Processing {$serverKey} players for overall stats", ['count' => count($players)]);
+
+                // Process in batches of 100 players
+                foreach (array_chunk($players, $batchSize) as $batchIndex => $batch) {
+                    $idsString = implode(',', $batch);
+
+                    $response = Http::get($overallUrl, [
+                        'application_id' => $this->apiKey,
+                        'account_id' => $idsString,
+                    ]);
+
+                    if ($response->successful()) {
+                        $data = $response->json();
+
+                        if (isset($data['data']) && !empty($data['data'])) {
+                            Log::info("Processing {$serverKey} batch {$batchIndex}", [
+                                'batch_size' => count($batch)
+                            ]);
+
+                            $this->processOverallStats($data, $serverKey);
+                        } else {
+                            Log::warning("No data returned for {$serverKey} batch", [
+                                'batch_index' => $batchIndex
+                            ]);
+                        }
+                    } else {
+                        Log::error("Failed to fetch overall stats for {$serverKey} batch", [
+                            'batch_index' => $batchIndex,
+                            'status' => $response->status(),
+                            'response' => $response->body()
+                        ]);
+                    }
+
+                    // Add a small delay to prevent rate limiting
+                    usleep(10000); // 10ms
+                }
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error("Error in fetchAndStoreOverallPlayerStats", [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             return false;
         }
+    }
 
-        Log::info("total player count: ", ['players_count' => count($playerIds)]);
-        $batchSize = 100; // API allows up to 100 accounts per request
+    // Helper method to process overall stats API response data
+    private function processOverallStats($data, $serverKey)
+    {
+        if (!isset($data['data']) || !is_array($data['data'])) {
+            Log::warning("Overall stats API returned invalid data structure", [
+                'server' => $serverKey
+            ]);
+            return;
+        }
 
-        // Loop through each server so that no server is skipped
-        foreach ($this->baseUrls as $serverKey => $baseUrl) {
-            $overallUrl = $baseUrl . "/wows/account/info/";
-            foreach (array_chunk($playerIds, $batchSize) as $batch) {
-                $idsString = implode(',', $batch);
-                $response = Http::get($overallUrl, [
-                    'application_id' => $this->apiKey,
-                    'account_id' => $idsString,
+        // Build batch updates array
+        $updates = [];
+        $updateCount = 0;
+
+        foreach ($data['data'] as $accountId => $accountData) {
+            // Skip invalid data structure
+            if (!isset($accountData['statistics']['pvp'])) {
+                Log::warning("Overall stats for account $accountId not in expected format", [
+                    'server' => strtoupper($serverKey)
                 ]);
+                continue;
+            }
 
-                if (!$response->successful()) {
-                    Log::error("Overall stats API request failed", [
-                        'server' => strtoupper($serverKey),
-                        'account_ids' => $idsString,
-                        'status' => $response->status(),
-                        'response' => $response->body()
-                    ]);
+            // Skip inactive players
+            if (isset($accountData['last_battle_time'])) {
+                $cutoffTime = now()->subDays(40)->timestamp;
+                if ($accountData['last_battle_time'] < $cutoffTime) {
                     continue;
                 }
+            }
 
-                $data = $response->json();
-                if (!isset($data['data']) || !is_array($data['data'])) {
-                    Log::warning("Overall stats API returned no data", ['response' => $data]);
-                    continue;
-                }
+            // Update player name if available
+            if (isset($accountData['nickname'])) {
+                $playerName = $accountData['nickname'];
+                PlayerShip::where('account_id', $accountId)
+                    ->whereNull('player_name')
+                    ->update(['player_name' => $playerName]);
+            }
 
-                // Build updates from the response
-                $updates = [];
-                foreach ($data['data'] as $accountId => $accountData) {
-                    if (!isset($accountData['statistics']['pvp'])) {
-                        Log::warning("Overall stats for account $accountId not in expected format", [
-                            'server' => strtoupper($serverKey),
-                            'data' => $accountData
-                        ]);
-                        continue;
-                    }
+            $pvp = $accountData['statistics']['pvp'];
+            $updates[] = [
+                'account_id'       => $accountId,
+                'battles_overall'  => $pvp['battles'] ?? 0,
+                'survived_overall' => $pvp['survived_battles'] ?? 0,
+                'wins_count_overall' => $pvp['wins'] ?? 0,
+                'damage_overall'   => $pvp['damage_dealt'] ?? 0,
+                'defended_overall' => $pvp['dropped_capture_points'] ?? 0,
+                'captured_overall' => $pvp['capture_points'] ?? 0,
+                'xp_overall'       => $pvp['xp'] ?? 0,
+                'spotted_overall'  => $pvp['ships_spotted'] ?? 0,
+                'frags_overall'    => $pvp['frags'] ?? 0,
+            ];
 
-                    if (isset($accountData['last_battle_time'])) {
-                        $cutoffTime = now()->subDays(40)->timestamp;
-                        if ($accountData['last_battle_time'] < $cutoffTime) {
-                            Log::info("Skipping inactive player overall stats", [
-                                'account_id' => $accountId,
-                                'last_battle_time' => date('Y-m-d', $accountData['last_battle_time'])
-                            ]);
-                            continue;
-                        }
-                    }
+            $updateCount++;
+        }
 
-                    $pvp = $accountData['statistics']['pvp'];
-                    $updates[] = [
-                        'account_id'       => $accountId,
-                        'battles_overall'  => $pvp['battles'] ?? 0,
-                        'survived_overall' => $pvp['survived_battles'] ?? 0,
-                        'wins_count_overall' => $pvp['wins'] ?? 0,
-                        'damage_overall'   => $pvp['damage_dealt'] ?? 0,
-                        'defended_overall' => $pvp['dropped_capture_points'] ?? 0,
-                        'captured_overall' => $pvp['capture_points'] ?? 0,
-                        'xp_overall'       => $pvp['xp'] ?? 0,
-                        'spotted_overall'  => $pvp['ships_spotted'] ?? 0,
-                        'frags_overall' => $pvp['frags'] ?? 0,
-                    ];
-                }
-
-                // Update the database for each account in this batch.
+        // Perform batch update using transactions for better performance
+        if (!empty($updates)) {
+            DB::transaction(function () use ($updates) {
                 foreach ($updates as $updateData) {
                     DB::table('player_ships')
                         ->where('account_id', $updateData['account_id'])
@@ -587,11 +696,14 @@ class PlayerShipService
                             'xp_overall'       => $updateData['xp_overall'],
                             'spotted_overall'  => $updateData['spotted_overall'],
                         ]);
-                    Log::info("Updated overall stats for account {$updateData['account_id']} on server " . strtoupper($serverKey));
                 }
-            }
+            });
+
+            Log::info("Batch updated overall stats", [
+                'server' => strtoupper($serverKey),
+                'updated_count' => $updateCount
+            ]);
         }
-        return true;
     }
 
 
