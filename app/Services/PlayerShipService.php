@@ -595,218 +595,6 @@ class PlayerShipService
     }
 
 
-    public function fetchAndStorePlayerShipsBoth()
-    {
-
-
-        try {
-            $this->loadExpectedValues();
-        } catch (\Exception $e) {
-            Log::error("Failed to load expected values", [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            throw new \Exception("Failed to initialize: " . $e->getMessage());
-        }
-
-        Log::info('Starting fetchAndStorePlayerShips');
-
-        try {
-            $playerIds = ClanMember::pluck('account_id')->all();
-            if (empty($playerIds)) {
-                Log::info("No player ids found in database");
-                return false;
-            }
-
-            Log::info("Data loaded", ['players_count' => count($playerIds)]);
-            foreach ($this->baseUrls as $serverKey => $baseUrl) {
-
-                $url = $baseUrl . "/wows/ships/stats/";
-
-                foreach ($playerIds as $playerId) {
-
-
-                    $response = Http::get($url, [
-                        'application_id' => $this->apiKey,
-                        'account_id' => $playerId,
-                        'extra' => 'pvp_solo,pvp_div2,pvp_div3'
-                    ]);
-
-                    if ($response->successful()) {
-                        $data = $response->json();
-
-                        $playerName = ClanMember::where('account_id', $playerId)->value('account_name');
-
-
-
-                        if (isset($data['data'][$playerId])) {
-                            foreach ($data['data'][$playerId] as $shipStats) {
-                                // Find the ship using ship_id from the API
-                                $ship = WikiVehicles::where('ship_id', $shipStats['ship_id'])->first();
-
-                                if (!$ship) {
-                                    Log::warning("Ship not found in database", [
-                                        'api_ship_id' => $shipStats['ship_id'],
-                                        'player_id' => $playerId
-                                    ]);
-                                    continue;
-                                }
-
-
-                                //extract stats from ships table 
-                                $shipName = $ship->name ?? 'Unknown ship name';
-                                $shipType = $ship->type ?? 'Unknown ship type';
-                                $shipTier = $ship->tier ?? 'Unknown ship tier';
-                                $shipNation = $ship->nation ?? 'Unkown nation';
-
-
-                                // Extract statistics for different battle types
-                                $pvpStats = [];
-
-
-                                if (isset($shipStats['pvp'])) {
-                                    $pvpStats = $this->extractBattleStats($shipStats, 'pvp');
-                                }
-
-
-
-
-                                // Calculate total battles
-                                $totalBattles = ($pvpStats['battles'] ?? 0);
-
-
-                                // Calculate total damage
-                                $totalDamageDealt = ($pvpStats['damage_dealt'] ?? 0);
-
-
-                                $averageDamage = $totalBattles > 0 ? $totalDamageDealt / $totalBattles : 0;
-
-                                //calculate total wins
-                                $totalWins = ($pvpStats['wins'] ?? 0);
-
-                                //calculate total frags
-                                $totalFrags = ($pvpStats['frags'] ?? 0);
-
-
-                                $totalXp = ($pvpStats['xp'] ?? 0);
-
-
-                                $totalCapture = ($pvpStats['capture_points'] ?? 0);
-
-                                $totalDefend = ($pvpStats['dropped_capture_points'] ?? 0);
-
-                                $totalSpotted = ($pvpStats['ships_spotted'] ?? 0);
-
-                                // Calculate survival rate
-                                $totalSurvivedBattles = ($pvpStats['survived_battles'] ?? 0) + ($pveStats['survived_battles'] ?? 0) + ($clubStats['survived_battles'] ?? 0) + ($rankStats['survived_battles'] ?? 0);
-                                $survivalRate = $totalBattles > 0 ? ($totalSurvivedBattles / $totalBattles) * 100 : 0;
-
-                                //wn8
-                                $wn8 =  $this->calculateWN8($ship, $totalBattles, $totalFrags, $totalWins, $totalDamageDealt);
-                                //pr
-                                $pr = $this->calculatePR($ship, $totalBattles, $totalFrags, $totalWins, $totalDamageDealt);
-                                $pr = $pr != null ? $pr : 0;
-                                Log::info("Processing ship for player", [
-                                    'player_id' => $playerId,
-                                    'ship_id' => $ship->ship_id,
-                                    'ship_name' => $ship->name,
-                                    'ship_nation' => $ship->nation,
-                                    'spotted' => $totalSpotted,
-                                    'capture' => $totalCapture,
-                                    'defend' => $totalDefend,
-                                    'xp' => $totalXp,
-                                ]);
-
-                                PlayerShip::updateOrCreate(
-                                    [
-                                        'account_id' => $playerId,
-                                        'ship_id' => $shipStats['ship_id']
-                                    ],
-                                    [
-                                        'player_name' => $playerName,
-                                        'battles_played' => $totalBattles,
-                                        'last_battle_time' => $shipStats['last_battle_time'],
-                                        'wins_count' => $totalWins,
-                                        'damage_dealt' => $totalDamageDealt,
-                                        'average_damage' => $averageDamage,
-                                        'frags' => $totalFrags,
-                                        'survival_rate' => $survivalRate,
-                                        'xp' => $totalXp,
-                                        'ship_name' => $shipName,
-                                        'ship_type' => $shipType,
-                                        'ship_tier' => $shipTier,
-                                        'ship_nation' => $shipNation,
-                                        'distance' => $shipStats['distance'],
-                                        'wn8' => $wn8,
-                                        'pr' => $pr,
-                                        'capture' => $totalCapture,
-                                        'defend' => $totalDefend,
-                                        'spotted' => $totalSpotted,
-                                        // PVE stats
-                                        'pve_battles' => $pveStats['battles'] ?? 0,
-                                        'pve_wins' => $pveStats['wins'] ?? 0,
-                                        'pve_frags' => $pveStats['frags'] ?? 0,
-                                        'pve_xp' => $pveStats['xp'] ?? 0,
-                                        'pve_survived_battles' => $pveStats['survived_battles'] ?? 0,
-                                        // PVP stats
-                                        'pvp_battles' => $pvpStats['battles'] ?? 0,
-                                        'pvp_wins' => $pvpStats['wins'] ?? 0,
-                                        'pvp_frags' => $pvpStats['frags'] ?? 0,
-                                        'pvp_xp' => $pvpStats['xp'] ?? 0,
-                                        'pvp_survived_battles' => $pvpStats['survived_battles'] ?? 0,
-                                        // Club stats
-                                        'club_battles' => $clubStats['battles'] ?? 0,
-                                        'club_wins' => $clubStats['wins'] ?? 0,
-                                        'club_frags' => $clubStats['frags'] ?? 0,
-                                        'club_xp' => $clubStats['xp'] ?? 0,
-                                        'club_survived_battles' => $clubStats['survived_battles'] ?? 0,
-                                        //Rank stats
-                                        'rank_battles' => $rankStats['battles'] ?? 0,
-                                        'rank_wins' => $rankStats['wins'] ?? 0,
-                                        'rank_frags' => $rankStats['frags'] ?? 0,
-                                        'rank_xp' => $rankStats['xp'] ?? 0,
-                                        'rank_survived_battles' => $rankStats['survived_battles'] ?? 0,
-                                    ]
-                                );
-                            }
-                            Log::info("Successfully updated/created player ship record", [
-                                'player_id' => $playerId,
-                                'ship_id' => $shipStats['ship_id'],
-                            ]);
-
-                            $finalTotalWN8 = $this->totalPlayerWN8($playerId);
-                            $finalTotalPR = $this->totalPlayerPR($playerId);
-
-                            // Update ALL ships for this player with the consistent values
-                            DB::table('player_ships')
-                                ->where('account_id', $playerId)
-                                ->update([
-                                    'total_player_wn8' => $finalTotalWN8,
-                                    'total_player_pr' => $finalTotalPR
-                                ]);
-                        }
-                    } else {
-                        Log::error("Failed to fetch player ships", [
-                            'account_id' => $playerId,
-                            'status' => $response->status(),
-                            'response' => $response->body()
-                        ]);
-                    }
-                }
-            }
-
-
-
-            return true;
-        } catch (\Exception $e) {
-            Log::error("Error in fetchAndStorePlayerShips", [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            throw $e;
-        }
-    }
-
     public function fetchAndStorePlayerShips()
     {
         try {
@@ -1271,46 +1059,28 @@ class PlayerShipService
 
     public function getPlayerVehicleData($account_id, $name)
     {
-        $playerVehicles = PlayerShip::select(
-            'ship_name as name',
-            'ship_nation as nation',
-            'ship_type as type',
-            'ship_tier as tier',
-            'battles_played as battles',
-            DB::raw('CASE WHEN battles_played > 0 THEN ROUND((frags / battles_played), 2) ELSE 0 END as frags'),
-            'average_damage as damage',  // plain value from column
-            DB::raw('CASE WHEN battles_played > 0 THEN ROUND((wins_count / battles_played) * 100, 2) ELSE 0 END as wins'),
-            DB::raw('CASE WHEN battles_played > 0 THEN CEIL(pvp_xp / battles_played) ELSE 0 END as xp'),
-            'wn8 as wn8'
-        )
-            ->where('account_id', $account_id)
-            ->where('player_name', $name)
-            ->where('battles_played', '>', 0)
-            ->orderBy('battles_played', 'desc')
-            ->get()
-            ->map(function ($vehicle) {
-                return [
-                    'name' => $vehicle->name,
-                    'nation' => $vehicle->nation,
-                    'type' => $vehicle->type,
-                    'tier' => $vehicle->tier,
-                    'battles' => $vehicle->battles,
-                    'frags' => $vehicle->frags,
-                    'damage' => $vehicle->damage,
-                    'xp' => $vehicle->xp,
-                    'wins' => $vehicle->wins,
-                    'wn8' => $vehicle->wn8,
-                ];
-            })
-            ->toArray();
-        if (!$playerVehicles) {
-            Log::warning("Player vehicle info not found", ['account_id' => $account_id, 'name' => $name]);
-            return [];
-        }
+        $cacheKey = "player_vehicles_{$account_id}";
 
-        Log::info("Fetched vehicle for player $account_id", ['player vehicle data: ' => $playerVehicles]);
-
-        return $playerVehicles;
+        return Cache::remember($cacheKey, now()->addHours(1), function () use ($account_id, $name) {
+            return PlayerShip::select(
+                'ship_name as name',
+                'ship_nation as nation',
+                'ship_type as type',
+                'ship_tier as tier',
+                'battles_played as battles',
+                DB::raw('ROUND(frags / NULLIF(battles_played, 0), 2) as frags'),
+                'average_damage as damage',
+                DB::raw('ROUND((wins_count / NULLIF(battles_played, 0)) * 100, 2) as wins'),
+                DB::raw('CEIL(pvp_xp / NULLIF(battles_played, 0)) as xp'),
+                'wn8 as wn8'
+            )
+                ->where('account_id', $account_id)
+                ->where('player_name', $name)
+                ->where('battles_played', '>', 0)
+                ->orderBy('battles_played', 'desc')
+                ->get()
+                ->toArray();
+        });
     }
 
     public function fetchSinglePlayerStats($name, $accountId)
