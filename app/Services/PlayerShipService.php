@@ -595,6 +595,25 @@ class PlayerShipService
     }
 
 
+    private function getExistingPlayerName($accountId)
+    {
+        // Check PlayerShip table first
+        $playerName = PlayerShip::where('account_id', $accountId)
+            ->whereNotNull('player_name')
+            ->value('player_name');
+
+        if ($playerName) {
+            return $playerName;
+        }
+
+        // Check ClanMember table if no name found
+        $clanMemberName = DB::table('clan_members')
+            ->where('account_id', $accountId)
+            ->value('account_name');
+
+        return $clanMemberName ?: null;
+    }
+
     public function fetchAndStorePlayerShips()
     {
         try {
@@ -610,28 +629,84 @@ class PlayerShipService
         Log::info('Starting fetchAndStorePlayerShips');
 
         try {
+            // Get players from each server's table - using uppercase table names
+            $euPlayers = DB::table('Player_EU')->pluck('account_id')->unique()->all();
+            $naPlayers = DB::table('Player_NA')->pluck('account_id')->unique()->all();
+            $asiaPlayers = DB::table('Player_ASIA')->pluck('account_id')->unique()->all();
+            $selfSearchPlayerIds = PlayerShip::distinct()->pluck('account_id')->all();
 
-            // Get player IDs from PlayerShip table (self-searching players)
-            $selfSearchPlayerIds = PlayerShip::pluck('account_id')->all();
-            // Get clan member IDs
-            $clanMemberIds = ClanMember::pluck('account_id')->all();
+            // Remove players from region tables from self-search to avoid duplicates
+            $selfSearchPlayerIds = array_diff($selfSearchPlayerIds, $euPlayers, $naPlayers, $asiaPlayers);
 
+            Log::info("Player counts by source", [
+                'eu' => count($euPlayers),
+                'na' => count($naPlayers),
+                'asia' => count($asiaPlayers),
+                'self_search' => count($selfSearchPlayerIds)
+            ]);
 
-            // Combine and remove duplicates
-            $playerIds = array_unique(array_merge($selfSearchPlayerIds, $clanMemberIds));
-            if (empty($playerIds)) {
-                Log::info("No player ids found in database");
-                return false;
+            // Define server-specific pools and their corresponding endpoint
+            $serverPools = [
+                'eu' => $euPlayers,
+                'na' => $naPlayers,
+                'asia' => $asiaPlayers
+            ];
+
+            // CHANGED ORDER: Process self-search players first - try all endpoints
+            if (!empty($selfSearchPlayerIds)) {
+                Log::info("Processing self-search players", ['count' => count($selfSearchPlayerIds)]);
+
+                foreach ($selfSearchPlayerIds as $playerId) {
+                    $processed = false;
+
+                    // Try each server endpoint
+                    foreach ($this->baseUrls as $serverKey => $baseUrl) {
+                        $url = $baseUrl . "/wows/ships/stats/";
+
+                        $response = Http::get($url, [
+                            'application_id' => $this->apiKey,
+                            'account_id' => $playerId,
+                            'extra' => 'pvp_solo,pvp_div2,pvp_div3'
+                        ]);
+
+                        if ($response->successful() && isset($response->json()['data'][$playerId])) {
+                            $data = $response->json();
+                            $playerName = PlayerShip::where('account_id', $playerId)->value('player_name');
+
+                            $this->StorePlayerShips($playerId, $playerName, $data['data'][$playerId]);
+                            $processed = true;
+                            Log::info("Self-search player processed successfully", [
+                                'player_id' => $playerId,
+                                'server' => $serverKey
+                            ]);
+                            break; // Exit the server loop once we've found data
+                        }
+
+                        // Add a small delay between requests
+                        usleep(50000);
+                    }
+
+                    if (!$processed) {
+                        Log::warning("Could not find data for self-search player on any server", [
+                            'player_id' => $playerId
+                        ]);
+                    }
+                }
             }
 
-            Log::info("Data loaded", ['players_count' => count($playerIds)]);
-            foreach ($this->baseUrls as $serverKey => $baseUrl) {
+            // THEN process players from each server using the appropriate endpoint
+            foreach ($serverPools as $serverKey => $players) {
+                if (empty($players)) {
+                    Log::info("No players from {$serverKey} server to process");
+                    continue;
+                }
 
+                $baseUrl = $this->baseUrls[$serverKey];
                 $url = $baseUrl . "/wows/ships/stats/";
 
-                foreach ($playerIds as $playerId) {
+                Log::info("Processing {$serverKey} players", ['count' => count($players)]);
 
-
+                foreach ($players as $playerId) {
                     $response = Http::get($url, [
                         'application_id' => $this->apiKey,
                         'account_id' => $playerId,
@@ -641,25 +716,34 @@ class PlayerShipService
                     if ($response->successful()) {
                         $data = $response->json();
 
-                        $playerName = ClanMember::where('account_id', $playerId)->value('account_name');
-                        Log::info("Processing player", ['player_id' => $playerId, 'player_name' => $playerName]);
+                        // For server tables, we initially set playerName to null
+                        // The getNullNamePlayersNames method will fill these in later
+                        $playerName = $this->getExistingPlayerName($playerId);
+
+                        Log::info("Processing player", ['player_id' => $playerId, 'server' => $serverKey]);
+
                         if (isset($data['data'][$playerId])) {
                             $this->StorePlayerShips($playerId, $playerName, $data['data'][$playerId]);
                         } else {
                             Log::warning("No ship data found for player", [
                                 'player_id' => $playerId,
-                                'player_name' => $playerName
+                                'server' => $serverKey
                             ]);
                         }
                     } else {
                         Log::error("Failed to fetch player ships", [
                             'account_id' => $playerId,
+                            'server' => $serverKey,
                             'status' => $response->status(),
                             'response' => $response->body()
                         ]);
                     }
+
+                    // Add a small delay to prevent rate limiting
+                    usleep(10); // 10ms
                 }
             }
+
             return true;
         } catch (\Exception $e) {
             Log::error("Error in fetchAndStorePlayerShips", [
@@ -669,7 +753,6 @@ class PlayerShipService
             throw $e;
         }
     }
-
 
     public function StorePlayerShips($playerId, $playerName, $playerShipsData)
     {
@@ -699,9 +782,19 @@ class PlayerShipService
                 return true; // Return true so the process continues, just skips this player
             }
 
+            // Prepare batch insert/update data
+            $batchData = [];
+            $shipIds = [];
             $processedShipsCount = 0;
+            $lastBattleTime = 0;
 
+            // First pass: collect data and calculate metrics
             foreach ($playerShipsData as $shipStats) {
+                // Skip ships with no data
+                if (empty($shipStats) || !isset($shipStats['ship_id'])) {
+                    continue;
+                }
+
                 // Find the ship using ship_id from the API
                 $ship = WikiVehicles::where('ship_id', $shipStats['ship_id'])->first();
 
@@ -712,6 +805,9 @@ class PlayerShipService
                     ]);
                     continue;
                 }
+
+                // Track ship IDs for later batch update
+                $shipIds[] = $shipStats['ship_id'];
 
                 // Extract stats from ships table 
                 $shipName = $ship->name ?? 'Unknown ship name';
@@ -744,6 +840,11 @@ class PlayerShipService
                 // Calculate total battles
                 $totalBattles = ($pvpStats['battles'] ?? 0);
 
+                // Skip if no battles
+                if ($totalBattles <= 0) {
+                    continue;
+                }
+
                 // Calculate total damage
                 $totalDamageDealt = ($pvpStats['damage_dealt'] ?? 0);
                 $averageDamage = $totalBattles > 0 ? $totalDamageDealt / $totalBattles : 0;
@@ -766,67 +867,115 @@ class PlayerShipService
                 $pr = $this->calculatePR($ship, $totalBattles, $totalFrags, $totalWins, $totalDamageDealt);
                 $pr = $pr !== null ? $pr : 0;
 
-                PlayerShip::updateOrCreate(
-                    [
-                        'account_id' => $playerId,
-                        'ship_id' => $shipStats['ship_id']
-                    ],
-                    [
-                        'player_name' => $playerName,
-                        'battles_played' => $totalBattles,
-                        'last_battle_time' => $shipStats['last_battle_time'],
-                        'wins_count' => $totalWins,
-                        'damage_dealt' => $totalDamageDealt,
-                        'average_damage' => $averageDamage,
-                        'frags' => $totalFrags,
-                        'survival_rate' => $survivalRate,
-                        'xp' => $totalXp,
-                        'ship_name' => $shipName,
-                        'ship_type' => $shipType,
-                        'ship_tier' => $shipTier,
-                        'ship_nation' => $shipNation,
-                        'distance' => $shipStats['distance'] ?? 0,
-                        'wn8' => $wn8,
-                        'pr' => $pr,
-                        'capture' => $totalCapture,
-                        'defend' => $totalDefend,
-                        'spotted' => $totalSpotted,
-                        // PVE stats
-                        'pve_battles' => $pveStats['battles'] ?? 0,
-                        'pve_wins' => $pveStats['wins'] ?? 0,
-                        'pve_frags' => $pveStats['frags'] ?? 0,
-                        'pve_xp' => $pveStats['xp'] ?? 0,
-                        'pve_survived_battles' => $pveStats['survived_battles'] ?? 0,
-                        // PVP stats
-                        'pvp_battles' => $pvpStats['battles'] ?? 0,
-                        'pvp_wins' => $pvpStats['wins'] ?? 0,
-                        'pvp_frags' => $pvpStats['frags'] ?? 0,
-                        'pvp_xp' => $pvpStats['xp'] ?? 0,
-                        'pvp_survived_battles' => $pvpStats['survived_battles'] ?? 0,
-                        // Club stats
-                        'club_battles' => $clubStats['battles'] ?? 0,
-                        'club_wins' => $clubStats['wins'] ?? 0,
-                        'club_frags' => $clubStats['frags'] ?? 0,
-                        'club_xp' => $clubStats['xp'] ?? 0,
-                        'club_survived_battles' => $clubStats['survived_battles'] ?? 0,
-                        //Rank stats
-                        'rank_battles' => $rankStats['battles'] ?? 0,
-                        'rank_wins' => $rankStats['wins'] ?? 0,
-                        'rank_frags' => $rankStats['frags'] ?? 0,
-                        'rank_xp' => $rankStats['xp'] ?? 0,
-                        'rank_survived_battles' => $rankStats['survived_battles'] ?? 0,
-                    ]
-                );
+                // Keep track of most recent battle
+                $lastBattleTime = max($lastBattleTime, $shipStats['last_battle_time'] ?? 0);
+
+                // Add to batch data array
+                $batchData[] = [
+                    'account_id' => $playerId,
+                    'player_name' => $playerName,
+                    'ship_id' => $shipStats['ship_id'],
+                    'battles_played' => $totalBattles,
+                    'last_battle_time' => $shipStats['last_battle_time'],
+                    'wins_count' => $totalWins,
+                    'damage_dealt' => $totalDamageDealt,
+                    'average_damage' => $averageDamage,
+                    'frags' => $totalFrags,
+                    'survival_rate' => $survivalRate,
+                    'xp' => $totalXp,
+                    'ship_name' => $shipName,
+                    'ship_type' => $shipType,
+                    'ship_tier' => $shipTier,
+                    'ship_nation' => $shipNation,
+                    'distance' => $shipStats['distance'] ?? 0,
+                    'wn8' => $wn8,
+                    'pr' => $pr,
+                    'capture' => $totalCapture,
+                    'defend' => $totalDefend,
+                    'spotted' => $totalSpotted,
+                    'pve_battles' => $pveStats['battles'] ?? 0,
+                    'pve_wins' => $pveStats['wins'] ?? 0,
+                    'pve_frags' => $pveStats['frags'] ?? 0,
+                    'pve_xp' => $pveStats['xp'] ?? 0,
+                    'pve_survived_battles' => $pveStats['survived_battles'] ?? 0,
+                    'pvp_battles' => $pvpStats['battles'] ?? 0,
+                    'pvp_wins' => $pvpStats['wins'] ?? 0,
+                    'pvp_frags' => $pvpStats['frags'] ?? 0,
+                    'pvp_xp' => $pvpStats['xp'] ?? 0,
+                    'pvp_survived_battles' => $pvpStats['survived_battles'] ?? 0,
+                    'club_battles' => $clubStats['battles'] ?? 0,
+                    'club_wins' => $clubStats['wins'] ?? 0,
+                    'club_frags' => $clubStats['frags'] ?? 0,
+                    'club_xp' => $clubStats['xp'] ?? 0,
+                    'club_survived_battles' => $clubStats['survived_battles'] ?? 0,
+                    'rank_battles' => $rankStats['battles'] ?? 0,
+                    'rank_wins' => $rankStats['wins'] ?? 0,
+                    'rank_frags' => $rankStats['frags'] ?? 0,
+                    'rank_xp' => $rankStats['xp'] ?? 0,
+                    'rank_survived_battles' => $rankStats['survived_battles'] ?? 0,
+                    'updated_at' => now()->toDateTimeString(),
+                ];
 
                 $processedShipsCount++;
             }
 
             if ($processedShipsCount > 0) {
-                // Update the total WN8 and PR for this player
+                // Batch update using upsert operation
+                DB::transaction(function () use ($batchData, $playerId) {
+                    // Using upsert to insert or update records in batch
+                    PlayerShip::upsert(
+                        $batchData,
+                        ['account_id', 'ship_id'], // Unique key combination
+                        [ // Fields to update if record exists
+                            'player_name',
+                            'battles_played',
+                            'last_battle_time',
+                            'wins_count',
+                            'damage_dealt',
+                            'average_damage',
+                            'frags',
+                            'survival_rate',
+                            'xp',
+                            'ship_name',
+                            'ship_type',
+                            'ship_tier',
+                            'ship_nation',
+                            'distance',
+                            'wn8',
+                            'pr',
+                            'capture',
+                            'defend',
+                            'spotted',
+                            'pve_battles',
+                            'pve_wins',
+                            'pve_frags',
+                            'pve_xp',
+                            'pve_survived_battles',
+                            'pvp_battles',
+                            'pvp_wins',
+                            'pvp_frags',
+                            'pvp_xp',
+                            'pvp_survived_battles',
+                            'club_battles',
+                            'club_wins',
+                            'club_frags',
+                            'club_xp',
+                            'club_survived_battles',
+                            'rank_battles',
+                            'rank_wins',
+                            'rank_frags',
+                            'rank_xp',
+                            'rank_survived_battles',
+                            'updated_at'
+                        ]
+                    );
+                });
+
+                // Calculate and update player totals ONCE after all ships are processed
                 $finalTotalWN8 = $this->totalPlayerWN8($playerId);
                 $finalTotalPR = $this->totalPlayerPR($playerId);
 
-                // Update ALL ships for this player with the consistent values
+                // Batch update all ships with player totals
                 DB::table('player_ships')
                     ->where('account_id', $playerId)
                     ->update([
@@ -834,7 +983,7 @@ class PlayerShipService
                         'total_player_pr' => $finalTotalPR
                     ]);
 
-                Log::info("Successfully processed {$processedShipsCount} ships for player", [
+                Log::info("Successfully processed {$processedShipsCount} ships for player in batch", [
                     'player_id' => $playerId,
                     'player_name' => $playerName,
                     'total_wn8' => $finalTotalWN8,
