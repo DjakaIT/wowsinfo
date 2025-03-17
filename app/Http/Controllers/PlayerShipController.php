@@ -124,7 +124,7 @@ class PlayerShipController extends Controller
     public function getHomePageStats()
     {
         // Use a single cache key for all homepage statistics
-        $statistics = Cache::remember('homepage_statistics', now()->addHour(), function () {
+        $statistics = Cache::remember('homepage_statistics', now()->addHours(4), function () {
             return [
                 'topPlayersLast24Hours' => $this->playerShipService->getTopPlayersLast24Hours(),
                 'topPlayersLast7Days' => $this->playerShipService->getTopPlayersLast7Days(),

@@ -275,9 +275,9 @@ class PlayerShipService
         $stats7d = $this->getTopPlayersLast7Days();
         $stats30d = $this->getTopPlayersLastMonth();
 
-        Cache::put('stats_24h', $stats24h, now()->addDay());
-        Cache::put('stats_7d', $stats7d, now()->addWeek());
-        Cache::put('stats_30d', $stats30d, now()->addMonth());
+        Cache::put('stats_24h', $stats24h, now()->addHours());
+        Cache::put('stats_7d', $stats7d, now()->addDay());
+        Cache::put('stats_30d', $stats30d, now()->addDays(2));
     }
 
 
@@ -285,7 +285,7 @@ class PlayerShipService
     public function getTopPlayersLast24Hours()
     {
 
-        return Cache::remember('stats_24h', now()->addDay(), function () {
+        return Cache::remember('stats_24h', now()->addHours(4), function () {
             $last24Hours = now()->subHours(24);
 
             return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
@@ -311,7 +311,7 @@ class PlayerShipService
     public function getTopPlayersLast7Days()
     {
 
-        return Cache::remember('stats_7d', now()->addWeek(), function () {
+        return Cache::remember('stats_7d', now()->addDay(), function () {
             $last7days = now()->subDays(6);
 
             return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
@@ -336,7 +336,7 @@ class PlayerShipService
     public function getTopPlayersLastMonth()
     {
 
-        return Cache::remember('stats_30d', now()->addMonth(), function () {
+        return Cache::remember('stats_30d', now()->addDays(2), function () {
             $lastMonth = now()->subDays(25);
 
             return PlayerShip::select('account_id', DB::raw('MAX(player_name) as player_name'), DB::raw('MAX(total_player_wn8) as total_player_wn8'))
@@ -1135,7 +1135,7 @@ class PlayerShipService
             Log::info("Cache miss for key: {$cacheKey}. Computing and caching value.");
         }
 
-        return Cache::remember("stats_24h_{$account_id}", now()->addDay(), function () use ($account_id) {
+        return Cache::remember("stats_24h_{$account_id}", now()->addHours(8), function () use ($account_id) {
             Log::info("Cache value for key:", ["key" => "stats_24h_{$account_id}"]);
             $threshold = now()->subDay()->timestamp; // Convert to Unix timestamp
             $playerStatistics = PlayerShip::select(
@@ -1175,7 +1175,7 @@ class PlayerShipService
 
     public function getPlayerStatsLastWeek($account_id)
     {
-        return Cache::remember("stats_7d_{$account_id}", now()->addWeek(), function () use ($account_id) {
+        return Cache::remember("stats_7d_{$account_id}", now()->addDays(2), function () use ($account_id) {
             $threshold = now()->subWeek()->timestamp;
             $playerStatistics = PlayerShip::select(
                 DB::raw('SUM(battles_played) as battles'),
@@ -1214,7 +1214,7 @@ class PlayerShipService
 
     public function getPlayerStatsLastMonth($account_id)
     {
-        return Cache::remember("stats_30d_{$account_id}", now()->addMonth(), function () use ($account_id) {
+        return Cache::remember("stats_30d_{$account_id}", now()->addDays(4), function () use ($account_id) {
             $threshold = now()->subMonth()->timestamp;
             $playerStatistics = PlayerShip::select(
                 DB::raw('SUM(battles_played) as battles'),
@@ -1320,32 +1320,73 @@ class PlayerShipService
 
     public function getPlayerVehicleData($account_id, $name)
     {
-        $cacheKey = "player_vehicles_{$account_id}";
+        $playerVehicles = PlayerShip::select(
+            'ship_id',  // Add ship_id for grouping
+            'ship_name as name',
+            'ship_nation as nation',
+            'ship_type as type',
+            'ship_tier as tier',
+            'battles_played as battles',
+            DB::raw('CASE WHEN battles_played > 0 THEN ROUND((frags / battles_played), 2) ELSE 0 END as frags'),
+            'average_damage as damage',  // plain value from column
+            DB::raw('CASE WHEN battles_played > 0 THEN ROUND((wins_count / battles_played) * 100, 2) ELSE 0 END as wins'),
+            DB::raw('CASE WHEN battles_played > 0 THEN CEIL(pvp_xp / battles_played) ELSE 0 END as xp'),
+            'wn8 as wn8',
+            'last_battle_time'  // Add this for sorting by most recent
+        )
+            ->where('account_id', $account_id)
+            ->where('player_name', $name)
+            ->where('battles_played', '>', 0)
+            ->orderBy('last_battle_time', 'desc')  // Order by latest battle time first
+            ->get()
+            ->unique('ship_id')  // Filter out duplicates by ship_id
+            ->sortByDesc('battles')  // Now sort by battles as before
+            ->map(function ($vehicle) {
+                return [
+                    'name' => $vehicle->name,
+                    'nation' => $vehicle->nation,
+                    'type' => $vehicle->type,
+                    'tier' => $vehicle->tier,
+                    'battles' => $vehicle->battles,
+                    'frags' => $vehicle->frags,
+                    'damage' => $vehicle->damage,
+                    'xp' => $vehicle->xp,
+                    'wins' => $vehicle->wins,
+                    'wn8' => $vehicle->wn8,
+                ];
+            })
+            ->values()  // Re-index the array after filtering
+            ->toArray();
+        if (!$playerVehicles) {
+            Log::warning("Player vehicle info not found", ['account_id' => $account_id, 'name' => $name]);
+            return [];
+        }
 
-        return Cache::remember($cacheKey, now()->addHours(1), function () use ($account_id, $name) {
-            return PlayerShip::select(
-                'ship_name as name',
-                'ship_nation as nation',
-                'ship_type as type',
-                'ship_tier as tier',
-                'battles_played as battles',
-                DB::raw('ROUND(frags / NULLIF(battles_played, 0), 2) as frags'),
-                'average_damage as damage',
-                DB::raw('ROUND((wins_count / NULLIF(battles_played, 0)) * 100, 2) as wins'),
-                DB::raw('CEIL(pvp_xp / NULLIF(battles_played, 0)) as xp'),
-                'wn8 as wn8'
-            )
-                ->where('account_id', $account_id)
-                ->where('player_name', $name)
-                ->where('battles_played', '>', 0)
-                ->orderBy('battles_played', 'desc')
-                ->get()
-                ->toArray();
-        });
+        Log::info("Fetched vehicle for player $account_id", ['player vehicle data: ' => $playerVehicles]);
+
+        return $playerVehicles;
+    }
+
+
+    public function cleanUpPlayerData($account_id)
+    {
+        // Clear all database records
+        PlayerShip::where('account_id', $account_id)->delete();
+
+        // Clear all caches
+        Cache::forget("stats_24h_{$account_id}");
+        Cache::forget("stats_7d_{$account_id}");
+        Cache::forget("stats_30d_{$account_id}");
+
+        Log::info("Cleaned up all data for player", ['account_id' => $account_id]);
+        return true;
     }
 
     public function fetchSinglePlayerStats($name, $accountId)
     {
+
+        $this->cleanUpPlayerData($accountId);
+
         // Load expected values first - this is critical for WN8 calculations
         try {
             $this->loadExpectedValues();

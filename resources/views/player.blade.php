@@ -66,16 +66,24 @@
                     <tr class="border-b">
                         <td class="py-2 px-4">{{ __('t_player_3') }}</td>
                         <td class="py-2 px-4">
-                            {{ isset($playerStatistics['overall']['survived']) ? round($playerStatistics['overall']['survived'], 2) . '%' : '-' }}
+                            {{ isset($playerStatistics['overall']['survived']) && is_numeric($playerStatistics['overall']['survived']) 
+                                ? round($playerStatistics['overall']['survived'], 2) . '%' 
+                                : (isset($playerStatistics['overall']['survived']) ? $playerStatistics['overall']['survived'] : '-') }}
                         </td>
                         <td class="py-2 px-4">
-                            {{ isset($playerStatistics['lastDay']['survived']) ? round($playerStatistics['lastDay']['survived'], 2) . '%' : '-' }}
+                            {{ isset($playerStatistics['lastDay']['survived']) && is_numeric($playerStatistics['lastDay']['survived']) 
+                                ? round($playerStatistics['lastDay']['survived'], 2) . '%' 
+                                : (isset($playerStatistics['lastDay']['survived']) ? $playerStatistics['lastDay']['survived'] : '-') }}
                         </td>
                         <td class="py-2 px-4">
-                            {{ isset($playerStatistics['lastWeek']['survived']) ? round($playerStatistics['lastWeek']['survived'], 2) . '%' : '-' }}
+                            {{ isset($playerStatistics['lastWeek']['survived']) && is_numeric($playerStatistics['lastWeek']['survived']) 
+                                ? round($playerStatistics['lastWeek']['survived'], 2) . '%' 
+                                : (isset($playerStatistics['lastWeek']['survived']) ? $playerStatistics['lastWeek']['survived'] : '-') }}
                         </td>
                         <td class="py-2 px-4">
-                            {{ isset($playerStatistics['lastMonth']['survived']) ? round($playerStatistics['lastMonth']['survived'], 2) . '%' : '-' }}
+                            {{ isset($playerStatistics['lastMonth']['survived']) && is_numeric($playerStatistics['lastMonth']['survived']) 
+                                ? round($playerStatistics['lastMonth']['survived'], 2) . '%' 
+                                : (isset($playerStatistics['lastMonth']['survived']) ? $playerStatistics['lastMonth']['survived'] : '-') }}
                         </td>
                     <tr class="border-b">
                         <td class="py-2 px-4">{{ __('t_player_4') }}</td>
