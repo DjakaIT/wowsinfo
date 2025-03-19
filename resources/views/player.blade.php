@@ -52,7 +52,7 @@
                     <tr class="border-b">
                         <td class="py-2 px-4">{{ __('t_player_10') }}</td>
                         <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($playerStatistics['overall']['wins'] ?? 0) }}">{{ $playerStatistics['overall']['wins'] ?? '-' }}%</td>
-                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($playerStatistics['lastDay']['wins'] ?? 0) }}">{{ $playerStatistics['lastDay']['wins'] ?? '-' }}%</td>
+                        <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($playerStatistics['lastDay']['wins'] ?? 0) }}">{{ $playerStatistics['lastDay']['wins'] ?? '' }}%</td>
                         <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($playerStatistics['lastWeek']['wins'] ?? 0) }}">{{ $playerStatistics['lastWeek']['wins'] ?? '-' }}%</td>
                         <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWinColor($playerStatistics['lastMonth']['wins'] ?? 0) }}">{{ $playerStatistics['lastMonth']['wins'] ?? '-' }}%</td>
                     </tr>

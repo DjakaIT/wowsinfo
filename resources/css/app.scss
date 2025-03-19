@@ -17,6 +17,20 @@ $container-max-widths: (
   xl: 80%
 );
 
+.processing-container {
+  padding: 2rem;
+  border-radius: 8px;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+}
+
+.spinner-border {
+  color: #007bff;
+}
+
 .table{
   margin-bottom: 0;
 }
