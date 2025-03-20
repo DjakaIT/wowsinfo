@@ -1199,64 +1199,127 @@ class PlayerShipService
     public function getPlayerStatsLastDay($account_id)
     {
 
+        $cacheKey = "stats_24h_{$account_id}";
+        if (Cache::has($cacheKey)) {
+            Log::info("Cache hit for key: {$cacheKey}");
+        } else {
+            Log::info("Cache miss for key: {$cacheKey}. Computing and caching value.");
+        }
 
+        return Cache::remember("stats_24h_{$account_id}", now()->addDay(), function () use ($account_id) {
+            Log::info("Cache value for key:", ["key" => "stats_24h_{$account_id}"]);
+            $threshold = now()->subDay()->timestamp; // Convert to Unix timestamp
+            $playerStatistics = PlayerShip::select(
+                DB::raw('SUM(battles_played) as battles'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND((SUM(wins_count)/SUM(battles_played))*100,0) ELSE 0 END as wins'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND(SUM(ship_tier * battles_played)/SUM(battles_played),1) ELSE 0 END as tier'),
+                DB::raw('AVG(survival_rate) as survived'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(damage_dealt) / SUM(battles_played)) ELSE 0 END as damage'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(frags) / SUM(battles_played)) ELSE 0 END as frags'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(xp) / SUM(battles_played)) ELSE 0 END as xp'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(spotted) / SUM(battles_played)) ELSE 0 END as spotted'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(capture) / SUM(battles_played)) ELSE 0 END as capture'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(defend) / SUM(battles_played)) ELSE 0 END as defend'),
+                DB::raw('MAX(total_player_wn8) as wn8'),
+                DB::raw('MAX(total_player_pr) as pr')
+            )
+                ->where('account_id', $account_id)
+                ->where('last_battle_time', '>=', $threshold)
+                ->first();
 
-        $playerStatistics =  [
-            'battles'  => '-',
-            'wins'     => '-',
-            'tier'     => '-',
-            'survived' => '-',
-            'damage'   => '-',
-            'frags'    => '-',
-            'xp'       => '-',
-            'spotted'  => '-',
-            'capture'  => '-',
-            'defend'   => '-',
-            'wn8'      => '-',
-            'pr'       => '-'
-        ];
-
-        return $playerStatistics;
+            return $playerStatistics ? $playerStatistics->toArray() : [
+                'battles'  => '-',
+                'wins'     => '-',
+                'tier'     => '-',
+                'survived' => '-',
+                'damage'   => '-',
+                'frags'    => '-',
+                'xp'       => '-',
+                'spotted'  => '-',
+                'capture'  => '-',
+                'defend'   => '-',
+                'wn8'      => '-',
+                'pr'       => '-'
+            ];
+        });
     }
 
     public function getPlayerStatsLastWeek($account_id)
     {
-        $playerStatistics =  [
-            'battles'  => '-',
-            'wins'     => '-',
-            'tier'     => '-',
-            'survived' => '-',
-            'damage'   => '-',
-            'frags'    => '-',
-            'xp'       => '-',
-            'spotted'  => '-',
-            'capture'  => '-',
-            'defend'   => '-',
-            'wn8'      => '-',
-            'pr'       => '-'
-        ];
+        return Cache::remember("stats_7d_{$account_id}", now()->addWeek(), function () use ($account_id) {
+            $threshold = now()->subWeek()->timestamp;
+            $playerStatistics = PlayerShip::select(
+                DB::raw('SUM(battles_played) as battles'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND((SUM(wins_count)/SUM(battles_played))*100,0) ELSE 0 END as wins'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND(SUM(ship_tier * battles_played)/SUM(battles_played),1) ELSE 0 END as tier'),
+                DB::raw('AVG(survival_rate) as survived'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(damage_dealt) / SUM(battles_played)) ELSE 0 END as damage'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(frags) / SUM(battles_played)) ELSE 0 END as frags'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(xp) / SUM(battles_played)) ELSE 0 END as xp'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(spotted) / SUM(battles_played)) ELSE 0 END as spotted'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(capture) / SUM(battles_played)) ELSE 0 END as capture'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(defend) / SUM(battles_played)) ELSE 0 END as defend'),
+                DB::raw('MAX(total_player_wn8) as wn8'),
+                DB::raw('MAX(total_player_pr) as pr')
+            )
+                ->where('account_id', $account_id)
+                ->where('last_battle_time', '>=', $threshold)
+                ->first();
 
-        return $playerStatistics;
+            return $playerStatistics ? $playerStatistics->toArray() : [
+                'battles'  => '-',
+                'wins'     => '-',
+                'tier'     => '-',
+                'survived' => '-',
+                'damage'   => '-',
+                'frags'    => '-',
+                'xp'       => '-',
+                'spotted'  => '-',
+                'capture'  => '-',
+                'defend'   => '-',
+                'wn8'      => '-',
+                'pr'       => '-'
+            ];
+        });
     }
 
     public function getPlayerStatsLastMonth($account_id)
     {
-        $playerStatistics =  [
-            'battles'  => '-',
-            'wins'     => '-',
-            'tier'     => '-',
-            'survived' => '-',
-            'damage'   => '-',
-            'frags'    => '-',
-            'xp'       => '-',
-            'spotted'  => '-',
-            'capture'  => '-',
-            'defend'   => '-',
-            'wn8'      => '-',
-            'pr'       => '-'
-        ];
+        return Cache::remember("stats_30d_{$account_id}", now()->addMonth(), function () use ($account_id) {
+            $threshold = now()->subMonth()->timestamp;
+            $playerStatistics = PlayerShip::select(
+                DB::raw('SUM(battles_played) as battles'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND((SUM(wins_count)/SUM(battles_played))*100,0) ELSE 0 END as wins'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN ROUND(SUM(ship_tier * battles_played)/SUM(battles_played),1) ELSE 0 END as tier'),
+                DB::raw('AVG(survival_rate) as survived'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(damage_dealt) / SUM(battles_played)) ELSE 0 END as damage'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(frags) / SUM(battles_played)) ELSE 0 END as frags'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(xp) / SUM(battles_played)) ELSE 0 END as xp'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(spotted) / SUM(battles_played)) ELSE 0 END as spotted'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(capture) / SUM(battles_played)) ELSE 0 END as capture'),
+                DB::raw('CASE WHEN SUM(battles_played) > 0 THEN CEIL(SUM(defend) / SUM(battles_played)) ELSE 0 END as defend'),
+                DB::raw('MAX(total_player_wn8) as wn8'),
+                DB::raw('MAX(total_player_pr) as pr')
+            )
+                ->where('account_id', $account_id)
+                ->where('last_battle_time', '>=', $threshold)
+                ->first();
 
-        return $playerStatistics;
+            return $playerStatistics ? $playerStatistics->toArray() : [
+                'battles'  => '-',
+                'wins'     => '-',
+                'tier'     => '-',
+                'survived' => '-',
+                'damage'   => '-',
+                'frags'    => '-',
+                'xp'       => '-',
+                'spotted'  => '-',
+                'capture'  => '-',
+                'defend'   => '-',
+                'wn8'      => '-',
+                'pr'       => '-'
+            ];
+        });
     }
 
 

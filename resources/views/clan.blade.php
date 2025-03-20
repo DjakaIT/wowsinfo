@@ -20,8 +20,6 @@
         <thead>
             <tr class="bg-gray-100 text-left">
                 <th class="border-b">{{ __('nav_player') }}</th>
-                <th class="border-b" style="min-width: 150px">{{ __('wn8_last_month') }}</th>
-                <th class="border-b" style="min-width: 150px">{{ __('battles_last_month') }}</th>
                 <th class="border-b">WN8</th>
                 <th class="border-b" style="min-width: 100px">{{ __('win_rate') }}</th>
                 <th class="border-b">{{ __('t_player_1') }}</th>
@@ -47,8 +45,6 @@
                         {{ $member['name'] }}
                     @endif
                 </td>
-                <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($member['wn8Month']) }}">{{ $member['wn8Month'] }}</td>
-                <td class="py-2 px-4">{{ $member['battlesMonth'] }}</td>
                 <td class="py-2 px-4 {{ 'table-' . FrontendHelper::getWN8Color($member['wn8']) }}">{{ $member['wn8'] }}</td>
                 <td class="py-2 px-4">{{ $member['winRate'] }}</td>
                 <td class="py-2 px-4">{{ $member['battles'] }}</td>

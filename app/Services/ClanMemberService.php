@@ -174,48 +174,63 @@ class ClanMemberService
             Log::info("No members found for this clan", ['clan_id' => $clanId]);
         }
     }
-    public function getClanMemberdata($clanId)
+    public function getClanMemberData($clanId)
     {
-        $playerShipService = app(\App\Services\PlayerShipService::class);
+        Log::info("Fetching clan member data for clan_id: {$clanId}");
 
         $members = DB::table('clan_members')
-            ->leftJoin('player_ships', 'clan_members.account_id', '=', 'player_ships.account_id')
+            ->leftJoin('player_ships', function ($join) {
+                $join->on('clan_members.account_id', '=', 'player_ships.account_id');
+            })
             ->join('clans', 'clan_members.clan_id', '=', 'clans.clan_id')
             ->where('clan_members.clan_id', $clanId)
             ->select(
                 'clan_members.account_id',
                 'clan_members.account_name as player_name',
-                DB::raw('MAX(player_ships.total_player_wn8) as wn8'),
-                DB::raw('CASE WHEN SUM(player_ships.battles_played) > 0 THEN ROUND((SUM(player_ships.wins_count) / SUM(player_ships.battles_played))*100,0) ELSE 0 END as win_rate'),
-                DB::raw('SUM(player_ships.battles_played) as battles'),
+                DB::raw('COALESCE(MAX(player_ships.total_player_wn8), 0) as wn8'),
+                DB::raw('CASE WHEN SUM(player_ships.battles_played) > 0 THEN ROUND((SUM(player_ships.wins_count) / SUM(player_ships.battles_played))*100, 2) ELSE 0 END as win_rate'),
+                DB::raw('COALESCE(SUM(player_ships.battles_played), 0) as battles'),
                 DB::raw('MAX(player_ships.last_battle_time) as lastBattle'),
                 'clan_members.role as position',
                 'clan_members.joined_at as joined',
                 'clans.tag as fullname',
                 'clans.clan_description as description'
             )
-            ->groupBy('clan_members.account_id', 'clan_members.account_name', 'clan_members.role', 'clan_members.joined_at', 'clans.tag', 'clans.clan_description')
+            ->groupBy(
+                'clan_members.account_id',
+                'clan_members.account_name',
+                'clan_members.role',
+                'clan_members.joined_at',
+                'clans.tag',
+                'clans.clan_description'
+            )
             ->get();
+
+        Log::info("Found {$members->count()} members for clan_id: {$clanId}");
 
         $result = [];
 
         foreach ($members as $member) {
-            $lastMonthStats = $playerShipService->getPlayerStatsLastMonth($member->account_id);
             $formattedLastBattleTime = $member->lastBattle ? date('Y-m-d H:i:s', $member->lastBattle) : null;
+
             $result[] = [
+                'account_id'   => $member->account_id, // Adding account_id
                 'name'         => $member->player_name,
-                'wn8'          => $member->wn8,
-                'winRate'      => $member->win_rate,
-                'battles'      => $member->battles,
+                'wn8'          => $member->wn8 ?? 0,   // Ensure not null
+                'winRate'      => $member->win_rate ?? 0, // Ensure not null
+                'battles'      => $member->battles ?? 0,  // Ensure not null
                 'lastBattle'   => $formattedLastBattleTime,
                 'position'     => $member->position,
                 'joined'       => $member->joined,
-                'wn8Month'     => $lastMonthStats['wn8'] ?? '-',
-                'battlesMonth' => $lastMonthStats['battles'] ?? '-',
                 'fullName'     => $member->fullname,
-                'description' => $member->description
+                'description'  => $member->description
             ];
         }
+
+        // Debug logging to verify data
+        Log::debug("Clan member data results", [
+            'sample_member' => !empty($result) ? $result[0] : 'No members found'
+        ]);
 
         return $result;
     }
