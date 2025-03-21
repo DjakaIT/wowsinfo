@@ -8,12 +8,26 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const userName = localStorage.getItem('user_name');
+        const accountId = localStorage.getItem('account_id');
+        const server = localStorage.getItem('server') || 'eu';
         const updateButton = document.getElementById('updateStatsButton');
+        const userNameElement = document.getElementById('userNameDashboard');
         let countdownInterval;
         
-        if (userName) {
-            // If user is logged in, display their name
-            document.getElementById('userNameDashboard').textContent = userName;
+        if (userName && accountId) {
+            // Create a link to the player's page
+            const locale = "{{ app()->getLocale() }}";
+            const playerLink = document.createElement('a');
+            playerLink.href = `/${locale}/${server.toLowerCase()}/player/${userName}/${accountId}`;
+            playerLink.textContent = userName;
+            playerLink.classList.add('player-link');
+            
+            // Clear the span and append the link
+            userNameElement.innerHTML = '';
+            userNameElement.appendChild(playerLink);
+        } else if (userName) {
+            // If we have a username but no account ID, just show the name
+            userNameElement.textContent = userName;
         }
         
         // Check if button should be disabled due to rate limiting
@@ -145,7 +159,7 @@
     <div class="container">
       <div class="row">
         <div class="col-12" class="image-page">
-          <h1>{{ __('dashboard_welcome') }} <span id="userNameDashboard"></span></h1>
+          <h1>{{ __('dashboard_welcome') }} <span id="userNameDashboard" style="text-decoration: underline #0B5ED7; color: #004bbc;"></span></h1>
           <p>{{ __('dashboard_description') }}</p>
           <div>  <button id="updateStatsButton" 
             class="btn btn-primary" 
