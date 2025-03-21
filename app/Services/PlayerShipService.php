@@ -1760,4 +1760,61 @@ class PlayerShipService
             'message' => $shipsUpdated ? 'Your stats have been updated succesfully, please navigate to your stat page by search to check them out!' : 'Failed to update player stats'
         ];
     }
+
+
+    public function cleanupDuplicatePlayerShips()
+    {
+        $duplicatesFound = 0;
+        $duplicatesDeleted = 0;
+
+        try {
+            // First, identify duplicate records by account_id and ship_id
+            $duplicates = DB::table('player_ships')
+                ->select('account_id', 'ship_id', DB::raw('COUNT(*) as count'))
+                ->groupBy('account_id', 'ship_id')
+                ->having('count', '>', 1)
+                ->get();
+
+            $duplicatesFound = $duplicates->count();
+
+            Log::info("Found $duplicatesFound sets of duplicate player ships");
+
+            // For each set of duplicates, delete all but the newest record
+            foreach ($duplicates as $duplicate) {
+                // Get all the duplicate records
+                $records = PlayerShip::where('account_id', $duplicate->account_id)
+                    ->where('ship_id', $duplicate->ship_id)
+                    ->orderBy('updated_at', 'desc') // Sort by most recent first
+                    ->get();
+
+                // Keep the first record (newest) and delete the rest
+                $keepRecord = $records->shift(); // Remove and get the first item
+
+                // Delete all remaining records
+                foreach ($records as $record) {
+                    $record->delete();
+                    $duplicatesDeleted++;
+                }
+
+                Log::info("Kept newest record for player {$duplicate->account_id}, ship {$duplicate->ship_id}, deleted " . count($records) . " duplicates");
+            }
+
+            return [
+                'success' => true,
+                'duplicates_found' => $duplicatesFound,
+                'duplicates_deleted' => $duplicatesDeleted,
+                'message' => "Successfully cleaned up player ships: found $duplicatesFound sets of duplicates, deleted $duplicatesDeleted duplicate records"
+            ];
+        } catch (\Exception $e) {
+            Log::error("Error cleaning up duplicate player ships", [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return [
+                'success' => false,
+                'message' => "Error cleaning up duplicate ships: " . $e->getMessage()
+            ];
+        }
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\PlayerShipController;
+use App\Services\PlayerShipService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -25,7 +26,7 @@ class fetchAndStorePlayerShipsCommand extends Command
 
             // Call the PlayerShipController's method
             app(PlayerShipController::class)->updatePlayerShips();
-
+            app(PlayerShipService::class)->cleanupDuplicatePlayerShips();
 
             $logger->info('FetchPlayerShipsCommand executed successfully.');
             $this->info("Players' ships data fetched and stored successfully.");

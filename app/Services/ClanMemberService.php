@@ -60,8 +60,7 @@ class ClanMemberService
                     ]);
 
                     // Define the rate limiter key
-                    $rateLimitKey = "fetch-clan-batch:" . implode(',', $batch) . ":$serverKey";
-
+                    $rateLimitKey = "fetch-clan-batch:{$serverKey}";
                     // Attempt to fetch clan data with rate limiting
                     $executed = RateLimiter::attempt(
                         $rateLimitKey,
