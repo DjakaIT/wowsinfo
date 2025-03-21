@@ -35,7 +35,7 @@ Route::view('/login', 'login', [
         'metaDescription' => 'Login on wows.wn8.info',
         'metaKeywords' => 'WN8, World of Warships, Statistics, Player statistics, Login',
     ],
-]);
+])->name('login');
 Route::get('/verification', function (Request $request) {
     if ($request->query('status') === 'ok') {
 
